@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(rand()%7+1);
+        next.push(randBlock.getBlock());
     }
-    block = Block(rand()%7+1);
+    block = Block(randBlock.getBlock());
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -77,7 +77,7 @@ void Grid::placeBlock() {
 void Grid::generateBlock() {
     block = Block(next.front());
     next.pop();
-    next.push(rand()%7+1);
+    next.push(randBlock.getBlock());
 }
 
 const std::vector<int> Grid::checkRowComplete() const{

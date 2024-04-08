@@ -1,4 +1,5 @@
 #include "raylib.h"
+#include "RandomBlock.h"
 #include <vector>
 #include <ctime>
 #include <queue>
@@ -96,7 +97,9 @@ class Grid {
         Block block;
         //next blocks
         std::queue<int> next;
-
+        //used to get random blocks
+        RandomBlock randBlock = RandomBlock();
+        //our grid of placed blocks
         int grid[20][10];
         
 };

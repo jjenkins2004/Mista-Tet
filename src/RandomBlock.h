@@ -4,7 +4,7 @@
 
 struct RandomBlock {
     public:
-        //chooses from bag of 14 blocks
+        //chooses from bag of 7 blocks
         int getBlock();
 
     private:
