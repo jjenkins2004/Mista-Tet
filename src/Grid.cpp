@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(/*rand()%7+1*/1);
+        next.push(rand()%7+1);
     }
-    block = Block(/*rand()%7+1*/1);
+    block = Block(rand()%7+1);
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -46,6 +46,24 @@ void Grid::drawGrid(bool drawBlock) {
         for (int i = 0; i < 4; i++) {
             DrawRectangle(xpos+block.getPos()[i].first*gridsize, ypos+block.getPos()[i].second*gridsize, gridsize, gridsize, colors[block.getId()]);
         }
+        int dist = 0;
+        while (true) {
+            bool leave = false;
+            for (int i = 0; i < 4; i++) {
+                if (block.getPos()[i].second+dist == 19 || grid[block.getPos()[i].second+dist+1][block.getPos()[i].first] != 0) {
+                    leave = true;
+                    break;
+                }
+            }
+            if (leave) {
+                break;
+            } else {
+                dist++;
+            }
+        }
+        for (int i = 0; i < 4; i++) {
+            DrawRectangle(xpos+block.getPos()[i].first*gridsize, ypos+(block.getPos()[i].second+dist)*gridsize, gridsize, gridsize, Fade(colors[block.getId()], 0.5));
+        }
     }
 }
 
@@ -59,7 +77,7 @@ void Grid::placeBlock() {
 void Grid::generateBlock() {
     block = Block(next.front());
     next.pop();
-    next.push(/*rand()%7+1*/1);
+    next.push(rand()%7+1);
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
