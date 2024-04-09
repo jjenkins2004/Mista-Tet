@@ -64,8 +64,9 @@ int main() {
             if (checkRows) {
                 std::vector<int> rowsRemoved = grid.checkRowComplete();
                 if (!rowsRemoved.empty()) {
+                    counter = 0;
                     //removes our grid rows and fixes, if -1 is returned then program needs to exit
-                    if (grid.removeRow(rowsRemoved) == -1 || grid.fixRows(rowsRemoved[0]-1, rowsRemoved.size()) == -1) {
+                    if (grid.removeRow(rowsRemoved) == -1 || grid.fixRows(rowsRemoved) == -1) {
                         CloseWindow();
                         return 0;
                     }

@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(randBlock.getBlock());
+        next.push(/*randBlock.getBlock()*/1);
     }
-    block = Block(randBlock.getBlock());
+    block = Block(/*randBlock.getBlock()*/1);
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -77,7 +77,7 @@ void Grid::placeBlock() {
 void Grid::generateBlock() {
     block = Block(next.front());
     next.pop();
-    next.push(randBlock.getBlock());
+    next.push(/*randBlock.getBlock()*/1);
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
@@ -98,22 +98,25 @@ const std::vector<int> Grid::checkRowComplete() const{
 }
 
 int Grid::removeRow(std::vector<int>& rows) {
-    int animationCount = 0;
+    std::vector<int*> cells;
     bool first = true;
+    //adds every cell that we need to remove as an int* in the correct order
     for (int r: rows) {
         for (int i = 0; i < 10; i++) {
             grid[r][i] = 8;
+            cells.push_back(&grid[r][i]);
         }
     }
+    std::vector<int*>::iterator it = cells.begin();
     while(!WindowShouldClose()) {
         BeginDrawing();
             ClearBackground(BLACK);
-            if (!first && animationCount < rows.size()*10) {
-                grid[animationCount/10+rows[0]][animationCount%10] = 0;
-                animationCount++;
+            if (!first && it != cells.end()) {
+                **it = 0;
+                it++;
                 WaitTime(1/60);
-            } else if (animationCount == rows.size()*10) {
-                WaitTime(0.4);
+            } else if (it == cells.end()) {
+                WaitTime(0.3);
                 return 0;
             }
             this->drawGrid(false);
@@ -126,26 +129,63 @@ int Grid::removeRow(std::vector<int>& rows) {
     return -1;
 }
 
-int Grid::fixRows(int r, int movement) {
+int Grid::fixRows(std::vector<int> rows) {
+    //initial checks to see if any fixing is needed
+    bool leave = true;
+    if (rows[0] == 0) {
+        return 0;
+    }
+    for (int i = 0; i < 10; i++) {
+        if (grid[rows[0]-1][i] != 0) {
+            leave = false;
+            break;
+        }
+    }
+    if (leave) {
+        return 0;
+    }
+
+    /*****
+     * The logic is that we start from the lowest row removed (which is the last element of the removed rows vector), then 
+     * iterate through the removed rows vector, in order to find from which row we need to move all our tetris pieces down.
+     * However, this program also takes into account if the removed rows are not all together. For example, if rows 19 and 17
+     * were removed, then the program would first find row 18 as the start and move everything about row 18 down a distance of one.
+     * Then it would find row 17 (17 becuase we moved everything down one already) as a new starting 
+     * point (there is still a gap at row 18). Finally, it would fill this gap.
+    *****/
+    std::vector<int>::iterator it = rows.end();
+    int distance = 0;
+    int row;
     while(!WindowShouldClose()) {
+        if (distance == 0 && it != rows.begin()) {
+            it--;
+             while (it != rows.begin() && (*it - *(it-1)) == 1) {
+                it = it-1;
+                distance++;
+            }
+            row = (*it)-1;
+            distance++;
+        }
+        else if (distance == 0) {
+            WaitTime(0.15);
+            return 0;
+        }
+        for (int i = 0; i < rows.size(); i++) {
+            rows[i]+=distance;
+        }
+            
         BeginDrawing();
             ClearBackground(BLACK);
-            if (movement == 0) {
-                return 0;
-            }
-            for (int i = r; i >= 0; i--) {
+            for (int i = row; i >= 0; i--) {
                 for (int j = 0; j < 10; j++) {
                     grid[i+1][j] = grid[i][j];
                 }
             }
-            r++;
-            for (int i = 0; i < 10; i++) {
-                grid[0][i] = 0;
-            }
-            this->drawGrid(false);
-            WaitTime(0.15);
-            movement--;
+            distance--; row++;
+        drawGrid(false);
+        WaitTime(.15);
         EndDrawing();
+
     }
     return -1;
 }

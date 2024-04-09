@@ -37,12 +37,12 @@ class Grid {
         void placeBlock();
         void generateBlock();
 
-        //removes rows in parameter and plays animation to make it look cool!
+        //removes rows in argument and plays animation to make it look cool!
         int removeRow(std::vector<int>& rows);
         //returns which rows need to be removed in a vector
         const std::vector<int> checkRowComplete() const;
-        //fixes rows after row has been removed from parameter row up, int movement tells how many rows to move upper blocks down
-        int fixRows(int r, int movement);
+        //fixes rows after removal of rows in argument vector 
+        int fixRows(std::vector<int> rows);
 
         
         //the class that keeps track of the current moving block
