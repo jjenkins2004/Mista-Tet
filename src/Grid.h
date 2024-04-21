@@ -44,12 +44,16 @@ class Grid {
         //fixes rows after removal of rows in argument vector 
         int fixRows(std::vector<int> rows);
 
+        //game over
+        void gameOver() {
+            CloseWindow();
+        }
         
         //the class that keeps track of the current moving block
         class Block {
             public:
                 //creates a block based on given id
-                Block(int id);
+                Block(int id, int grid[20][10]);
                 Block() {};
 
                 //getters and setters
@@ -100,6 +104,6 @@ class Grid {
         //used to get random blocks
         RandomBlock randBlock = RandomBlock();
         //our grid of placed blocks
-        int grid[20][10];
+        int grid[21][10];
         
 };

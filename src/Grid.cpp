@@ -9,7 +9,7 @@
 
 Grid::Grid() {
     srand(time(NULL));
-    for (int i = 0; i < 20; i++) {
+    for (int i = 0; i < 21; i++) {
         for (int j = 0; j < 10; j++) {
             grid[i][j] = 0;
         }
@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(/*randBlock.getBlock()*/1);
+        next.push(randBlock.getBlock());
     }
-    block = Block(/*randBlock.getBlock()*/1);
+    block = Block(randBlock.getBlock(), grid);
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -32,11 +32,13 @@ void Grid::drawGrid(bool drawBlock) {
     DrawRectangle(xpos+10*gridsize, ypos, borderWidth, gridsize*20+borderWidth, borderColor);
     DrawRectangle(xpos-10, ypos+20*gridsize, 10*gridsize+2*borderWidth, borderWidth, borderColor);
 
-    //filling in 10x20 grid based on the 2d array and considering the skiped rows
-    for (int i = 0; i < 20; i++) {
+    //filling in 10x20 grid based on the 2d array
+    for (int i = 1; i < 21; i++) {
         for (int j = 0; j < 10; j++) {
             if (grid[i][j] != 0) {
-                DrawRectangle(xpos+j*gridsize, ypos+i*gridsize, gridsize, gridsize, colors[grid[i][j]]);
+                Rectangle rec; rec.x = xpos+j*gridsize; rec.y = ypos+i*gridsize; rec.width = gridsize; rec.height = gridsize;
+                DrawRectangleRec(rec, colors[grid[i][j]]);
+                DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.2));
             }
         }
     }
@@ -44,9 +46,17 @@ void Grid::drawGrid(bool drawBlock) {
     //drawing our block
     if (drawBlock) {
         for (int i = 0; i < 4; i++) {
-            DrawRectangle(xpos+block.getPos()[i].first*gridsize, ypos+block.getPos()[i].second*gridsize, gridsize, gridsize, colors[block.getId()]);
+            if (block.getPos()[i].second != 0) {
+                Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second-1)*gridsize;
+                rec.height = gridsize; rec.width = gridsize; 
+                DrawRectangleRec(rec, colors[block.getId()]);
+                DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.2));
+            }
         }
         int dist = 0;
+
+        //finds out how much distance between block and the ground or another block below it to figure out where to draw the
+        //the ghost block that shows where block is going
         while (true) {
             bool leave = false;
             for (int i = 0; i < 4; i++) {
@@ -62,27 +72,47 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
         for (int i = 0; i < 4; i++) {
-            DrawRectangle(xpos+block.getPos()[i].first*gridsize, ypos+(block.getPos()[i].second+dist)*gridsize, gridsize, gridsize, Fade(colors[block.getId()], 0.5));
+            Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second+dist)*gridsize;
+            rec.height = gridsize; rec.width = gridsize;
+            DrawRectangleRec(rec, Fade(colors[block.getId()], 0.5));
+            DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.1));
         }
     }
 }
 
 void Grid::placeBlock() {
+    bool lose = false;
     const std::pair<int, int>* pos = block.getPos();
     for (int i = 0; i < 4; i++) {
         grid[pos[i].second][pos[i].first] = block.getId();
+        if (pos[i].second == 1) {
+            lose = true;
+        }
+    }
+    if (lose) {
+        int counter = 0;
+        while (!WindowShouldClose()) {
+            BeginDrawing();
+                drawGrid(true);
+                counter++;
+                if (counter == 120) {
+                    break;
+                }
+            EndDrawing();
+        }
+        gameOver();
     }
 }
 
 void Grid::generateBlock() {
-    block = Block(next.front());
+    block = Block(next.front(), grid);
     next.pop();
-    next.push(/*randBlock.getBlock()*/1);
+    next.push(randBlock.getBlock());
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
     std::vector<int> rows;
-    for (int i = 0; i < 20; i++) {
+    for (int i = 1; i < 21; i++) {
         bool addRow = true;
         for (int j = 0; j < 10; j++) {
             if (grid[i][j] == 0) {
@@ -132,7 +162,7 @@ int Grid::removeRow(std::vector<int>& rows) {
 int Grid::fixRows(std::vector<int> rows) {
     //initial checks to see if any fixing is needed
     bool leave = true;
-    if (rows[0] == 0) {
+    if (rows[0] == 1) {
         return 0;
     }
     for (int i = 0; i < 10; i++) {
@@ -198,63 +228,70 @@ int Grid::fixRows(std::vector<int> rows) {
 *** START OF BLOCK CLASS 
 ******/
 
-Grid::Block::Block(int id): id(id), rotation(0) {
+Grid::Block::Block(int id, int grid[20][10]): id(id), rotation(0) {
 
     //I-block
     if (id == 1) {
-        pos[0] = std::make_pair(3, 1);
-        pos[1] = std::make_pair(4, 1);
-        pos[2] = std::make_pair(5, 1);
-        pos[3] = std::make_pair(6, 1);
+        pos[0] = std::make_pair(3, 2);
+        pos[1] = std::make_pair(4, 2);
+        pos[2] = std::make_pair(5, 2);
+        pos[3] = std::make_pair(6, 2);
     }
 
     //J-block
     else if (id == 2) {
-        pos[0] = std::make_pair(3, 0);
-        pos[1] = std::make_pair(3, 1);
-        pos[2] = std::make_pair(4, 1);
-        pos[3] = std::make_pair(5, 1);
+        pos[0] = std::make_pair(3, 1);
+        pos[1] = std::make_pair(3, 2);
+        pos[2] = std::make_pair(4, 2);
+        pos[3] = std::make_pair(5, 2);
 
     }
 
     //L-block
     else if (id == 3) {
-        pos[0] = std::make_pair(5, 0);
-        pos[1] = std::make_pair(5, 1);
-        pos[2] = std::make_pair(4, 1);
-        pos[3] = std::make_pair(3, 1);
+        pos[0] = std::make_pair(5, 1);
+        pos[1] = std::make_pair(5, 2);
+        pos[2] = std::make_pair(4, 2);
+        pos[3] = std::make_pair(3, 2);
     }
 
     //O-block
     else if (id == 4) {
-        pos[0] = std::make_pair(4, 0);
-        pos[1] = std::make_pair(4, 1);
-        pos[2] = std::make_pair(5, 1);
-        pos[3] = std::make_pair(5, 0);
+        pos[0] = std::make_pair(4, 1);
+        pos[1] = std::make_pair(4, 2);
+        pos[2] = std::make_pair(5, 2);
+        pos[3] = std::make_pair(5, 1);
     }
 
     //S-block
     else if (id == 5) {
-        pos[0] = std::make_pair(5, 0);
-        pos[1] = std::make_pair(4, 0);
-        pos[2] = std::make_pair(4, 1);
-        pos[3] = std::make_pair(3, 1);
+        pos[0] = std::make_pair(5, 1);
+        pos[1] = std::make_pair(4, 1);
+        pos[2] = std::make_pair(4, 2);
+        pos[3] = std::make_pair(3, 2);
     }
 
     //T-block
     else if (id == 6) {
-        pos[0] = std::make_pair(3, 1);
-        pos[1] = std::make_pair(4, 1);
-        pos[2] = std::make_pair(4, 0);
-        pos[3] = std::make_pair(5, 1);
+        pos[0] = std::make_pair(3, 2);
+        pos[1] = std::make_pair(4, 2);
+        pos[2] = std::make_pair(4, 1);
+        pos[3] = std::make_pair(5, 2);
     }
     
     //Z-block
     else if (id == 7) {
-        pos[0] = std::make_pair(4, 0);
-        pos[1] = std::make_pair(5, 0);
-        pos[2] = std::make_pair(5, 1);
-        pos[3] = std::make_pair(6, 1);
+        pos[0] = std::make_pair(4, 1);
+        pos[1] = std::make_pair(5, 1);
+        pos[2] = std::make_pair(5, 2);
+        pos[3] = std::make_pair(6, 2);
+    }
+
+    //see if we need to put the block one higher
+    if (checkVerticalCollision(grid)) {
+        for (int i = 0; i < 4; i++) {
+            pos[i].second--;
+        }
     }
 }
 
