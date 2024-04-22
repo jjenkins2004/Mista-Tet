@@ -53,7 +53,7 @@ class Grid {
         class Block {
             public:
                 //creates a block based on given id
-                Block(int id, int grid[20][10]);
+                Block(int id, int grid[21][10]);
                 Block() {};
 
                 //getters and setters
@@ -66,19 +66,19 @@ class Grid {
                 }
 
                 //block movements (bool for downwards to tell if block needs to be placed)
-                bool moveDown(const int grid[20][10]);
-                void moveLeft(const int grid[20][10]);
-                void moveRight(const int grid[20][10]);
-                void drop(const int grid[20][10]);
-                void rotate(const int grid[20][10]);
+                bool moveDown(const int grid[21][10]);
+                void moveLeft(const int grid[21][10]);
+                void moveRight(const int grid[21][10]);
+                void drop(const int grid[21][10]);
+                void rotate(const int grid[21][10]);
 
                 //collision checks, returns true if a collision is imminent
-                bool checkVerticalCollision(const int grid[20][10]) const;
+                bool checkVerticalCollision(const int grid[21][10]) const;
                 // 0 for left side 1 for right side
-                bool checkHorizontalCollision(int side, const int grid[20][10]) const;
+                bool checkHorizontalCollision(int side, const int grid[21][10]) const;
                 //helper functions to check for rotational collisions and move block accordingly for seemless rotations
-                static bool checkRotationalCollision(std::pair<int, int>* position, const int grid[20][10]);
-                static bool isRotationalCollision(const std::pair<int, int>* position, const int grid[20][10]);
+                static bool checkRotationalCollision(std::pair<int, int>* position, const int grid[21][10]);
+                static bool isRotationalCollision(const std::pair<int, int>* position, const int grid[21][10]);
 
             private:
                 //rotational nature of block (0-3)

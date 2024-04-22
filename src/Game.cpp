@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "Grid.h"
+#include "Score.h"
 
 int menu();
 
@@ -10,6 +11,7 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 800;
     Grid grid = Grid();
+    Score score = Score();
     int counter = 0;
     bool start = true;
 
@@ -86,6 +88,7 @@ int main() {
                     }
                 }
             }
+            score.drawScore();
             grid.drawGrid(true);
 
         EndDrawing();

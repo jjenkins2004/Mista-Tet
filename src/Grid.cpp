@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(randBlock.getBlock());
+        next.push(/*randBlock.getBlock()*/1);
     }
-    block = Block(randBlock.getBlock(), grid);
+    block = Block(/*randBlock.getBlock()*/1, grid);
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -36,7 +36,7 @@ void Grid::drawGrid(bool drawBlock) {
     for (int i = 1; i < 21; i++) {
         for (int j = 0; j < 10; j++) {
             if (grid[i][j] != 0) {
-                Rectangle rec; rec.x = xpos+j*gridsize; rec.y = ypos+i*gridsize; rec.width = gridsize; rec.height = gridsize;
+                Rectangle rec; rec.x = xpos+j*gridsize; rec.y = ypos+(i-1)*gridsize; rec.width = gridsize; rec.height = gridsize;
                 DrawRectangleRec(rec, colors[grid[i][j]]);
                 DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.2));
             }
@@ -60,7 +60,7 @@ void Grid::drawGrid(bool drawBlock) {
         while (true) {
             bool leave = false;
             for (int i = 0; i < 4; i++) {
-                if (block.getPos()[i].second+dist == 19 || grid[block.getPos()[i].second+dist+1][block.getPos()[i].first] != 0) {
+                if (block.getPos()[i].second+dist == 20 || grid[block.getPos()[i].second+dist+1][block.getPos()[i].first] != 0) {
                     leave = true;
                     break;
                 }
@@ -72,7 +72,7 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
         for (int i = 0; i < 4; i++) {
-            Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second+dist)*gridsize;
+            Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second+dist-1)*gridsize;
             rec.height = gridsize; rec.width = gridsize;
             DrawRectangleRec(rec, Fade(colors[block.getId()], 0.5));
             DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.1));
@@ -107,7 +107,7 @@ void Grid::placeBlock() {
 void Grid::generateBlock() {
     block = Block(next.front(), grid);
     next.pop();
-    next.push(randBlock.getBlock());
+    next.push(/*randBlock.getBlock()*/1);
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
@@ -160,20 +160,6 @@ int Grid::removeRow(std::vector<int>& rows) {
 }
 
 int Grid::fixRows(std::vector<int> rows) {
-    //initial checks to see if any fixing is needed
-    bool leave = true;
-    if (rows[0] == 1) {
-        return 0;
-    }
-    for (int i = 0; i < 10; i++) {
-        if (grid[rows[0]-1][i] != 0) {
-            leave = false;
-            break;
-        }
-    }
-    if (leave) {
-        return 0;
-    }
 
     /*****
      * The logic is that we start from the lowest row removed (which is the last element of the removed rows vector), then 
@@ -183,37 +169,66 @@ int Grid::fixRows(std::vector<int> rows) {
      * Then it would find row 17 (17 becuase we moved everything down one already) as a new starting 
      * point (there is still a gap at row 18). Finally, it would fill this gap.
     *****/
-    std::vector<int>::iterator it = rows.end();
+
+    std::queue<int> removedRows;
+    for (int i = rows.size()-1; i >= 0; i--) {
+        removedRows.push(rows[i]);
+    }
     int distance = 0;
     int row;
     while(!WindowShouldClose()) {
-        if (distance == 0 && it != rows.begin()) {
-            it--;
-             while (it != rows.begin() && (*it - *(it-1)) == 1) {
-                it = it-1;
+    
+
+        //if our distance is 0 then either we are done or we need to move on to the next row in removedRows
+        if (distance == 0) {
+
+            //initial check to see if any fixing is actually required
+            bool leave = true;
+            for (int i = 0; i < removedRows.size(); i++) {
+                for (int j = 0; j < 10; j++) {
+                    if (grid[removedRows.front()-1][j] != 0) {
+                        leave = false;
+                        break;
+                    }
+                }
+                removedRows.push(removedRows.front());
+                removedRows.pop();
+            }
+            if (leave) {
+                WaitTime(0.15);
+                return 0;
+            }
+
+            //moving on to the next row and seeing if there are consecutive removed rows with said row
+            row = removedRows.front();
+            while (!removedRows.empty() && row == removedRows.front()) {
+                row = removedRows.front()-1;
+                removedRows.pop();
                 distance++;
             }
-            row = (*it)-1;
-            distance++;
         }
-        else if (distance == 0) {
-            WaitTime(0.15);
-            return 0;
+
+        //removedRows needs the distance moved to be added to it
+        for (int i = 0; i < removedRows.size(); i++) {
+            removedRows.push(removedRows.front()+1);
+            removedRows.pop();
         }
-        for (int i = 0; i < rows.size(); i++) {
-            rows[i]+=distance;
-        }
-            
-        BeginDrawing();
-            ClearBackground(BLACK);
-            for (int i = row; i >= 0; i--) {
-                for (int j = 0; j < 10; j++) {
-                    grid[i+1][j] = grid[i][j];
-                }
+
+        //moving the grid
+        for (int i = row; i >= 0; i--) {
+            for (int j = 0; j < 10; j++) {
+                grid[i+1][j] = grid[i][j];
             }
-            distance--; row++;
-        drawGrid(false);
-        WaitTime(.15);
+        }
+        distance--; row++;   
+
+        //drawing
+        BeginDrawing();
+
+            ClearBackground(BLACK);
+            drawGrid(false);
+            WaitTime(.15);
+
         EndDrawing();
 
     }
@@ -228,7 +243,7 @@ int Grid::fixRows(std::vector<int> rows) {
 *** START OF BLOCK CLASS 
 ******/
 
-Grid::Block::Block(int id, int grid[20][10]): id(id), rotation(0) {
+Grid::Block::Block(int id, int grid[21][10]): id(id), rotation(0) {
 
     //I-block
     if (id == 1) {
@@ -298,7 +313,7 @@ Grid::Block::Block(int id, int grid[20][10]): id(id), rotation(0) {
 /*
 * MOVEMENTS
 */
-bool Grid::Block::moveDown(const int grid[20][10]) {
+bool Grid::Block::moveDown(const int grid[21][10]) {
     if (checkVerticalCollision(grid)) {
         return false;
     }
@@ -308,7 +323,7 @@ bool Grid::Block::moveDown(const int grid[20][10]) {
     return true;
 }
 
-void Grid::Block::moveRight(const int grid[20][10]) {
+void Grid::Block::moveRight(const int grid[21][10]) {
    if (checkHorizontalCollision(1, grid)) {
     return;
    }
@@ -317,7 +332,7 @@ void Grid::Block::moveRight(const int grid[20][10]) {
     }
 }
 
-void Grid::Block::moveLeft(const int grid[20][10]) {
+void Grid::Block::moveLeft(const int grid[21][10]) {
     if (checkHorizontalCollision(0, grid)) {
         return;
     }
@@ -326,7 +341,7 @@ void Grid::Block::moveLeft(const int grid[20][10]) {
     }
 }
 
-void Grid::Block::drop(const int grid[20][10]) {
+void Grid::Block::drop(const int grid[21][10]) {
     while (!checkVerticalCollision(grid)) {
         for (int i = 0; i < 4; i++) {
             pos[i].second++;
@@ -334,7 +349,7 @@ void Grid::Block::drop(const int grid[20][10]) {
     }
 }
 
-void Grid::Block::rotate(const int grid[20][10]) {
+void Grid::Block::rotate(const int grid[21][10]) {
     std::pair<int, int> backUpPos[4];
     for (int i = 0; i < 4; i++) {
         backUpPos[i] = pos[i];
@@ -636,7 +651,7 @@ void Grid::Block::rotate(const int grid[20][10]) {
 * COLLISION CHECKS
 */
 
-bool Grid::Block::checkHorizontalCollision(int side, const int grid[20][10]) const{
+bool Grid::Block::checkHorizontalCollision(int side, const int grid[21][10]) const{
     if (side == 0) {
         for (int i = 0; i < 4; i++) {
             if (pos[i].first == 0 || grid[pos[i].second][pos[i].first-1] != 0) {
@@ -658,14 +673,14 @@ bool Grid::Block::checkHorizontalCollision(int side, const int grid[20][10]) con
 
 bool Grid::Block::checkVerticalCollision(const int grid[20][10]) const {
     for (int i = 0; i < 4; i++) {
-        if (pos[i].second == 19 || grid[pos[i].second+1][pos[i].first] != 0) {
+        if (pos[i].second == 20 || grid[pos[i].second+1][pos[i].first] != 0) {
             return true;
         }
     }
     return false;
 }
 
-bool Grid::Block::checkRotationalCollision(std::pair<int, int>* position, const int grid[20][10]) {
+bool Grid::Block::checkRotationalCollision(std::pair<int, int>* position, const int grid[21][10]) {
     //translations that the function will try for a valid rotation
     std::vector<int> xVals = {1, 2, -1, -2};
     std::vector<int> yVals = {0, 0, 0, 0};
@@ -703,10 +718,10 @@ bool Grid::Block::checkRotationalCollision(std::pair<int, int>* position, const 
     }
 }
 
-bool Grid::Block::isRotationalCollision(const std::pair<int, int>* position, const int grid[20][10]) {
+bool Grid::Block::isRotationalCollision(const std::pair<int, int>* position, const int grid[21][10]) {
     for (int i = 0; i < 4; i++) {
         //checking for out of bounds and collision with another block
-        if (position[i].first > 9 || position[i].first < 0 || position[i].second < 0 || position[i].second > 19 || grid[position[i].second][position[i].first] != 0) {
+        if (position[i].first > 9 || position[i].first < 0 || position[i].second < 0 || position[i].second > 20 || grid[position[i].second][position[i].first] != 0) {
             return true;
         }
     }
