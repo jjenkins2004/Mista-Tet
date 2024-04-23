@@ -17,9 +17,9 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(/*randBlock.getBlock()*/1);
+        next.push(randBlock.getBlock());
     }
-    block = Block(/*randBlock.getBlock()*/1, grid);
+    block = Block(randBlock.getBlock(), grid);
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -107,7 +107,7 @@ void Grid::placeBlock() {
 void Grid::generateBlock() {
     block = Block(next.front(), grid);
     next.pop();
-    next.push(/*randBlock.getBlock()*/1);
+    next.push(randBlock.getBlock());
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
@@ -127,7 +127,7 @@ const std::vector<int> Grid::checkRowComplete() const{
     return rows;
 }
 
-int Grid::removeRow(std::vector<int>& rows) {
+int Grid::removeRow(std::vector<int>& rows, Score& s) {
     std::vector<int*> cells;
     bool first = true;
     //adds every cell that we need to remove as an int* in the correct order
@@ -138,28 +138,56 @@ int Grid::removeRow(std::vector<int>& rows) {
         }
     }
     std::vector<int*>::iterator it = cells.begin();
+    int counter = 0;
     while(!WindowShouldClose()) {
+
+        //this is removing each square and delaying it a little bit
+         if (counter == 1 && !first && it != cells.end()) {
+            **it = 0;
+            it++;
+            counter = 0;
+        } else if (!first) {
+            counter++;
+        }  
+        
+        //checking if we have removed everything
+        if (it == cells.end()) {
+            counter = 0;
+            while (!WindowShouldClose()) {
+                if (counter == 10) {
+                    return 0;
+                }
+                else {
+                    counter++;
+                }
+                BeginDrawing();
+                    ClearBackground(BLACK);
+                    drawGrid(false);
+                    s.drawScore();
+                EndDrawing();
+            }
+            return -1;
+        }
+
+        //adding a little delay in the very beginning before any squares are removed
+        if (first && counter == 10) {
+            first = false;
+            counter = 0;
+        }
+        else if (first) {
+            counter++;
+        }
+
         BeginDrawing();
             ClearBackground(BLACK);
-            if (!first && it != cells.end()) {
-                **it = 0;
-                it++;
-                WaitTime(1/60);
-            } else if (it == cells.end()) {
-                WaitTime(0.3);
-                return 0;
-            }
-            this->drawGrid(false);
+            drawGrid(false);
+            s.drawScore();
         EndDrawing();
-        if (first) {
-            WaitTime(0.2);
-            first = false;
-        }
     }
     return -1;
 }
 
-int Grid::fixRows(std::vector<int> rows) {
+int Grid::fixRows(std::vector<int> rows, Score& s) {
 
     /*****
      * The logic is that we start from the lowest row removed (which is the last element of the removed rows vector), then 
@@ -174,60 +202,92 @@ int Grid::fixRows(std::vector<int> rows) {
     for (int i = rows.size()-1; i >= 0; i--) {
         removedRows.push(rows[i]);
     }
+
     int distance = 0;
     int row;
+    int counter = 0;
+
     while(!WindowShouldClose()) {
     
-
         //if our distance is 0 then either we are done or we need to move on to the next row in removedRows
-        if (distance == 0) {
+        if (counter == 10) {
+            if (distance == 0) {
 
-            //initial check to see if any fixing is actually required
-            bool leave = true;
-            for (int i = 0; i < removedRows.size(); i++) {
-                for (int j = 0; j < 10; j++) {
-                    if (grid[removedRows.front()-1][j] != 0) {
-                        leave = false;
-                        break;
+                //initial check to see if any fixing is actually required
+                bool leave = true;
+                for (int i = 0; i < removedRows.size(); i++) {
+                    for (int j = 0; j < 10; j++) {
+                        if (grid[removedRows.front()-1][j] != 0) {
+                            leave = false;
+                            break;
+                        }
                     }
+                    removedRows.push(removedRows.front());
+                    removedRows.pop();
                 }
-                removedRows.push(removedRows.front());
+                if (leave) {
+                    counter = 0;
+                    if (rows.size() == 1) {
+                        s.addScore(50);
+                    }
+                    else if (rows.size() == 2) {
+                        s.addScore(150);
+                    }
+                    else if (rows.size() == 3) {
+                        s.addScore(300);
+                    }
+                    else {
+                        s.addScore(500);
+                    }
+                    while (!WindowShouldClose()) {
+                        if (counter == 15) {
+                            return 0;
+                        }
+                        else {
+                            counter++;
+                        }
+                        BeginDrawing();
+                            ClearBackground(BLACK);
+                            drawGrid(false);
+                            s.drawScore();
+                        EndDrawing();
+                    }
+                    return -1;
+                }
+
+                //moving on to the next row and seeing if there are consecutive removed rows with said row
+                row = removedRows.front();
+                while (!removedRows.empty() && row == removedRows.front()) {
+                    row = removedRows.front()-1;
+                    removedRows.pop();
+                    distance++;
+                }
+            }
+
+            //removedRows needs the distance moved to be added to it
+            for (int i = 0; i < removedRows.size(); i++) {
+                removedRows.push(removedRows.front()+1);
                 removedRows.pop();
             }
-            if (leave) {
-                WaitTime(0.15);
-                return 0;
-            }
 
-            //moving on to the next row and seeing if there are consecutive removed rows with said row
-            row = removedRows.front();
-            while (!removedRows.empty() && row == removedRows.front()) {
-                row = removedRows.front()-1;
-                removedRows.pop();
-                distance++;
+            //moving the grid
+            for (int i = row; i >= 0; i--) {
+                for (int j = 0; j < 10; j++) {
+                    grid[i+1][j] = grid[i][j];
+                }
             }
+            distance--; row++; counter = 0;
         }
-
-        //removedRows needs the distance moved to be added to it
-        for (int i = 0; i < removedRows.size(); i++) {
-            removedRows.push(removedRows.front()+1);
-            removedRows.pop();
+        else {
+            counter++;
         }
-
-        //moving the grid
-        for (int i = row; i >= 0; i--) {
-            for (int j = 0; j < 10; j++) {
-                grid[i+1][j] = grid[i][j];
-            }
-        }
-        distance--; row++;   
 
         //drawing
         BeginDrawing();
 
             ClearBackground(BLACK);
             drawGrid(false);
-            WaitTime(.15);
+            s.drawScore();
 
         EndDrawing();
 
@@ -341,12 +401,15 @@ void Grid::Block::moveLeft(const int grid[21][10]) {
     }
 }
 
-void Grid::Block::drop(const int grid[21][10]) {
+int Grid::Block::drop(const int grid[21][10]) {
+    int counter = 0;
     while (!checkVerticalCollision(grid)) {
         for (int i = 0; i < 4; i++) {
             pos[i].second++;
         }
+        counter++;
     }
+    return counter;
 }
 
 void Grid::Block::rotate(const int grid[21][10]) {

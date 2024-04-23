@@ -1,7 +1,6 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "Grid.h"
-#include "Score.h"
 
 int menu();
 
@@ -41,6 +40,7 @@ int main() {
         //updating our block every so often
         if (counter == 60) {
             grid.moveDown();
+            score.addScore(1);
             counter = 0;
             checkRows = true;
         }
@@ -65,24 +65,25 @@ int main() {
             else if (IsKeyPressed(KEY_UP)) {
                 grid.rotate();
             }
-
+        
             else if (IsKeyPressed(KEY_DOWN)) {
                 grid.moveDown();
+                score.addScore(1);
                 checkRows = true;
             }
 
             else if (IsKeyPressed(KEY_SPACE)) {
-                grid.drop();
+                score.addScore(grid.drop()*1.5);
                 checkRows = true;
             }
             
             //do we need to check if a row is complete?
             if (checkRows) {
                 std::vector<int> rowsRemoved = grid.checkRowComplete();
+                counter = 0;
+                //removes our grid rows and fixes, if -1 is returned then program needs to exit
                 if (!rowsRemoved.empty()) {
-                    counter = 0;
-                    //removes our grid rows and fixes, if -1 is returned then program needs to exit
-                    if (grid.removeRow(rowsRemoved) == -1 || grid.fixRows(rowsRemoved) == -1) {
+                    if (grid.removeRow(rowsRemoved, score) == -1 || grid.fixRows(rowsRemoved, score) == -1) {
                         CloseWindow();
                         return 0;
                     }
@@ -97,7 +98,6 @@ int main() {
 
     // De-Initialization
     CloseWindow();
-
     return 0;
 }
 

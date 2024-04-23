@@ -4,6 +4,7 @@
 #include <ctime>
 #include <queue>
 #include <iostream>
+#include "Score.h"
 
 
 class Grid {
@@ -27,10 +28,11 @@ class Grid {
         void rotate() {
             block.rotate(grid);
         }
-        void drop() {
-            block.drop(grid);
+        int drop() {
+            int r = block.drop(grid);
             this->placeBlock();
             this->generateBlock();
+            return r;
         }
 
         //block placement, generation
@@ -38,11 +40,11 @@ class Grid {
         void generateBlock();
 
         //removes rows in argument and plays animation to make it look cool!
-        int removeRow(std::vector<int>& rows);
+        int removeRow(std::vector<int>& rows, Score& s);
         //returns which rows need to be removed in a vector
         const std::vector<int> checkRowComplete() const;
         //fixes rows after removal of rows in argument vector 
-        int fixRows(std::vector<int> rows);
+        int fixRows(std::vector<int> rows, Score& s);
 
         //game over
         void gameOver() {
@@ -69,7 +71,7 @@ class Grid {
                 bool moveDown(const int grid[21][10]);
                 void moveLeft(const int grid[21][10]);
                 void moveRight(const int grid[21][10]);
-                void drop(const int grid[21][10]);
+                int drop(const int grid[21][10]);
                 void rotate(const int grid[21][10]);
 
                 //collision checks, returns true if a collision is imminent
