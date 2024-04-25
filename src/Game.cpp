@@ -1,6 +1,7 @@
 #include "raylib.h"
 #include "raymath.h"
 #include "Grid.h"
+#include <cmath>
 
 int menu();
 
@@ -10,9 +11,12 @@ int main() {
     const int screenWidth = 800;
     const int screenHeight = 800;
     Grid grid = Grid();
-    Score score = Score();
+    Score* score = new Score();
+    grid.setScoreBoard(score);
+
     int counter = 0;
     bool start = true;
+    int level = 0;
 
     InitWindow(screenWidth, screenHeight, "TETris");
 
@@ -31,18 +35,20 @@ int main() {
             }
             start = false;
         }
-
         //----------------------------------------------------------------------------------
         // Update
         //----------------------------------------------------------------------------------
         bool checkRows = false;
 
-        //updating our block every so often
-        if (counter == 60) {
+        //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
+        //using level as x that approaches 120
+        int num = 240/(1+pow(M_E, (-0.05*level)))-120;
+        if (counter == 120-(num)) {
             grid.moveDown();
-            score.addScore(1);
+            score->addScore(1);
             counter = 0;
             checkRows = true;
+            level++;
         }
         counter++;
         
@@ -68,12 +74,12 @@ int main() {
         
             else if (IsKeyPressed(KEY_DOWN)) {
                 grid.moveDown();
-                score.addScore(1);
+                score->addScore(1);
                 checkRows = true;
             }
 
             else if (IsKeyPressed(KEY_SPACE)) {
-                score.addScore(grid.drop()*1.5);
+                score->addScore(grid.drop()*1.5);
                 checkRows = true;
             }
             
@@ -83,14 +89,13 @@ int main() {
                 counter = 0;
                 //removes our grid rows and fixes, if -1 is returned then program needs to exit
                 if (!rowsRemoved.empty()) {
-                    if (grid.removeRow(rowsRemoved, score) == -1 || grid.fixRows(rowsRemoved, score) == -1) {
+                    if (grid.removeRow(rowsRemoved) == -1 || grid.fixRows(rowsRemoved) == -1) {
                         CloseWindow();
                         return 0;
                     }
                 }
             }
-            score.drawScore();
-            grid.drawGrid(true);
+            grid.drawAll(true);
 
         EndDrawing();
         //----------------------------------------------------------------------------------

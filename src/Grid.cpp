@@ -7,6 +7,7 @@
 ******/
 
 
+
 Grid::Grid() {
     srand(time(NULL));
     for (int i = 0; i < 21; i++) {
@@ -17,7 +18,7 @@ Grid::Grid() {
 
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) {
-        next.push(randBlock.getBlock());
+        next.push_back(randBlock.getBlock());
     }
     block = Block(randBlock.getBlock(), grid);
 }
@@ -42,6 +43,71 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
     }
+
+    //drawing our next blocks board
+    int height = 250; int width = 120;
+    DrawRectangle(30, 90, 5, height, borderColor);
+    DrawRectangle(35, 90, width, 5, borderColor);
+    DrawRectangle(35, height+90-5, width, 5, borderColor);
+    DrawRectangle(35+width, 90, 5, height, borderColor);
+    DrawText("Next", 63, 105, 30, BLUE);
+    for (int i = 0; i < 3; i++) {
+        int side = 20;
+        if (next[i] == 1) {
+            Rectangle rec; rec.x = 55; rec.y = 155+(i*65), rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[1]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            for (int i = 0; i < 3; i++) {
+                rec.x+= side;
+                DrawRectangleRec(rec, colors[1]); 
+                DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            }
+        }
+        else if (next[i] == 2) {
+            Rectangle rec; rec.x = 65; rec.y = 150+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        }
+        else if (next[i] == 3) {
+            Rectangle rec; rec.x = 65; rec.y = 170+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y-=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+
+        }
+        else if (next[i] == 4) {
+            Rectangle rec; rec.x = 75; rec.y = 150+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x-=side; rec.y+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+
+        }
+        else if (next[i] == 5) {
+            Rectangle rec; rec.x = 65; rec.y = 170+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y-=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        }
+        else if (next[i] == 6) {
+            Rectangle rec; rec.x = 65; rec.y = 170+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y-=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y+=side; rec.x+=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        }
+        else {
+            Rectangle rec; rec.x = 65; rec.y = 150+(i*65); rec.width = side; rec.height = side;
+            DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.y+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+            rec.x+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        }
+    }
+
 
     //drawing our block
     if (drawBlock) {
@@ -72,10 +138,12 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
         for (int i = 0; i < 4; i++) {
-            Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second+dist-1)*gridsize;
-            rec.height = gridsize; rec.width = gridsize;
-            DrawRectangleRec(rec, Fade(colors[block.getId()], 0.5));
-            DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.1));
+            if (block.getPos()[i].second+dist != 0) {
+                Rectangle rec; rec.x = xpos+block.getPos()[i].first*gridsize; rec.y = ypos+(block.getPos()[i].second+dist-1)*gridsize;
+                rec.height = gridsize; rec.width = gridsize;
+                DrawRectangleRec(rec, Fade(colors[block.getId()], 0.5));
+                DrawRectangleLinesEx(rec, 2, Fade(BLACK, 0.1));
+            }
         }
     }
 }
@@ -106,8 +174,8 @@ void Grid::placeBlock() {
 
 void Grid::generateBlock() {
     block = Block(next.front(), grid);
-    next.pop();
-    next.push(randBlock.getBlock());
+    next.pop_front();
+    next.push_back(randBlock.getBlock());
 }
 
 const std::vector<int> Grid::checkRowComplete() const{
@@ -127,7 +195,7 @@ const std::vector<int> Grid::checkRowComplete() const{
     return rows;
 }
 
-int Grid::removeRow(std::vector<int>& rows, Score& s) {
+int Grid::removeRow(std::vector<int>& rows) {
     std::vector<int*> cells;
     bool first = true;
     //adds every cell that we need to remove as an int* in the correct order
@@ -162,8 +230,7 @@ int Grid::removeRow(std::vector<int>& rows, Score& s) {
                 }
                 BeginDrawing();
                     ClearBackground(BLACK);
-                    drawGrid(false);
-                    s.drawScore();
+                    drawAll(false);
                 EndDrawing();
             }
             return -1;
@@ -180,14 +247,13 @@ int Grid::removeRow(std::vector<int>& rows, Score& s) {
 
         BeginDrawing();
             ClearBackground(BLACK);
-            drawGrid(false);
-            s.drawScore();
+            drawAll(false);
         EndDrawing();
     }
     return -1;
 }
 
-int Grid::fixRows(std::vector<int> rows, Score& s) {
+int Grid::fixRows(std::vector<int> rows) {
 
     /*****
      * The logic is that we start from the lowest row removed (which is the last element of the removed rows vector), then 
@@ -228,16 +294,16 @@ int Grid::fixRows(std::vector<int> rows, Score& s) {
                 if (leave) {
                     counter = 0;
                     if (rows.size() == 1) {
-                        s.addScore(50);
+                        scr->addScore(50);
                     }
                     else if (rows.size() == 2) {
-                        s.addScore(150);
+                        scr->addScore(150);
                     }
                     else if (rows.size() == 3) {
-                        s.addScore(300);
+                        scr->addScore(300);
                     }
                     else {
-                        s.addScore(500);
+                        scr->addScore(500);
                     }
                     while (!WindowShouldClose()) {
                         if (counter == 15) {
@@ -249,7 +315,7 @@ int Grid::fixRows(std::vector<int> rows, Score& s) {
                         BeginDrawing();
                             ClearBackground(BLACK);
                             drawGrid(false);
-                            s.drawScore();
+                            scr->drawScore();
                         EndDrawing();
                     }
                     return -1;
@@ -286,8 +352,7 @@ int Grid::fixRows(std::vector<int> rows, Score& s) {
         BeginDrawing();
 
             ClearBackground(BLACK);
-            drawGrid(false);
-            s.drawScore();
+            drawAll(false);
 
         EndDrawing();
 

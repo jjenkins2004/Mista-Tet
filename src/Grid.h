@@ -10,6 +10,18 @@
 class Grid {
     public:
         Grid();
+        ~Grid() {
+            delete scr;
+        }
+        //set scr to pointer
+        void setScoreBoard(Score* score) {
+            scr = score;
+        }
+        //convinient funciton that draws everything
+        void drawAll(bool block) {
+            drawGrid(block);
+            scr->drawScore();
+        }
         //draws the grid and bool tells grid if block should also be drawn
         void drawGrid(bool block);
         //block movements (true if block needs to be generated, false otherwise)
@@ -40,11 +52,11 @@ class Grid {
         void generateBlock();
 
         //removes rows in argument and plays animation to make it look cool!
-        int removeRow(std::vector<int>& rows, Score& s);
+        int removeRow(std::vector<int>& rows);
         //returns which rows need to be removed in a vector
         const std::vector<int> checkRowComplete() const;
         //fixes rows after removal of rows in argument vector 
-        int fixRows(std::vector<int> rows, Score& s);
+        int fixRows(std::vector<int> rows);
 
         //game over
         void gameOver() {
@@ -92,6 +104,8 @@ class Grid {
 
 
     private:
+        //scoreboard pointer
+        Score* scr;
         //number of pixels from the left and top of the window to the top left corner of grid
         const int xpos = 200;
         const int ypos = 100;
@@ -102,7 +116,7 @@ class Grid {
         //current block that is moving
         Block block;
         //next blocks
-        std::queue<int> next;
+        std::deque<int> next;
         //used to get random blocks
         RandomBlock randBlock = RandomBlock();
         //our grid of placed blocks
