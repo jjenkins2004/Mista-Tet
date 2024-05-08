@@ -50,6 +50,7 @@ int main() {
             grid.moveDown();
             score->addScore(1);
             checkRows = true;
+            grid.updatelevel(++level);
         }
         ++levelcounter;
 
@@ -131,7 +132,7 @@ int main() {
             BeginDrawing();
 
                 ClearBackground(BLACK);
-                grid.drawAll(true, level);
+                grid.drawAll(true);
 
             EndDrawing();
         //----------------------------------------------------------------------------------

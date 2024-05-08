@@ -108,6 +108,23 @@ void Grid::drawGrid(bool drawBlock) {
         }
     }
 
+    //drawing level board
+    height = 100;
+    DrawRectangle(30, 590, 5, height, borderColor);
+    DrawRectangle(35, 590, width, 5, borderColor);
+    DrawRectangle(35, height+590-5, width, 5, borderColor);
+    DrawRectangle(35+width, 590, 5, height, borderColor);
+    std::string l = "";
+    if (std::to_string(level).length() == 1) {
+        l+='0';
+    }
+    l+= std::to_string(level);
+    Color DarkRed = {static_cast<unsigned char>(255-level*2), 0, 0, 255};
+    DrawText(l.c_str(), 53, 605, 75, DarkRed);
+    DrawText(l.c_str(), 53, 605, 75, Fade(BLUE, 1-level*.02));
+
+
+
 
     //drawing our block
     if (drawBlock) {

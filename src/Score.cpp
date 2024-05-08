@@ -6,7 +6,7 @@ Score::Score(): score(0) {}
 
 void Score::drawScore() {
     Rectangle rec = Rectangle(); rec.x = 569; rec.y = 585; rec.height = 110; rec.width = 153;
-    DrawRectangleLinesEx(rec, 7, Fade(LIGHTGRAY, 0.4));
+    DrawRectangleLinesEx(rec, 5, GRAY);
     DrawText("Score", 600, 600, 30, BLUE);
     std::string text;
     for (int i = 0; i < 6-std::to_string(score).length(); i++) {
