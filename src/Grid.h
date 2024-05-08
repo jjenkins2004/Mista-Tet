@@ -62,6 +62,11 @@ class Grid {
         void gameOver() {
             CloseWindow();
         }
+
+        //update level
+        void updatelevel(int l) {
+            level = l;
+        }
         
         //the class that keeps track of the current moving block
         class Block {
@@ -119,6 +124,8 @@ class Grid {
         std::deque<int> next;
         //used to get random blocks
         RandomBlock randBlock = RandomBlock();
+        //level
+        int level;
         //our grid of placed blocks
         int grid[21][10];
         
