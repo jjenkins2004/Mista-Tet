@@ -7,6 +7,7 @@
 #define screenHeight 800
 
 int menu();
+int pause();
 
 int main() {
     // Initialization
@@ -14,11 +15,9 @@ int main() {
     InitWindow(screenWidth, screenHeight, "TETris");
     
     ChangeDirectory(GetApplicationDirectory());
-    Grid grid = Grid();
-    Score* score = new Score();
-    Tet* tet = new Tet(score);
-    grid.setScoreBoard(score);
-    grid.setTet(tet);
+    Grid* grid = nullptr;
+    Score* score;
+    Tet* tet;
 
     int levelcounter = 0;
     int horizontalcounter = 0;
@@ -32,9 +31,19 @@ int main() {
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        // Main Menu
+        // Main Menu into tet monologue
         //----------------------------------------------------------------------------------
         if (start) {
+            if (grid != nullptr) {
+                delete grid;
+                delete score;
+                delete tet;
+            }
+            grid = new Grid();
+            score = new Score();
+            tet = new Tet(score);
+            grid->setScoreBoard(score);
+            grid->setTet(tet);
             if (menu() == -1) {
                 break;
             }
@@ -46,7 +55,8 @@ int main() {
             bool quit = true;
             while (!WindowShouldClose()) {
                 BeginDrawing();
-                    grid.drawAll(true);
+                    ClearBackground(BLACK);
+                    grid->drawAll(true);
                     DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
                 EndDrawing();
                 fade-=0.01;
@@ -70,23 +80,23 @@ int main() {
         int num = 240/(1+pow(M_E, (-0.05*level)))-120;
         if (levelcounter == 120-(num)) {
             levelcounter = 0;
-            grid.moveDown();
+            grid->moveDown();
             score->addScore(1);
             checkRows = true;
-            grid.updatelevel(++level);
+            grid->updatelevel(++level);
         }
         ++levelcounter;
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
-            grid.moveRight();
+            grid->moveRight();
             horizontalcounter = -7;
         }
 
         else if (IsKeyDown(KEY_RIGHT)) {
             if (horizontalcounter == 3) {
                 horizontalcounter = 0;
-                grid.moveRight();
+                grid->moveRight();
             }
             else {
                 ++horizontalcounter;
@@ -94,14 +104,14 @@ int main() {
         }
 
         else if (IsKeyPressed(KEY_LEFT)) {
-            grid.moveLeft();
+            grid->moveLeft();
             horizontalcounter = -7;
         }
 
         else if (IsKeyDown(KEY_LEFT)) {
             if (horizontalcounter == 4) {
                 horizontalcounter = 0;
-                grid.moveLeft();
+                grid->moveLeft();
             }
             else {
                 ++horizontalcounter;
@@ -109,7 +119,7 @@ int main() {
         }
     
         if (IsKeyPressed(KEY_DOWN)) {
-            grid.moveDown();
+            grid->moveDown();
             score->addScore(1);
             checkRows = true;
         }
@@ -117,7 +127,7 @@ int main() {
         else if (IsKeyDown(KEY_DOWN)) {
             if (downcounter == 4) {
                 downcounter = 0;
-                grid.moveDown();
+                grid->moveDown();
                 score->addScore(1);
                 checkRows = true;
             }
@@ -127,21 +137,35 @@ int main() {
         }
 
         else if (IsKeyPressed(KEY_SPACE)) {
-            score->addScore(grid.drop()*1.5);
+            score->addScore(grid->drop()*1.5);
             checkRows = true;
         }
 
         if (IsKeyPressed(KEY_UP)) {
-            grid.rotate();
+            grid->rotate();
+        }
+
+        //pause menu
+        if (IsKeyPressed(KEY_P)) {
+            int p = pause();
+            if (p == -1) {
+                //quit game
+                break;
+            }
+            else if(p == 0) {
+                //quit to start
+                start = true;
+                continue;
+            }
         }
         
         //do we need to check if a row is complete?
         if (checkRows) {
-            std::vector<int> rowsRemoved = grid.checkRowComplete();
+            std::vector<int> rowsRemoved = grid->checkRowComplete();
             levelcounter = 0;
             //removes our grid rows and fixes, if -1 is returned then program needs to exit
             if (!rowsRemoved.empty()) {
-                if (grid.removeRow(rowsRemoved) == -1 || grid.fixRows(rowsRemoved) == -1) {
+                if (grid->removeRow(rowsRemoved) == -1 || grid->fixRows(rowsRemoved) == -1) {
                     CloseWindow();
                     return 0;
                 }
@@ -155,13 +179,18 @@ int main() {
             BeginDrawing();
 
                 ClearBackground(BLACK);
-                grid.drawAll(true);
+                grid->drawAll(true);
 
             EndDrawing();
         //----------------------------------------------------------------------------------
     }
 
     // De-Initialization
+    if (grid != nullptr) {
+        delete grid;
+        delete score;
+        delete tet;
+    }
     CloseWindow();
     return 0;
 }
@@ -228,6 +257,82 @@ int menu() {
             }
 
         EndDrawing();
+    }
+    return -1;
+}
+
+int pause() {
+    Texture2D tetHead = LoadTexture("resources/mistaTet4Forward.png");
+    Rectangle src = (Rectangle){0, 0, 70, 70}, dest = (Rectangle) {400, 275, 70*6, 70*6}; 
+    int bobCounter = 0, bobSpeed = 10, yvel = -1, startWait = 60, counter = 0, add = 1;
+    double fade = 0;
+    bool wait, quit = false;
+    while (!WindowShouldClose()) {
+        if (counter == 15) {
+                src.x+=70*add;
+            if (src.x == 280) {
+                add = -1;
+            } 
+            if (src.x == 0) {
+                add = 1;
+            }
+            counter = 0;
+        }
+        if (wait) {
+            if (bobCounter == 50) {
+                bobCounter = 0;
+                wait = false;
+            }
+        }
+        else if (bobCounter == bobSpeed) {
+            dest.y += yvel;
+            if ((dest.y <= 255 && yvel < 0) || (dest.y >= 270 && yvel > 0)) {
+                bobSpeed++;
+            }
+            else if (bobSpeed != 5) {
+                bobSpeed--;
+            }
+            if (dest.y == 250) {
+                wait = true;
+                yvel = 1;
+            }
+            if (dest.y == 275) {
+                yvel = -1;
+                wait = true;
+            }
+            bobCounter = 0;
+        }
+
+        if (startWait == 0) {
+            if (IsKeyPressed(KEY_P)) {
+            return 1;
+            }
+            else if (IsKeyPressed(KEY_M)) {
+                quit = true;
+            }
+            else if (IsKeyDown(KEY_Q)) {
+                return -1;
+            }
+        }
+        else {--startWait;}
+        
+
+        BeginDrawing();
+            ClearBackground(BLACK);
+            DrawTexturePro(tetHead, src, dest, (Vector2){35*6, 35*6}, 0, WHITE);
+            DrawText("P to resume", 400-MeasureText("P to resume", 20)/2, 500, 20, WHITE);
+            DrawText("M to quit", 400-MeasureText("M to quit", 20)/2, 550, 20, WHITE);
+            DrawText("Q to exit game", 400-MeasureText("Q to exit game", 20)/2, 600, 20, WHITE);
+            if (quit) {
+                DrawRectangle(0, 0, 800, 800, Fade(WHITE, fade));
+                fade+=0.01;
+                if (fade >= 1) {
+                    return 0;
+                }
+            }
+        EndDrawing();
+        ++counter;
+        ++bobCounter;
     }
     return -1;
 }

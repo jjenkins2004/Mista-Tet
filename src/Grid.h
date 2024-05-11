@@ -14,9 +14,6 @@
 class Grid {
     public:
         Grid();
-        ~Grid() {
-            delete scr;
-        }
         //set scr to pointer
         void setScoreBoard(Score* score) {
             scr = score;
