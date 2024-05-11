@@ -1,3 +1,6 @@
+#ifndef SCORE_H
+#define SCORE_H
+
 #include <vector>
 #include <string>
 #include <raylib.h>
@@ -44,3 +47,5 @@ class Score {
         int score;
         std::vector<Text> scores;
 };
+
+#endif

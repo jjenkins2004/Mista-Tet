@@ -1,3 +1,6 @@
+#ifndef GRID_H
+#define GRID_H
+
 #include "raylib.h"
 #include "RandomBlock.h"
 #include <vector>
@@ -5,6 +8,7 @@
 #include <queue>
 #include <iostream>
 #include "Score.h"
+#include "Tet.h"
 
 
 class Grid {
@@ -17,10 +21,15 @@ class Grid {
         void setScoreBoard(Score* score) {
             scr = score;
         }
+        //set tet to pointer
+        void setTet(Tet* t) {
+            tet = t;
+        }
         //convinient funciton that draws everything
         void drawAll(bool block) {
             drawGrid(block);
             scr->drawScore();
+            tet->drawTet();
         }
         //draws the grid and bool tells grid if block should also be drawn
         void drawGrid(bool block);
@@ -111,6 +120,8 @@ class Grid {
     private:
         //scoreboard pointer
         Score* scr;
+        //tet pointer
+        Tet* tet;
         //number of pixels from the left and top of the window to the top left corner of grid
         const int xpos = 200;
         const int ypos = 100;
@@ -125,8 +136,10 @@ class Grid {
         //used to get random blocks
         RandomBlock randBlock = RandomBlock();
         //level
-        int level;
+        int level = 0;
         //our grid of placed blocks
         int grid[21][10];
         
 };
+
+#endif

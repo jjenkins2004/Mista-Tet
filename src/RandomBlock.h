@@ -1,3 +1,6 @@
+#ifndef RANDOMBLOCK_H
+#define RANDOMBLOCK_H
+
 #include <raylib.h>
 #include <random>
 #include <vector>
@@ -12,3 +15,5 @@ struct RandomBlock {
         void resetBag();
         std::vector<int> blocks;
 };
+
+#endif

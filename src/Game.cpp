@@ -3,24 +3,28 @@
 #include "Grid.h"
 #include <cmath>
 
+#define screenWidth 800
+#define screenHeight 800
+
 int menu();
 
 int main() {
     // Initialization
     //--------------------------------------------------------------------------------------
-    const int screenWidth = 800;
-    const int screenHeight = 800;
+    InitWindow(screenWidth, screenHeight, "TETris");
+    
+    ChangeDirectory(GetApplicationDirectory());
     Grid grid = Grid();
     Score* score = new Score();
+    Tet* tet = new Tet(score);
     grid.setScoreBoard(score);
+    grid.setTet(tet);
 
     int levelcounter = 0;
     int horizontalcounter = 0;
     int downcounter = 0;
     bool start = true;
     int level = 0;
-
-    InitWindow(screenWidth, screenHeight, "TETris");
 
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
@@ -31,11 +35,30 @@ int main() {
         // Main Menu
         //----------------------------------------------------------------------------------
         if (start) {
-            int val = menu();
-            if (val == -1) {
+            if (menu() == -1) {
                 break;
             }
             start = false;
+            if (tet->tetMonologue() == -1) {
+                break;
+            }
+            double fade = 1;
+            bool quit = true;
+            while (!WindowShouldClose()) {
+                BeginDrawing();
+                    grid.drawAll(true);
+                    DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
+                EndDrawing();
+                fade-=0.01;
+                if (fade <= 0) {
+                    quit = false;
+                    break;
+                }
+            }
+            if (quit) {
+                break;
+            }
+
         }
         //----------------------------------------------------------------------------------
         // Update
@@ -152,6 +175,8 @@ int menu() {
     std::vector<std::pair<Rectangle, Color>> cubes;
     int addCubeCounter = 0;
     int cubeSize = 20;
+    bool fade = false;
+    double fadeTracker = 0;
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -182,15 +207,24 @@ int menu() {
             DrawText("Mista Tet", 150, 150, 100, Fade(GRAY, 0.7));
             DrawRectangleRounded(playbutton, 50, 100, Fade(LIGHTGRAY, 0.7));
             DrawRectangleRoundedLines(playbutton, 50, 100, 10, Fade(GRAY, 0.7));
-            DrawText("PLAY", 300, 415, 75, Fade(MAROON, 0.7));
+            DrawText("START", playbutton.x+playbutton.width/2-MeasureText("START", 50)/2, playbutton.y+playbutton.height/2-25, 50, Fade(MAROON, 0.7));
 
             //checking if mouse is over the play button and if play button is clicked
-            int mX = GetMouseX(); int mY = GetMouseY();
-            if ( mX >playbutton.x && mX < playbutton.x+playbutton.width && mY > playbutton.y && mY < playbutton.y+playbutton.height) {
+            float mX = GetMouseX(); float mY = GetMouseY();
+            if (CheckCollisionPointRec((Vector2){mX, mY}, playbutton)) {
                 DrawRectangleRounded(playbutton, 50, 100, Fade(WHITE, 0.3));
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    return 0;
+                    fade = true;
                 }
+            }
+
+            //once play button is hit then fade to black for tet monologue
+            if (fade) {
+                DrawRectangle(0, 0, 800, 800, Fade(BLACK, fadeTracker));
+                fadeTracker+=0.01;
+            }
+            if (fadeTracker >= 1.5) {
+                return 0;
             }
 
         EndDrawing();
