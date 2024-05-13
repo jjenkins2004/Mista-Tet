@@ -18,6 +18,7 @@ int main() {
     Grid* grid = nullptr;
     Score* score;
     Tet* tet;
+    Powerup* powerUp;
 
     int levelcounter = 0;
     int horizontalcounter = 0;
@@ -38,12 +39,16 @@ int main() {
                 delete grid;
                 delete score;
                 delete tet;
+                delete powerUp;
             }
             grid = new Grid();
             score = new Score();
             tet = new Tet(score);
+            powerUp = new Powerup();
             grid->setScoreBoard(score);
             grid->setTet(tet);
+            //temp
+            start = false; continue;
             if (menu() == -1) {
                 break;
             }
@@ -180,6 +185,7 @@ int main() {
 
                 ClearBackground(BLACK);
                 grid->drawAll(true);
+                powerUp->drawPowerup();
 
             EndDrawing();
         //----------------------------------------------------------------------------------
@@ -190,6 +196,7 @@ int main() {
         delete grid;
         delete score;
         delete tet;
+        delete powerUp;
     }
     CloseWindow();
     return 0;

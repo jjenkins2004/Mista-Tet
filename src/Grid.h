@@ -9,6 +9,7 @@
 #include <iostream>
 #include "Score.h"
 #include "Tet.h"
+#include "Powerup.h"
 
 
 class Grid {
