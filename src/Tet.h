@@ -12,6 +12,11 @@ class Tet {
     public:
         Tet(Score* s);
 
+        //set level
+        void updateLevel(int l) {
+            level = l;
+        }
+
         //draw mista tet
         void drawTet();
         //tet monologue
@@ -22,6 +27,7 @@ class Tet {
     Score* src;
     Texture2D tet1;
     Font tetFont;
+    int level;
 
 };
 

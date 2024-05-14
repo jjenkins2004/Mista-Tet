@@ -6,7 +6,7 @@ using namespace std;
 
 Tet::Tet(Score* s): src(s) {
      tet1 = LoadTexture("resources/mistaTet1.png");
-     tetFont = LoadFont("resources/tetFont.ttf");
+     tetFont = LoadFont("resources/allFont.ttf");
 }
 
 void Tet::drawTet() {
@@ -92,7 +92,7 @@ int Tet::tetMonologue() {
             DrawRectangleRounded(textBox, 0.2, 500, textBoxColor);
             DrawRectangleRoundedLines(textBox, 0.2, 500, 5, (Color){30, 30, 30, 255});
             DrawTextPro(tetFont, txt.c_str(), (Vector2){textBox.x+15, textBox.y+10}, (Vector2){0,0}, 0, 30, 0, textColor);
-            DrawText("S to skip, CLICK to proceed", 800-MeasureText("S to skip, CLICK to proceed", 10)-5, 800-15, 10, WHITE);
+            DrawTextEx(tetFont, "S to skip, CLICK to proceed", (Vector2){800-MeasureTextEx(tetFont, "S to skip, CLICK to proceed", 15, 0).x-5, 800-18}, 15, 0, WHITE);
             DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
         EndDrawing();
         ++txtcounter;
