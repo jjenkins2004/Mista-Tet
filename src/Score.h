@@ -37,6 +37,11 @@ class Score {
     public:
         Score();
 
+        //set level
+        void updateLevel(int l) {
+            level = l;
+        }
+
         //draws scoreboard and score
         void drawScore();
 
@@ -44,9 +49,11 @@ class Score {
         void addScore(int score);
         
     private:
+        Font allFont = LoadFont("resources/allFont.ttf");
         int score;
         std::vector<Text> scores;
         double multiplier = 5;
+        int level;
 };
 
 #endif

@@ -9,11 +9,20 @@
 class Powerup {
     public:
         Powerup();
+        void updateLevel(int l) {
+            level = l;
+        }
         void drawPowerup();
         void spawnPowerup();
         int checkPowerup();
+
         
     private:
+    //font
+    Font allFont = LoadFont("resources/allFont.ttf");
+    //level
+    int level;
+
     //locations for powerboard
     Rectangle powerBoard = (Rectangle) {350-RECWIDTH/2, 705, RECWIDTH, RECHEIGHT};
     Vector2 circle1 = (Vector2) {280, 740};
