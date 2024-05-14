@@ -46,6 +46,7 @@ class Score {
     private:
         int score;
         std::vector<Text> scores;
+        double multiplier = 5;
 };
 
 #endif

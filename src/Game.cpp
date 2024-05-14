@@ -20,6 +20,7 @@ int main() {
     Tet* tet;
     Powerup* powerUp;
 
+    Font titleFont = LoadFont("resources/titleFont.ttf");
     int levelcounter = 0;
     int horizontalcounter = 0;
     int downcounter = 0;
@@ -47,8 +48,9 @@ int main() {
             powerUp = new Powerup();
             grid->setScoreBoard(score);
             grid->setTet(tet);
+            grid->setPowerup(powerUp);
             //temp
-            start = false; continue;
+            /*start = false; continue;*/
             if (menu() == -1) {
                 break;
             }
@@ -177,6 +179,33 @@ int main() {
             }
         }
 
+        //checking if the game should be over
+        if (grid->checkGameOver()) {
+            start = true; bool quit = true;
+            int endcounter = 0; double fade = 0;
+            while (!WindowShouldClose()) {
+                ++endcounter;
+                fade +=0.01;
+                if (endcounter == 450) {
+                    quit = false;
+                    break;
+                }
+                BeginDrawing();
+                    ClearBackground(BLACK);
+                    grid->drawAll(true);
+                    DrawRectangle(0, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2-10, 800, MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y+20, Fade(BLACK, fade));
+                    DrawTextEx(titleFont, "YOU LOSE", (Vector2){400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).x/2, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2}, 150, 5, Fade(WHITE, fade));
+                EndDrawing();
+            }
+            if (quit) {
+                break;
+            }
+            else {
+                continue;
+            }
+
+        }
+
 
         //----------------------------------------------------------------------------------
         // Draw
@@ -185,7 +214,6 @@ int main() {
 
                 ClearBackground(BLACK);
                 grid->drawAll(true);
-                powerUp->drawPowerup();
 
             EndDrawing();
         //----------------------------------------------------------------------------------

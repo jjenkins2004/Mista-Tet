@@ -23,11 +23,15 @@ class Grid {
         void setTet(Tet* t) {
             tet = t;
         }
+        void setPowerup(Powerup* p) {
+            pow = p;
+        }
         //convinient funciton that draws everything
         void drawAll(bool block) {
             drawGrid(block);
             scr->drawScore();
             tet->drawTet();
+            pow->drawPowerup();
         }
         //draws the grid and bool tells grid if block should also be drawn
         void drawGrid(bool block);
@@ -66,8 +70,8 @@ class Grid {
         int fixRows(std::vector<int> rows);
 
         //game over
-        void gameOver() {
-            CloseWindow();
+        bool checkGameOver() {
+            return gameover;
         }
 
         //update level
@@ -120,6 +124,8 @@ class Grid {
         Score* scr;
         //tet pointer
         Tet* tet;
+        //powerup class pointer
+        Powerup* pow;
         //number of pixels from the left and top of the window to the top left corner of grid
         const int xpos = 200;
         const int ypos = 100;
@@ -135,6 +141,8 @@ class Grid {
         RandomBlock randBlock = RandomBlock();
         //level
         int level = 0;
+        //is it game over?
+        bool gameover = false;
         //our grid of placed blocks
         int grid[21][10];
         

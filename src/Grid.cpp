@@ -175,17 +175,7 @@ void Grid::placeBlock() {
         }
     }
     if (lose) {
-        int counter = 0;
-        while (!WindowShouldClose()) {
-            BeginDrawing();
-                drawGrid(true);
-                counter++;
-                if (counter == 120) {
-                    break;
-                }
-            EndDrawing();
-        }
-        gameOver();
+        gameover = true;
     }
 }
 
