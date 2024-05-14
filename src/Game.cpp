@@ -49,6 +49,10 @@ int main() {
             grid->setScoreBoard(score);
             grid->setTet(tet);
             grid->setPowerup(powerUp);
+            level = 0;
+            levelcounter = 0;
+            horizontalcounter = 0;
+            downcounter = 0;
             //temp
             /*start = false; continue;*/
             if (menu() == -1) {
@@ -191,7 +195,7 @@ int main() {
                     break;
                 }
                 BeginDrawing();
-                    ClearBackground(BLACK);
+                    ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                     grid->drawAll(true);
                     DrawRectangle(0, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2-10, 800, MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y+20, Fade(BLACK, fade));
                     DrawTextEx(titleFont, "YOU LOSE", (Vector2){400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).x/2, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2}, 150, 5, Fade(WHITE, fade));
@@ -212,7 +216,7 @@ int main() {
         //----------------------------------------------------------------------------------
             BeginDrawing();
 
-                ClearBackground(BLACK);
+                ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                 grid->drawAll(true);
 
             EndDrawing();
@@ -231,6 +235,8 @@ int main() {
 }
 
 int menu() {
+    //loading font
+    Font titleFont = LoadFont("resources/titleFont.ttf");
     //defining the play button rectangle
     Rectangle playbutton; playbutton.x = 275; playbutton.y = 400; playbutton.width = 240; playbutton.height = 100;
 
@@ -241,6 +247,7 @@ int menu() {
     int cubeSize = 20;
     bool fade = false;
     double fadeTracker = 0;
+
 
     while (!WindowShouldClose()) {
         BeginDrawing();
@@ -268,15 +275,15 @@ int menu() {
 
 
             //drawing our title and play button
-            DrawText("Mista Tet", 150, 150, 100, Fade(GRAY, 0.7));
-            DrawRectangleRounded(playbutton, 50, 100, Fade(LIGHTGRAY, 0.7));
-            DrawRectangleRoundedLines(playbutton, 50, 100, 10, Fade(GRAY, 0.7));
-            DrawText("START", playbutton.x+playbutton.width/2-MeasureText("START", 50)/2, playbutton.y+playbutton.height/2-25, 50, Fade(MAROON, 0.7));
+            DrawTextEx(titleFont, "MistaTet", (Vector2){400-MeasureTextEx(titleFont, "MistaTet", 150, 5).x/2, 200}, 150, 5, WHITE);
+            DrawRectangleRounded(playbutton, 0.2, 100, LIGHTGRAY);
+            DrawRectangleRoundedLines(playbutton, 0.2, 100, 10, GRAY);
+            DrawTextEx(titleFont, "start", Vector2{playbutton.x+playbutton.width/2-MeasureTextEx(titleFont, "start", 60, 0).x/2, playbutton.y+playbutton.height/2-MeasureTextEx(titleFont, "start", 60, 0).y/2}, 60, 0, WHITE);
 
             //checking if mouse is over the play button and if play button is clicked
             float mX = GetMouseX(); float mY = GetMouseY();
             if (CheckCollisionPointRec((Vector2){mX, mY}, playbutton)) {
-                DrawRectangleRounded(playbutton, 50, 100, Fade(WHITE, 0.3));
+                DrawRectangleRounded(playbutton, 0.2, 100, Fade(WHITE, 0.3));
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                     fade = true;
                 }
@@ -298,6 +305,7 @@ int menu() {
 
 int pause() {
     Texture2D tetHead = LoadTexture("resources/mistaTet4Forward.png");
+     Font allFont = LoadFont("resources/allFont.ttf");
     Rectangle src = (Rectangle){0, 0, 70, 70}, dest = (Rectangle) {400, 275, 70*6, 70*6}; 
     int bobCounter = 0, bobSpeed = 10, yvel = -1, startWait = 60, counter = 0, add = 1;
     double fade = 0;
@@ -351,13 +359,12 @@ int pause() {
         }
         else {--startWait;}
         
-
         BeginDrawing();
             ClearBackground(BLACK);
             DrawTexturePro(tetHead, src, dest, (Vector2){35*6, 35*6}, 0, WHITE);
-            DrawText("P to resume", 400-MeasureText("P to resume", 20)/2, 500, 20, WHITE);
-            DrawText("M to quit", 400-MeasureText("M to quit", 20)/2, 550, 20, WHITE);
-            DrawText("Q to exit game", 400-MeasureText("Q to exit game", 20)/2, 600, 20, WHITE);
+            DrawTextEx(allFont, "P to resume", (Vector2){400-MeasureTextEx(allFont, "P to resume", 25, 1).x/2, 500}, 25, 1, WHITE);
+            DrawTextEx(allFont, "M to quit", (Vector2){400-MeasureTextEx(allFont, "M to quit", 25, 1).x/2, 550}, 25, 1, WHITE);
+            DrawTextEx(allFont, "Q to exit game", (Vector2){400-MeasureTextEx(allFont, "Q to exit game", 25, 1).x/2, 600}, 25, 1, WHITE);
             if (quit) {
                 DrawRectangle(0, 0, 800, 800, Fade(WHITE, fade));
                 fade+=0.01;
