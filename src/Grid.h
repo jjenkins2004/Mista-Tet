@@ -77,6 +77,8 @@ class Grid {
         //update level
         void updatelevel(int l) {
             level = l;
+            scr->updateLevel(l);
+            pow->updateLevel(l);
         }
         
         //the class that keeps track of the current moving block
@@ -120,6 +122,8 @@ class Grid {
 
 
     private:
+        //font
+        Font allFont = LoadFont("resources/allFont.ttf");
         //scoreboard pointer
         Score* scr;
         //tet pointer
@@ -130,7 +134,7 @@ class Grid {
         const int xpos = 200;
         const int ypos = 100;
         //pixel size of each grid
-        const int gridsize = 30;
+        const float gridsize = 30;
         //1: I-block 2: J-block 3: L-block 4: O-block 5: S-block 6: T-block 7: Z-block
         const std::vector<Color> colors = {WHITE, SKYBLUE, DARKBLUE, ORANGE, YELLOW, LIME, PURPLE, RED, DARKGRAY};
         //current block that is moving

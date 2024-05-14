@@ -24,14 +24,9 @@ Grid::Grid() {
 }
 
 void Grid::drawGrid(bool drawBlock) {
-    int borderWidth = 10;
-    Color borderColor = GRAY;
-
-    //border for grid
-    DrawRectangle(xpos-borderWidth, ypos-borderWidth, 10*gridsize+2*borderWidth, borderWidth, borderColor);
-    DrawRectangle(xpos-borderWidth, ypos, borderWidth, gridsize*20+borderWidth, borderColor);
-    DrawRectangle(xpos+10*gridsize, ypos, borderWidth, gridsize*20+borderWidth, borderColor);
-    DrawRectangle(xpos-10, ypos+20*gridsize, 10*gridsize+2*borderWidth, borderWidth, borderColor);
+    Color DarkRed = {static_cast<unsigned char>(255-level*1.4), 0, 0, 255};
+    float borderWidth = 10;
+    Color borderColor = (Color){80, 60, 60, 255};
 
     //filling in 10x20 grid based on the 2d array
     for (int i = 1; i < 21; i++) {
@@ -45,12 +40,11 @@ void Grid::drawGrid(bool drawBlock) {
     }
 
     //drawing our next blocks board
-    int height = 250; int width = 120;
-    DrawRectangle(30, 90, 5, height, borderColor);
-    DrawRectangle(35, 90, width, 5, borderColor);
-    DrawRectangle(35, height+90-5, width, 5, borderColor);
-    DrawRectangle(35+width, 90, 5, height, borderColor);
-    DrawText("Next", 63, 105, 30, BLUE);
+    float height = 250; float width = 120;
+    DrawRectangleRoundedLines((Rectangle){30, 90, width+10, height+10}, 0.2, 100, 5, borderColor);
+    DrawTextPro(allFont, "next", (Vector2){35+width/2, 100+MeasureTextEx(allFont, "next", 35, 3).y/2}, (Vector2){MeasureTextEx(allFont, "next", 35, 3).x/2, MeasureTextEx(allFont, "next", 35, 3).y/2}, 0, 35, 3, DarkRed);
+    DrawTextPro(allFont, "next", (Vector2){35+width/2, 100+MeasureTextEx(allFont, "next", 35, 3).y/2}, (Vector2){MeasureTextEx(allFont, "next", 35, 3).x/2, MeasureTextEx(allFont, "next", 35, 3).y/2}, 0, 35, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
+    
     for (int i = 0; i < 3; i++) {
         int side = 20;
         if (next[i] == 1) {
@@ -110,19 +104,16 @@ void Grid::drawGrid(bool drawBlock) {
 
     //drawing level board
     height = 100;
-    DrawRectangle(30, 590, 5, height, borderColor);
-    DrawRectangle(35, 590, width, 5, borderColor);
-    DrawRectangle(35, height+590-5, width, 5, borderColor);
-    DrawRectangle(35+width, 590, 5, height, borderColor);
     std::string l = "";
     if (std::to_string(level).length() == 1) {
         l+='0';
     }
+    DrawRectangleRoundedLines((Rectangle){30, 625, width+10, 90}, 0.2, 100, 5, borderColor);
     l+= std::to_string(level);
-    Color DarkRed = {static_cast<unsigned char>(255-level*2), 0, 0, 255};
-    DrawText(l.c_str(), 53, 605, 75, DarkRed);
-    DrawText(l.c_str(), 53, 605, 75, Fade(BLUE, 1-level*.02));
-
+    DrawTextPro(allFont, "level", (Vector2){35+width/2, 650}, (Vector2){MeasureTextEx(allFont, "level", 35, 3).x/2, MeasureTextEx(allFont, "level", 35, 3).y/2}, 0, 35, 3, DarkRed);
+    DrawTextPro(allFont, "level", (Vector2){35+width/2, 650}, (Vector2){MeasureTextEx(allFont, "level", 35, 3).x/2, MeasureTextEx(allFont, "level", 35, 3).y/2}, 0, 35, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
+    DrawTextPro(allFont, l.c_str(), (Vector2){35+width/2, 690}, (Vector2){MeasureTextEx(allFont, l.c_str(), 30, 3).x/2, MeasureTextEx(allFont, l.c_str(), 30, 3).y/2}, 0, 30, 3, DarkRed);
+    DrawTextPro(allFont, l.c_str(), (Vector2){35+width/2, 690}, (Vector2){MeasureTextEx(allFont, l.c_str(), 30, 3).x/2, MeasureTextEx(allFont, l.c_str(), 30, 3).y/2}, 0, 30, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
 
 
 
@@ -163,6 +154,8 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
     }
+    //grid border
+    DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 }
 
 void Grid::placeBlock() {
@@ -236,7 +229,7 @@ int Grid::removeRow(std::vector<int>& rows) {
                     counter++;
                 }
                 BeginDrawing();
-                    ClearBackground(BLACK);
+                    ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                     drawAll(false);
                 EndDrawing();
             }
@@ -253,7 +246,7 @@ int Grid::removeRow(std::vector<int>& rows) {
         }
 
         BeginDrawing();
-            ClearBackground(BLACK);
+            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
             drawAll(false);
         EndDrawing();
     }
@@ -320,9 +313,8 @@ int Grid::fixRows(std::vector<int> rows) {
                             counter++;
                         }
                         BeginDrawing();
-                            ClearBackground(BLACK);
-                            drawGrid(false);
-                            scr->drawScore();
+                            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
+                            drawAll(false);
                         EndDrawing();
                     }
                     return -1;
@@ -358,7 +350,7 @@ int Grid::fixRows(std::vector<int> rows) {
         //drawing
         BeginDrawing();
 
-            ClearBackground(BLACK);
+            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
             drawAll(false);
 
         EndDrawing();
