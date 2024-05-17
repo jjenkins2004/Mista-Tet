@@ -24,6 +24,8 @@ int main() {
     int levelcounter = 0;
     int horizontalcounter = 0;
     int downcounter = 0;
+    int powerupcounter = 0;
+    int spawnpower = /*GetRandomValue(5*60, 10*60)*/ 60;
     bool start = true;
     int level = 0;
 
@@ -94,9 +96,16 @@ int main() {
             grid->moveDown();
             score->addScore(1);
             checkRows = true;
-            grid->updatelevel(++level);
+            grid->updatelevel(level);
         }
-        ++levelcounter;
+        levelcounter++;
+
+        if (powerupcounter == spawnpower) {
+            powerUp->spawnPowerup();
+            powerupcounter = 0;
+            spawnpower = /*GetRandomValue(5*60, 10*60)*/ 60;
+        }
+        powerupcounter++;
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
