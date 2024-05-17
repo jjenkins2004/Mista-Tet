@@ -80,6 +80,9 @@ class Grid {
             scr->updateLevel(l);
             pow->updateLevel(l);
         }
+
+        //add the current block to the hold and current block in the hold becomes active block
+        void hold();
         
         //the class that keeps track of the current moving block
         class Block {
@@ -141,6 +144,8 @@ class Grid {
         Block block;
         //next blocks
         std::deque<int> next;
+        //current block being held
+        int held = 0; bool ableToHold = true;
         //used to get random blocks
         RandomBlock randBlock = RandomBlock();
         //level

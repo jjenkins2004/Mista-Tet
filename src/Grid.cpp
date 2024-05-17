@@ -115,6 +115,68 @@ void Grid::drawGrid(bool drawBlock) {
     DrawTextPro(allFont, l.c_str(), (Vector2){35+width/2, 690}, (Vector2){MeasureTextEx(allFont, l.c_str(), 30, 3).x/2, MeasureTextEx(allFont, l.c_str(), 30, 3).y/2}, 0, 30, 3, DarkRed);
     DrawTextPro(allFont, l.c_str(), (Vector2){35+width/2, 690}, (Vector2){MeasureTextEx(allFont, l.c_str(), 30, 3).x/2, MeasureTextEx(allFont, l.c_str(), 30, 3).y/2}, 0, 30, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
 
+    //drawing hold board
+    int side = 30;
+    int y = 480;
+    int x = 50;
+
+    DrawRectangleRoundedLines((Rectangle){20, 400, width+30, height+70}, 0.2, 100, 5, borderColor);
+    DrawTextPro(allFont, "hold", (Vector2){35+width/2, 410+MeasureTextEx(allFont, "hold", 35, 3).y/2}, (Vector2){MeasureTextEx(allFont, "next", 35, 3).x/2, MeasureTextEx(allFont, "next", 35, 3).y/2}, 0, 35, 3, DarkRed);
+    DrawTextPro(allFont, "hold", (Vector2){35+width/2, 410+MeasureTextEx(allFont, "hold", 35, 3).y/2}, (Vector2){MeasureTextEx(allFont, "next", 35, 3).x/2, MeasureTextEx(allFont, "next", 35, 3).y/2}, 0, 35, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
+    
+    if (held == 1) {
+        Rectangle rec; rec.x = x-15; rec.y = y+5; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[1]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        for (int i = 0; i < 3; i++) {
+            rec.x+= side;
+            DrawRectangleRec(rec, colors[1]); 
+            DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        }
+    }
+    else if (held == 2) {
+        Rectangle rec; rec.x = x; rec.y = y; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[2]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+    }
+    else if (held == 3) {
+        Rectangle rec; rec.x = x; rec.y = y+20; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y-=side; DrawRectangleRec(rec, colors[3]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+
+    }
+    else if (held == 4) {
+        Rectangle rec; rec.x = x+15; rec.y = y; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x-=side; rec.y+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[4]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+
+    }
+    else if (held == 5) {
+        Rectangle rec; rec.x = x; rec.y = y+20; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y-=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[5]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+    }
+    else if (held == 6) {
+        Rectangle rec; rec.x = x; rec.y = y+20; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y-=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y+=side; rec.x+=side; DrawRectangleRec(rec, colors[6]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+    }
+    else if (held == 7) {
+        Rectangle rec; rec.x = x; rec.y = y; rec.width = side; rec.height = side;
+        DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.y+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+        rec.x+=side; DrawRectangleRec(rec, colors[7]); DrawRectangleLinesEx(rec, 3, Fade(BLACK, 0.2));
+    }
 
 
     //drawing our block
@@ -158,6 +220,21 @@ void Grid::drawGrid(bool drawBlock) {
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 }
 
+void Grid::hold() {
+    if (ableToHold) {
+        int temp = block.getId();
+        if (held != 0) {
+            block = Block(held, grid);
+        }else {
+            block = Block(next.front(), grid);
+            next.pop_front();
+            next.push_back(randBlock.getBlock());
+        }
+        held = temp;
+        ableToHold = false;
+    }
+}
+
 void Grid::placeBlock() {
     bool lose = false;
     const std::pair<int, int>* pos = block.getPos();
@@ -176,6 +253,7 @@ void Grid::generateBlock() {
     block = Block(next.front(), grid);
     next.pop_front();
     next.push_back(randBlock.getBlock());
+    ableToHold = true;
 }
 
 const std::vector<int> Grid::checkRowComplete() const{

@@ -156,6 +156,11 @@ int main() {
             grid->rotate();
         }
 
+        //hold current block
+        if (IsKeyPressed(KEY_C)) {
+            grid->hold();
+        }
+
         //pause menu
         if (IsKeyPressed(KEY_P)) {
             int p = pause();
@@ -305,7 +310,7 @@ int menu() {
 
 int pause() {
     Texture2D tetHead = LoadTexture("resources/mistaTet4Forward.png");
-     Font allFont = LoadFont("resources/allFont.ttf");
+    Font allFont = LoadFont("resources/allFont.ttf");
     Rectangle src = (Rectangle){0, 0, 70, 70}, dest = (Rectangle) {400, 275, 70*6, 70*6}; 
     int bobCounter = 0, bobSpeed = 10, yvel = -1, startWait = 60, counter = 0, add = 1;
     double fade = 0;
