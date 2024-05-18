@@ -42,6 +42,48 @@ struct PowerupItem {
         }
         vel.y++;
     }
+    //gives a eerie animation when powerups are collected
+    void spaz() {
+        //vel.x == 0 checks if it is our first time calling spaz
+        if (vel.x == 0) {
+            time = 60;
+            vel.x = 1;
+            vel.y = 1;
+            spazpos.x = pos.x;
+            spazpos.y = pos.y;
+        }
+        //if position goes some distance from the origin given by distFromOrigin, then reverse the velocity
+        if (time == 0) {
+            spazpos.x+=vel.x;
+            spazpos.y+=vel.y;
+            if (spazpos.x > pos.x+distFromOrigin.x) {
+                vel.x = vel.x*-1-GetRandomValue(1, 2);
+                spazpos.x = pos.x+distFromOrigin.x-25;
+                distFromOrigin.x+=2;
+            }
+            else if (spazpos.x < pos.x-distFromOrigin.x) {
+                vel.x = vel.x*-1+GetRandomValue(1, 2);
+                spazpos.x = pos.x-distFromOrigin.x+25;
+                distFromOrigin.x+=2;
+            }
+            if (spazpos.y > pos.y+distFromOrigin.y) {
+                vel.y = vel.y*-1-GetRandomValue(-2, 2);
+                spazpos.y = pos.y+distFromOrigin.y-25;
+                distFromOrigin.y+=2;
+            }
+            else if (spazpos.y < pos.y-distFromOrigin.y) {
+                vel.y = vel.y*-1+GetRandomValue(-2, 2);
+                spazpos.y = pos.y-distFromOrigin.y+25;
+                distFromOrigin.y+=2;
+            }
+            fade-=0.007;
+        }
+        //this is just for our iniitial pause before the spaz
+        else {
+            time--;
+        }
+        DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){spazpos.x, spazpos.y, 50, 50}, (Vector2){25, 25}, 0, Fade(WHITE, fade));
+    }
     Vector2 pos;
     Vector2 vel;
     std::string id;
@@ -49,6 +91,11 @@ struct PowerupItem {
     //how many frames before item despawns (60 frames per second)
     int time;
     double fade = 1;
+    bool removed = false;
+
+    //for da spaz
+    Vector2 spazpos;
+    Vector2 distFromOrigin = (Vector2) {5, 5};
 };
 
 struct Multiplier: PowerupItem {
@@ -131,7 +178,7 @@ class Powerup {
 
     //storage for spawned powerups
     powerList spawnedPower;
-    PowerupItem currPower[3];
+    std::vector<PowerupItem> currPower;
 };
 
 #endif

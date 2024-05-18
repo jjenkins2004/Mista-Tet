@@ -2,7 +2,7 @@
 
 Powerup::Powerup() {
     for (int i = 0; i < 3; i++) {
-        currPower[i] = PowerupItem();
+        currPower.push_back(PowerupItem());
     }
 }
 
@@ -28,20 +28,51 @@ void Powerup::drawPowerup() {
 
     //drawing powerups
     item* it = spawnedPower.head;
+    bool removed = false;
     while(it != nullptr) {
-        it->curr.moveItem();
-        it->curr.DrawItem();
-        it->curr.time--;
-        if (it->curr.time <= 0) {
-            if (it->curr.fade <= 0) {
-                item* temp = it; it = it->next;
-                spawnedPower.remove(temp);
-            }
-            else {
-                it->curr.fade-=0.01;
+        if (it->curr.removed) {
+            it->curr.spaz();
+        }
+        else {
+            it->curr.moveItem();
+            it->curr.DrawItem();
+            it->curr.time--;
+            if (CheckCollisionPointCircle(GetMousePosition(), it->curr.pos, 25) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                it->curr.removed = true;
             }
         }
-        it = it->next;
+        if (it->curr.removed || it->curr.time <= 0) {
+                if (it->curr.fade <= 0) {
+                    item* temp = it; it = it->next;
+                    removed = true;
+                    for (int i = 0; i < 3; i++) {
+                        if (currPower[i].id == "null") {
+                            currPower[i] = temp->curr;
+                            if (i == 0) {
+                                currPower[i].pos.x = circle1.x; currPower[i].pos.y = circle1.y;
+                            }
+                            else if (i == 1) {
+                                currPower[i].pos.x = circle2.x; currPower[i].pos.y = circle2.y;
+                            }
+                            else if (i == 2) {
+                                currPower[i].pos.x = circle3.x; currPower[i].pos.y = circle3.y;
+                            }
+                            currPower[i].fade = 1;
+                            break;
+                        }
+                    }
+                    spawnedPower.remove(temp);
+                }
+                else if (!it->curr.removed) {
+                    it->curr.fade-=0.01;
+                }
+            }
+        if (!removed) {
+            it = it->next;
+        }
+        else {
+            removed = false;
+        }
     }
     for (int i = 0; i < 3; i++) {
         if (currPower[i].id != "null") {
@@ -59,21 +90,18 @@ void Powerup::spawnPowerup() {
         int rand = GetRandomValue(1, 50);
         //x2 multiplier
         if (rand <= 10) {
-            std::cout << "creating x2 multiplier" << std::endl;
             int rand = GetRandomValue(20, 35);
-            spawnedPower.push_back(Multiplier(2, 600, "resources/powerup/x2Multiplier.png", (Vector2){static_cast<float>(rand+GetRandomValue(0, 1)*rand*-2), static_cast<float>(GetRandomValue(15, 30))}));
+            spawnedPower.push_back(Multiplier(2, 600, "resources/powerup/x2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(15, 30))}));
         }
         //x1.5 multiplier
         else if (rand <= 25 && rand > 10) {
-            std::cout << "creating x1.5 multiplier" << std::endl;
             int rand = GetRandomValue(10, 20);
-            spawnedPower.push_back(Multiplier(2, 1200, "resources/powerup/x1,5Multiplier.png", (Vector2){static_cast<float>(rand+GetRandomValue(0, 1)*rand*-2), static_cast<float>(GetRandomValue(0, 20))}));
+            spawnedPower.push_back(Multiplier(2, 1200, "resources/powerup/x1,5Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 20))}));
         }
         //x1.2 multiplier
         else if (rand <=50 && rand > 25) {
-            std::cout << "creating x1.2 multiplier" << std::endl;
             int rand = GetRandomValue(5, 15);
-            spawnedPower.push_back(Multiplier(2, 1500, "resources/powerup/x1,2Multiplier.png", (Vector2){static_cast<float>(rand+GetRandomValue(0, 1)*rand*-2), static_cast<float>(GetRandomValue(0, 15))}));
+            spawnedPower.push_back(Multiplier(2, 1500, "resources/powerup/x1,2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 15))}));
         }  
         //
     }
