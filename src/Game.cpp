@@ -51,6 +51,8 @@ int main() {
             grid->setScoreBoard(score);
             grid->setTet(tet);
             grid->setPowerup(powerUp);
+            powerUp->setScore(score);
+            powerUp->setGrid(grid);
             level = 0;
             levelcounter = 0;
             horizontalcounter = 0;
@@ -169,6 +171,18 @@ int main() {
         if (IsKeyPressed(KEY_C)) {
             grid->hold();
         }
+
+        //check if any powerups are being used
+        if (IsKeyPressed(KEY_ONE)) {
+            powerUp->usePowerup(1);
+        }
+        else if (IsKeyPressed(KEY_TWO)) {
+            powerUp->usePowerup(2);
+        }
+        else if (IsKeyPressed(KEY_THREE)) {
+            powerUp->usePowerup(3);
+        }
+
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {

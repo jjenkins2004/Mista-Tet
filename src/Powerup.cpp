@@ -2,7 +2,7 @@
 
 Powerup::Powerup() {
     for (int i = 0; i < 3; i++) {
-        currPower.push_back(PowerupItem());
+        currPower.push_back(new PowerupItem());
     }
 }
 
@@ -30,41 +30,41 @@ void Powerup::drawPowerup() {
     item* it = spawnedPower.head;
     bool removed = false;
     while(it != nullptr) {
-        if (it->curr.removed) {
-            it->curr.spaz();
+        if (it->curr->removed) {
+            it->curr->spaz();
         }
         else {
-            it->curr.moveItem();
-            it->curr.DrawItem();
-            it->curr.time--;
-            if (CheckCollisionPointCircle(GetMousePosition(), it->curr.pos, 25) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                it->curr.removed = true;
+            it->curr->moveItem();
+            it->curr->DrawItem();
+            it->curr->time--;
+            if (CheckCollisionPointCircle(GetMousePosition(), it->curr->pos, 25) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                it->curr->removed = true;
             }
         }
-        if (it->curr.removed || it->curr.time <= 0) {
-                if (it->curr.fade <= 0) {
+        if (it->curr->removed || it->curr->time <= 0) {
+                if (it->curr->fade <= 0) {
                     item* temp = it; it = it->next;
                     removed = true;
                     for (int i = 0; i < 3; i++) {
-                        if (currPower[i].id == "null") {
+                        if (currPower[i]->id == "null") {
                             currPower[i] = temp->curr;
                             if (i == 0) {
-                                currPower[i].pos.x = circle1.x; currPower[i].pos.y = circle1.y;
+                                currPower[i]->pos.x = circle1.x; currPower[i]->pos.y = circle1.y;
                             }
                             else if (i == 1) {
-                                currPower[i].pos.x = circle2.x; currPower[i].pos.y = circle2.y;
+                                currPower[i]->pos.x = circle2.x; currPower[i]->pos.y = circle2.y;
                             }
                             else if (i == 2) {
-                                currPower[i].pos.x = circle3.x; currPower[i].pos.y = circle3.y;
+                                currPower[i]->pos.x = circle3.x; currPower[i]->pos.y = circle3.y;
                             }
-                            currPower[i].fade = 1;
+                            currPower[i]->fade = 1;
                             break;
                         }
                     }
                     spawnedPower.remove(temp);
                 }
-                else if (!it->curr.removed) {
-                    it->curr.fade-=0.01;
+                else if (!it->curr->removed) {
+                    it->curr->fade-=0.01;
                 }
             }
         if (!removed) {
@@ -75,8 +75,8 @@ void Powerup::drawPowerup() {
         }
     }
     for (int i = 0; i < 3; i++) {
-        if (currPower[i].id != "null") {
-            currPower[i].DrawItem();
+        if (currPower[i]->id != "null") {
+            currPower[i]->DrawItem();
         }
     }
 }
@@ -91,18 +91,29 @@ void Powerup::spawnPowerup() {
         //x2 multiplier
         if (rand <= 10) {
             int rand = GetRandomValue(20, 35);
-            spawnedPower.push_back(Multiplier(2, 600, "resources/powerup/x2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(15, 30))}));
+            spawnedPower.push_back(new Multiplier(2, 600, "resources/powerup/x2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(15, 30))}));
         }
         //x1.5 multiplier
         else if (rand <= 25 && rand > 10) {
             int rand = GetRandomValue(10, 20);
-            spawnedPower.push_back(Multiplier(2, 1200, "resources/powerup/x1,5Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 20))}));
+            spawnedPower.push_back(new Multiplier(2, 1200, "resources/powerup/x1,5Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 20))}));
         }
         //x1.2 multiplier
         else if (rand <=50 && rand > 25) {
             int rand = GetRandomValue(5, 15);
-            spawnedPower.push_back(Multiplier(2, 1500, "resources/powerup/x1,2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 15))}));
+            spawnedPower.push_back(new Multiplier(2, 1500, "resources/powerup/x1,2Multiplier.png", (Vector2){0, static_cast<float>(GetRandomValue(0, 15))}));
         }  
         //
+    }
+}
+
+PowerupItem* Powerup::usePowerup(int k) {
+    PowerupItem* p;
+    p = currPower[k-1];
+    currPower[k-1] = new PowerupItem();
+    if (p->id == "multiplier") {
+        Multiplier* m = dynamic_cast<Multiplier*>(p);
+        src->addMultiplier(m->multiplier);
+        delete m;
     }
 }

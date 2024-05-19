@@ -42,3 +42,7 @@ void Score::addScore(int score) {
     }
     scores.push_back(Text(s.c_str(), 690, 637, font, c));
 }
+
+void updateMultiplier() {
+    
+}

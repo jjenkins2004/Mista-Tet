@@ -14,6 +14,7 @@ struct Text {
     double alpha;
     Color color;
 
+    //used for animation when score is being added
     void move() {
         xpos+=xVelocity;
         ypos+=yVelocity;
@@ -47,13 +48,32 @@ class Score {
 
         //add some numeber to the score
         void addScore(int score);
+
+        //adding multiplier
+        void addMultiplier(int i);
+        //updating the multipliers
+        void updateMultiplier();
+
         
     private:
+        //font we are using for text
         Font allFont = LoadFont("resources/allFont.ttf");
-        int score;
-        std::vector<Text> scores;
-        double multiplier = 5;
+
+        //the current multipliers that are being applied
+        std::vector<std::pair<int, int>> currmultipliers;
+
+        //current level (used for color of text)
         int level;
+
+        //used for animation of scores being added
+        std::vector<Text> scores;
+
+        //current multiplier
+        double multiplier = 5;
+
+        //the current score
+        int score;
+        
 };
 
 #endif

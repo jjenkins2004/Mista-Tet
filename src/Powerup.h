@@ -2,6 +2,7 @@
 #define POWERUP_H
 
 #include "raylib.h"
+#include "grid.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -14,6 +15,7 @@ struct PowerupItem {
     PowerupItem() {
         id = "null";
     }
+    virtual ~PowerupItem() {}
     PowerupItem(std::string i, std::string txt, int t, Vector2 v): id(i), time(t), vel(v){
         if (i != "null") {
             pos.x = GetRandomValue(30, 770);
@@ -109,21 +111,19 @@ struct Multiplier: PowerupItem {
 
 //list we will use to store current powerups
 struct item {
-    PowerupItem curr;
+    PowerupItem* curr;
     item* next;
     item* prev;
 };
 
 struct powerList {
-    void push_back(PowerupItem i) {
-        std::cout << "adding item" << std::endl;
+    void push_back(PowerupItem* i) {
         if (tail != nullptr) {
             tail->next = new item();
             tail->next->next = nullptr; tail->next->curr = i; tail->next->prev = tail;
             tail = tail->next;
         }
         else {
-            std::cout << "addddding item" << std::endl;
             head = new item();
             tail = head;
             head->curr = i; head->next = nullptr; head->prev = nullptr;
@@ -143,6 +143,7 @@ struct powerList {
         if (i->next != nullptr) {
             i->next->prev = i->prev;
         }
+        delete i->curr;
         delete i;
     }
     item* head = nullptr;
@@ -157,11 +158,20 @@ class Powerup {
         void updateLevel(int l) {
             level = l;
         }
+
+        //setting access to other classes
+        void setScore(Score* s) {
+            src = s;
+        }
+        void setGrid(Grid* g) {
+            grid = g;
+        }
+
+        //powerup related functions
         void drawPowerup();
         void spawnPowerup();
-        int checkPowerup();
+        PowerupItem* usePowerup(int k);
 
-        
     private:
     //font
     Font allFont = LoadFont("resources/allFont.ttf");
@@ -178,7 +188,11 @@ class Powerup {
 
     //storage for spawned powerups
     powerList spawnedPower;
-    std::vector<PowerupItem> currPower;
+    std::vector<PowerupItem*> currPower;
+
+    //other classes
+    Grid* grid;
+    Score* src;
 };
 
 #endif
