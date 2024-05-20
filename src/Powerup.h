@@ -2,7 +2,7 @@
 #define POWERUP_H
 
 #include "raylib.h"
-#include "grid.h"
+#include "Score.h"
 #include <vector>
 #include <string>
 #include <iostream>
@@ -10,6 +10,7 @@
 #define RECWIDTH 240
 #define RECHEIGHT 70
 
+class Grid;
 
 struct PowerupItem {
     PowerupItem() {

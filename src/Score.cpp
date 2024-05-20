@@ -44,5 +44,6 @@ void Score::addScore(int score) {
 }
 
 void updateMultiplier() {
-    
+
 }
+
