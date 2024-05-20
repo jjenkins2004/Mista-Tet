@@ -25,7 +25,7 @@ int main() {
     int horizontalcounter = 0;
     int downcounter = 0;
     int powerupcounter = 0;
-    int spawnpower = /*GetRandomValue(5*60, 10*60)*/ 60;
+    int spawnpower = GetRandomValue(10*60, 15*60);
     bool start = true;
     int level = 0;
 
@@ -105,7 +105,7 @@ int main() {
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup();
             powerupcounter = 0;
-            spawnpower = /*GetRandomValue(5*60, 10*60)*/ 60;
+            spawnpower = GetRandomValue(10*60, 15*60);
         }
         powerupcounter++;
 
@@ -182,7 +182,7 @@ int main() {
         else if (IsKeyPressed(KEY_THREE)) {
             powerUp->usePowerup(3);
         }
-
+        score->updateMultiplier();
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {

@@ -17,11 +17,11 @@ struct PowerupItem {
         id = "null";
     }
     virtual ~PowerupItem() {}
-    PowerupItem(std::string i, std::string txt, int t, Vector2 v): id(i), time(t), vel(v){
+    PowerupItem(std::string i, Texture2D txt, int t, Vector2 v): id(i), time(t), vel(v){
         if (i != "null") {
             pos.x = GetRandomValue(30, 770);
             pos.y = -25;
-            texture = LoadTexture(txt.c_str());
+            texture = txt;
         }
     }
     void DrawItem() {
@@ -95,6 +95,7 @@ struct PowerupItem {
     int time;
     double fade = 1;
     bool removed = false;
+    bool positive;
 
     //for da spaz
     Vector2 spazpos;
@@ -102,7 +103,13 @@ struct PowerupItem {
 };
 
 struct Multiplier: PowerupItem {
-    Multiplier(double m, int time, std::string texture, Vector2 v): PowerupItem("multiplier", texture, time, v) {
+    Multiplier(double m, int time, Texture2D texture, Vector2 v): PowerupItem("multiplier", texture, time, v) {
+        if (m < 1) {
+            positive = false;
+        }
+        else {
+            positive = true;
+        }
         multiplier = m;
     }
     double multiplier;
@@ -144,7 +151,6 @@ struct powerList {
         if (i->next != nullptr) {
             i->next->prev = i->prev;
         }
-        delete i->curr;
         delete i;
     }
     item* head = nullptr;
@@ -171,11 +177,19 @@ class Powerup {
         //powerup related functions
         void drawPowerup();
         void spawnPowerup();
-        PowerupItem* usePowerup(int k);
+        void usePowerup(int k);
 
     private:
     //font
     Font allFont = LoadFont("resources/allFont.ttf");
+
+    //textures
+    Texture2D x2 = LoadTexture("resources/powerup/x2Multiplier.png");
+    Texture2D x1_5 = LoadTexture("resources/powerup/x1,5Multiplier.png");
+    Texture2D x1_2 = LoadTexture("resources/powerup/x1,2Multiplier.png");
+    Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
+    Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
+
     //level
     int level;
 

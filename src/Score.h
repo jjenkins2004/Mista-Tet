@@ -2,6 +2,7 @@
 #define SCORE_H
 
 #include <vector>
+#include <deque>
 #include <string>
 #include <raylib.h>
 
@@ -50,7 +51,7 @@ class Score {
         void addScore(int score);
 
         //adding multiplier
-        void addMultiplier(int i);
+        void addMultiplier(double i);
         //updating the multipliers
         void updateMultiplier();
 
@@ -60,7 +61,7 @@ class Score {
         Font allFont = LoadFont("resources/allFont.ttf");
 
         //the current multipliers that are being applied
-        std::vector<std::pair<int, int>> currmultipliers;
+        std::deque<std::pair<double, int>> currmultipliers;
 
         //current level (used for color of text)
         int level;
@@ -69,7 +70,7 @@ class Score {
         std::vector<Text> scores;
 
         //current multiplier
-        double multiplier = 5;
+        double multiplier = 1;
 
         //the current score
         int score;
