@@ -8,11 +8,13 @@
 
 int menu();
 int pause();
+int usePower(PowerupItem* p, Score* src, Grid* grid);
 
 int main() {
     // Initialization
     //--------------------------------------------------------------------------------------
     InitWindow(screenWidth, screenHeight, "TETris");
+    InitAudioDevice();
     
     ChangeDirectory(GetApplicationDirectory());
     Grid* grid = nullptr;
@@ -58,7 +60,6 @@ int main() {
             grid->setTet(tet);
             grid->setPowerup(powerUp);
             powerUp->setScore(score);
-            powerUp->setGrid(grid);
             level = 0;
             levelcounter = 0;
             horizontalcounter = 0;
@@ -179,14 +180,18 @@ int main() {
         }
 
         //check if any powerups are being used
+        PowerupItem* p;
         if (IsKeyPressed(KEY_ONE)) {
-            powerUp->usePowerup(1);
+            p = powerUp->usePowerup(1);
         }
         else if (IsKeyPressed(KEY_TWO)) {
-            powerUp->usePowerup(2);
+            p = powerUp->usePowerup(2);
         }
         else if (IsKeyPressed(KEY_THREE)) {
-            powerUp->usePowerup(3);
+            p = powerUp->usePowerup(3);
+        }
+        if (usePower(p, score, grid) == -1) {
+            break;
         }
         score->updateMultiplier();
 
@@ -265,6 +270,7 @@ int main() {
         delete powerUp;
     }
     CloseWindow();
+    CloseAudioDevice();
     return 0;
 }
 
@@ -411,4 +417,20 @@ int pause() {
         ++bobCounter;
     }
     return -1;
+}
+
+int usePower(PowerupItem* p, Score* src, Grid* grid) {
+    if (p == nullptr) {
+        return 0;
+    }
+    if (p->id == "multiplier") {
+        Multiplier* m = dynamic_cast<Multiplier*>(p);
+        src->addMultiplier(m->multiplier);
+        delete m;
+    }
+    if (p->id == "laser") {
+        delete p;
+        return grid->lasers();
+    }
+    return 0;
 }

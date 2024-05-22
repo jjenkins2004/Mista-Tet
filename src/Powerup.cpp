@@ -107,6 +107,10 @@ void Powerup::spawnPowerup() {
     if (GetRandomValue(1,2) == 1) {
         positive = true;
     }
+    //temp poweruptest
+    spawnedPower.push_back(new Laser(1200, lasers));
+
+    /*
     if (positive) {
         int rand = GetRandomValue(1, 50);
         //x2 multiplier
@@ -132,16 +136,12 @@ void Powerup::spawnPowerup() {
         else if (rand <= 3) {
             spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
         }
-    }
+    }*/
 }
 
-void Powerup::usePowerup(int k) {
+PowerupItem* Powerup::usePowerup(int k) {
     PowerupItem* p;
     p = currPower[k-1];
     currPower[k-1] = new PowerupItem();
-    if (p->id == "multiplier") {
-        Multiplier* m = dynamic_cast<Multiplier*>(p);
-        src->addMultiplier(m->multiplier);
-        delete m;
-    }
+    return p;
 }

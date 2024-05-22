@@ -46,7 +46,6 @@ void Score::addScore(int score) {
     std::string s;
     if (score*multiplier > 0) {
         s = "+" + convertDecimal(score*multiplier);
-        std::cout << "string s " << s.c_str() << std::endl;
     }
     else {
         s = convertDecimal(score*multiplier);
@@ -82,9 +81,7 @@ std::string Score::convertDecimal(float i) {
         i = float(int(i*10+.5))/10;
     }
     std::string s = std::to_string(i);
-    std::cout << s <<std::endl;
     for (int i = 0; i < s.length(); i++) {
-        std::cout << s.substr(i, 1) <<std::endl;
         if (s.substr(i, 1) == ".") {
             if (i < 2){
                 return s.substr(0, i+2);

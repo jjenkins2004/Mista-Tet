@@ -83,6 +83,9 @@ class Grid {
 
         //add the current block to the hold and current block in the hold becomes active block
         void hold();
+
+        //powerup functions
+        int lasers();
         
         //the class that keeps track of the current moving block
         class Block {

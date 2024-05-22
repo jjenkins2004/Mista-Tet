@@ -437,6 +437,94 @@ int Grid::fixRows(std::vector<int> rows) {
     return -1;
 }
 
+int Grid::lasers() {
+    Rectangle laserHeadSource = {0, 60, 50, 50};
+    Vector2 laserHeadOrigin = {25, 25};
+    Rectangle laserBodySource = {0, 0, 50, 70};
+    Vector2 laserBodyOrigin = {25, 35};
+    Texture2D laser = LoadTexture("resources/powerup/Laser.png");
+    Sound s = LoadSound("resources/audio/laserAudio.wav");
+    float fade = 0;
+    int wait = 0;
+
+    //camera for screen shake
+    Camera2D camera = { 0 };
+    camera.target = (Vector2){400, 400};
+    camera.offset = (Vector2){400, 400};
+    camera.rotation = 0;
+    camera.zoom = 1;
+    float maxAngle = 2;
+    float maxOffset = 15;
+
+    //choosing three random columns
+    int col[3];
+    std::vector<int> nums = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9};
+    for (int i = 0; i < 3; i++) {
+        int randnum = GetRandomValue(0, nums.size()-1);
+        std::vector<int>::iterator it = nums.begin() + randnum;
+        col[i] = nums[randnum];
+        nums.erase(it);
+    }
+    
+    PlaySound(s);
+
+    while(!WindowShouldClose()) {
+
+            if (wait < 90) {
+                wait++;
+                BeginDrawing();
+                    this->drawAll(true);
+                EndDrawing();
+                continue;
+            }
+
+            camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            fade+=0.008;
+            if (fade >= 1.2) {
+                int counter = 0;
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 1; j < 21; j++) {
+                        if (grid[j][col[i]] != 0) {
+                            grid[j][col[i]] = 0;
+                            counter++;
+                        }
+                    }
+                }
+                //the more blocks you break, the higher score and greater multiplier buff
+                this->scr->addMultiplier(1+counter*0.025);
+                this->scr->addScore(counter*10);
+                return 0;
+            }
+    
+
+        BeginDrawing();
+            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
+            BeginMode2D(camera);
+                this->drawAll(true);
+                for (int i = 0; i < 3; i++) {
+                    for (int j = 1; j < 21; j++) {
+                        if (grid[j][col[i]] != 0) {
+                            DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
+                            if (fade > 1 && maxOffset > 3 && maxAngle > 1) {
+                                maxOffset-=0.2;
+                                maxAngle-=0.02;
+                            }
+                        }
+                    }
+                    DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 690.0f-25, 50, 70}, laserBodyOrigin, 0, WHITE);
+                    for (int j = 1; j < 15; j++) {
+                        DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 665.0f-j*60, 50, 70}, laserBodyOrigin, 0, WHITE);
+                    }
+                    DrawTexturePro(laser, laserHeadSource, {215.0f+col[i]*30, 690, 50, 50}, laserHeadOrigin, 0, WHITE);
+                }
+            EndMode2D();
+        EndDrawing();
+    }
+    return -1;
+}
+
 /*****
 *** END OF GRID CLASS 
 ******/

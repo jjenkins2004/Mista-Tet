@@ -10,8 +10,6 @@
 #define RECWIDTH 240
 #define RECHEIGHT 70
 
-class Grid;
-
 struct PowerupItem {
     PowerupItem() {
         id = "null";
@@ -145,6 +143,12 @@ struct Multiplier: PowerupItem {
     double multiplier;
 };
 
+struct Laser: PowerupItem {
+    Laser(int time, Texture2D texture): PowerupItem("laser", texture, time) {
+
+    }
+};
+
 
 
 //list we will use to store current powerups
@@ -200,14 +204,11 @@ class Powerup {
         void setScore(Score* s) {
             src = s;
         }
-        void setGrid(Grid* g) {
-            grid = g;
-        }
 
         //powerup related functions
         void drawPowerup();
         void spawnPowerup();
-        void usePowerup(int k);
+        PowerupItem* usePowerup(int k);
 
     private:
     //font
@@ -219,6 +220,7 @@ class Powerup {
     Texture2D x1_2 = LoadTexture("resources/powerup/x1,2Multiplier.png");
     Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
     Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
+    Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
 
     //level
     int level;
@@ -236,7 +238,6 @@ class Powerup {
     std::vector<PowerupItem*> currPower;
 
     //other classes
-    Grid* grid;
     Score* src;
 };
 
