@@ -70,9 +70,8 @@ struct PowerupItem {
     }
     //gives a eerie animation when powerups are collected
     void spaz() {
-        //vel.x == 0 checks if it is our first time calling spaz
+        //checks if it is our first time calling spaz
         if (!spazzed) {
-            std::cout <<"spazzzzzz" << std::endl;
             spazzed = true;
             time = 45;
             vel.first = 1;
@@ -84,24 +83,24 @@ struct PowerupItem {
         if (time == 0) {
             spazpos.x+=vel.first;
             spazpos.y+=vel.second;
-            if (spazpos.x > pos.first+distFromOrigin.x) {
+            if (spazpos.x > (int)(pos.first)+distFromOrigin.x) {
                 vel.first = vel.first*-1-GetRandomValue(1, 2);
-                spazpos.x = pos.first+distFromOrigin.x-25;
+                spazpos.x = pos.first+distFromOrigin.x-26;
                 distFromOrigin.x+=2;
             }
-            else if (spazpos.x < pos.second-distFromOrigin.x) {
+            else if (spazpos.x < (int)(pos.first)-distFromOrigin.x) {
                 vel.first = vel.first*-1+GetRandomValue(1, 2);
-                spazpos.x = pos.first-distFromOrigin.x+25;
+                spazpos.x = pos.first-distFromOrigin.x+26;
                 distFromOrigin.x+=2;
             }
             if (spazpos.y > pos.second+distFromOrigin.y) {
                 vel.second = vel.second*-1-GetRandomValue(-2, 2);
-                spazpos.y = pos.second+distFromOrigin.y-25;
+                spazpos.y = pos.second+distFromOrigin.y-26;
                 distFromOrigin.y+=2;
             }
             else if (spazpos.y < pos.second-distFromOrigin.y) {
                 vel.second = vel.second*-1+GetRandomValue(-2, 2);
-                spazpos.y = pos.second-distFromOrigin.y+25;
+                spazpos.y = pos.second-distFromOrigin.y+26;
                 distFromOrigin.y+=2;
             }
             fade-=0.007;

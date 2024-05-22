@@ -1,6 +1,5 @@
 #include "Score.h"
 #include "string"
-#include "iostream"
 
 Score::Score(): score(0) {}
 
@@ -19,10 +18,10 @@ void Score::drawScore() {
     DrawTextPro(allFont, multipliertxt.c_str(), (Vector2){650, 750}, (Vector2){MeasureTextEx(allFont, multipliertxt.c_str(), 25, 3).x/2, MeasureTextEx(GetFontDefault(), multipliertxt.c_str(), 25, 3).y/2}, 0, 25, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
 
     std::string text;
-    for (int i = 0; i < 6-std::to_string(score).length(); i++) {
+    for (int i = 0; i < 6-std::to_string(int(score)).length(); i++) {
         text+='0';
     }
-    text+=std::to_string(score);
+    text+=std::to_string(int(score));
     DrawRectangleRoundedLines((Rectangle){570, 625, 160, 90}, 0.2, 100, 5, (Color){80, 60, 60, 255});
     DrawTextPro(allFont, "score", (Vector2){650, 645}, (Vector2){MeasureTextEx(allFont, "score", 35, 3).x/2, MeasureTextEx(allFont, "score", 35, 3).y/2}, 0, 35, 3, DarkRed);
     DrawTextPro(allFont, "score", (Vector2){650, 645}, (Vector2){MeasureTextEx(allFont, "score", 35, 3).x/2, MeasureTextEx(allFont, "score", 35, 3).y/2}, 0, 35, 3, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
@@ -38,9 +37,21 @@ void Score::drawScore() {
 }
 
 void Score::addScore(int score) {
-    this->score+=score*multiplier;
-    std::string s = "+" + std::to_string((int)(score*multiplier));
-    int font = 12 + log2(score*multiplier)*2;
+    if (this->score+score*multiplier > 0) {
+        this->score+=score*multiplier;
+    }
+    else {
+        this->score = 0;
+    }
+    std::string s;
+    if (score*multiplier > 0) {
+        s = "+" + convertDecimal(score*multiplier);
+        std::cout << "string s " << s.c_str() << std::endl;
+    }
+    else {
+        s = convertDecimal(score*multiplier);
+    }
+    int font = 12 + log2(abs(score*multiplier))*2;
     Color c = WHITE;
     if (score*multiplier >= 50) {
         c = GOLD;
@@ -61,4 +72,27 @@ void Score::updateMultiplier() {
 
 void Score::addMultiplier(double i) {
     currmultipliers.push_back(std::make_pair(i, 1800));
+}
+
+std::string Score::convertDecimal(float i) {
+    if (i < 0) {
+        i = float(int(i*10-.5))/10;
+    }
+    else {
+        i = float(int(i*10+.5))/10;
+    }
+    std::string s = std::to_string(i);
+    std::cout << s <<std::endl;
+    for (int i = 0; i < s.length(); i++) {
+        std::cout << s.substr(i, 1) <<std::endl;
+        if (s.substr(i, 1) == ".") {
+            if (i < 2){
+                return s.substr(0, i+2);
+            }
+            else {
+                return s.substr(0, i);
+            }
+        } 
+    }
+    return s;
 }

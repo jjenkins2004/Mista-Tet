@@ -64,6 +64,7 @@ void Powerup::drawPowerup() {
                                     currPower[i]->pos.first = circle3.x; currPower[i]->pos.second = circle3.y;
                                 }
                                 currPower[i]->fade = 1;
+                                currPower[i]->rotation.first = 0;
                                 added = true;
                                 break;
                             }

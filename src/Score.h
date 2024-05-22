@@ -5,9 +5,12 @@
 #include <deque>
 #include <string>
 #include <raylib.h>
+#include <iostream>
 
 struct Text {
-    Text(std::string t, int x, int y, int f, Color c): text(t), xpos(x), ypos(y), fsize(f), alpha(1), color(c) {}
+    Text(std::string t, int x, int y, int f, Color c): text(t), xpos(x), ypos(y), fsize(f), alpha(1), color(c) {
+        std::cout << "text is " << t << std::endl;
+    }
     std::string text;
     int xpos;
     int ypos;
@@ -57,6 +60,9 @@ class Score {
 
         
     private:
+        //convert a decimal to a string with only one decimal place or none
+        std::string convertDecimal(float x);
+
         //font we are using for text
         Font allFont = LoadFont("resources/allFont.ttf");
 
@@ -70,10 +76,10 @@ class Score {
         std::vector<Text> scores;
 
         //current multiplier
-        double multiplier = 1;
+        float multiplier = 1;
 
         //the current score
-        int score;
+        float score;
         
 };
 
