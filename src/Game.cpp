@@ -64,7 +64,7 @@ int main() {
             horizontalcounter = 0;
             downcounter = 0;
             //temp
-            /*start = false; continue;*/
+            start = false; continue;
             if (menu() == -1) {
                 break;
             }
@@ -110,7 +110,7 @@ int main() {
 
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup();
-            powerupcounter = 0;
+            powerupcounter = 999;
             spawnpower = GetRandomValue(10*60, 15*60);
         }
         powerupcounter++;

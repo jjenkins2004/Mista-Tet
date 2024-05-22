@@ -55,13 +55,13 @@ void Powerup::drawPowerup() {
                             if (currPower[i]->id == "null") {
                                 currPower[i] = temp->curr;
                                 if (i == 0) {
-                                    currPower[i]->pos.x = circle1.x; currPower[i]->pos.y = circle1.y;
+                                    currPower[i]->pos.first = circle1.x; currPower[i]->pos.second = circle1.y;
                                 }
                                 else if (i == 1) {
-                                    currPower[i]->pos.x = circle2.x; currPower[i]->pos.y = circle2.y;
+                                    currPower[i]->pos.first = circle2.x; currPower[i]->pos.second = circle2.y;
                                 }
                                 else if (i == 2) {
-                                    currPower[i]->pos.x = circle3.x; currPower[i]->pos.y = circle3.y;
+                                    currPower[i]->pos.first = circle3.x; currPower[i]->pos.second = circle3.y;
                                 }
                                 currPower[i]->fade = 1;
                                 added = true;
@@ -79,7 +79,7 @@ void Powerup::drawPowerup() {
             it->curr->moveItem();
             it->curr->DrawItem();
             it->curr->time--;
-            if (CheckCollisionPointCircle(GetMousePosition(), it->curr->pos, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 it->curr->removed = true;
             }
         }
@@ -110,15 +110,15 @@ void Powerup::spawnPowerup() {
         int rand = GetRandomValue(1, 50);
         //x2 multiplier
         if (rand <= 10) {
-            spawnedPower.push_back(new Multiplier(2, 600, x2, (Vector2){0, static_cast<float>(GetRandomValue(20, 35))}));
+            spawnedPower.push_back(new Multiplier(2, 600, x2));
         }
         //x1.5 multiplier
         else if (rand <= 25 && rand > 10) {
-            spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5, (Vector2){0, static_cast<float>(GetRandomValue(0, 20))}));
+            spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
         }
         //x1.2 multiplier
         else if (rand <=50 && rand > 25) {
-            spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2, (Vector2){0, static_cast<float>(GetRandomValue(0, 15))}));
+            spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
         }  
         //
     }
@@ -126,10 +126,10 @@ void Powerup::spawnPowerup() {
         int rand = GetRandomValue(1, 3);
         //negative multiplier
         if (rand <= 1) {
-            spawnedPower.push_back(new Multiplier(-1, 1500, xNegative, (Vector2){0, static_cast<float>(GetRandomValue(0,20))}));
+            spawnedPower.push_back(new Multiplier(-1, 1500, xNegative));
         }
         else if (rand <= 3) {
-            spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7, (Vector2){0, static_cast<float>(GetRandomValue(0,20))}));
+            spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
         }
     }
 }
