@@ -11,11 +11,14 @@ void Powerup::drawPowerup() {
     //drawing border and powerup placeholders
     DrawRectangleRoundedLines(powerBoard, 0.2, 100, 5, (Color){80, 60, 60, 255});
     DrawCircleV(circle1, 25, circleColor);
-    DrawCircleV(circle1, 22, BLACK);
+    DrawCircleV(circle1, 23, BLACK);
+    DrawCircleV(circle1, 23, (Color){static_cast<unsigned char>(0+level/2), 0, 0});
     DrawCircleV(circle2, 25, circleColor);
-    DrawCircleV(circle2, 22, BLACK);
+    DrawCircleV(circle2, 23, BLACK);
+    DrawCircleV(circle2, 23, (Color){static_cast<unsigned char>(0+level/2), 0, 0});
     DrawCircleV(circle3, 25, circleColor);
-    DrawCircleV(circle3, 22, BLACK);
+    DrawCircleV(circle3, 23, BLACK);
+    DrawCircleV(circle3, 23, (Color){static_cast<unsigned char>(0+level/2), 0, 0});
 
     //drawing text
     Color DarkRed = {static_cast<unsigned char>(255-level*1.4), 0, 0, 255};

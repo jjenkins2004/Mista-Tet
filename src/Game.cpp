@@ -29,6 +29,12 @@ int main() {
     bool start = true;
     int level = 0;
 
+    Camera2D camera = {0};
+    camera.target = (Vector2){screenWidth/2, screenHeight/2};
+    camera.offset = (Vector2){screenWidth/2, screenHeight/2};
+    camera.rotation = 180;
+    camera.zoom = 1;
+
     SetTargetFPS(60);               // Set our game to run at 60 frames-per-second
     //--------------------------------------------------------------------------------------
 
