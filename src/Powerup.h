@@ -149,6 +149,12 @@ struct Laser: PowerupItem {
     }
 };
 
+struct Bomb: PowerupItem{
+    Bomb(int time, Texture2D texture): PowerupItem("bomb", texture, time) {
+
+    }
+};
+
 
 
 //list we will use to store current powerups
@@ -221,6 +227,7 @@ class Powerup {
     Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
     Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
     Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
+    Texture2D bomb = LoadTexture("resources/powerup/Bomb.png");
 
     //level
     int level;

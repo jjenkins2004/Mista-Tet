@@ -108,7 +108,7 @@ void Powerup::spawnPowerup() {
         positive = true;
     }
     //temp poweruptest
-    spawnedPower.push_back(new Laser(1200, lasers));
+    spawnedPower.push_back(new Bomb(1200, bomb));
 
     /*
     if (positive) {
@@ -125,6 +125,9 @@ void Powerup::spawnPowerup() {
         else if (rand <=50 && rand > 25) {
             spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
         }  
+        else if () {
+            spawnedPower.push_back(new Laser(1200, lasers));
+        }
         //
     }
     else {

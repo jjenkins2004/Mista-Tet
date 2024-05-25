@@ -28,6 +28,8 @@ void Grid::drawGrid(bool drawBlock) {
     float borderWidth = 10;
     Color borderColor = (Color){80, 60, 60, 255};
 
+    ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
+
     //filling in 10x20 grid based on the 2d array
     for (int i = 1; i < 21; i++) {
         for (int j = 0; j < 10; j++) {
@@ -236,21 +238,24 @@ void Grid::hold() {
 }
 
 void Grid::placeBlock() {
-    bool lose = false;
     const std::pair<int, int>* pos = block.getPos();
     for (int i = 0; i < 4; i++) {
         grid[pos[i].second][pos[i].first] = block.getId();
-        if (pos[i].second == 1) {
+    }
+}
+
+void Grid::generateBlock() {
+    bool lose = false;
+    block = Block(next.front(), grid);
+    const std::pair<int, int>* pos = block.getPos();
+    for (int i = 0; i < 4; i++) {
+        if (grid[pos[i].second][pos[i].first] != 0) {
             lose = true;
         }
     }
     if (lose) {
         gameover = true;
     }
-}
-
-void Grid::generateBlock() {
-    block = Block(next.front(), grid);
     next.pop_front();
     next.push_back(randBlock.getBlock());
     ableToHold = true;
@@ -307,7 +312,6 @@ int Grid::removeRow(std::vector<int>& rows) {
                     counter++;
                 }
                 BeginDrawing();
-                    ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                     drawAll(false);
                 EndDrawing();
             }
@@ -391,7 +395,6 @@ int Grid::fixRows(std::vector<int> rows) {
                             counter++;
                         }
                         BeginDrawing();
-                            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                             drawAll(false);
                         EndDrawing();
                     }
@@ -428,7 +431,6 @@ int Grid::fixRows(std::vector<int> rows) {
         //drawing
         BeginDrawing();
 
-            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
             drawAll(false);
 
         EndDrawing();
@@ -500,14 +502,13 @@ int Grid::lasers() {
     
 
         BeginDrawing();
-            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
             BeginMode2D(camera);
                 this->drawAll(true);
                 for (int i = 0; i < 3; i++) {
                     for (int j = 1; j < 21; j++) {
                         if (grid[j][col[i]] != 0) {
                             DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
-                            if (fade > 1 && maxOffset > 3 && maxAngle > 1) {
+                            if (fade > 0.5 && maxOffset > 1 && maxAngle > 0.5) {
                                 maxOffset-=0.2;
                                 maxAngle-=0.02;
                             }
@@ -521,6 +522,86 @@ int Grid::lasers() {
                 }
             EndMode2D();
         EndDrawing();
+    }
+    return -1;
+}
+
+int Grid::bomb() {
+    Sound s = LoadSound("resources/audio/explosion.wav");
+    Texture2D target = LoadTexture("resources/powerup/target.png");
+    Texture2D explosion = LoadTexture("resources/powerup/Explosion.png");
+    int counter1 = 0;
+    int counter2 = 0;
+    Rectangle pos = {350, 400, 100, 100};
+    Rectangle explosionSource = {0, 0, 250, 275};
+    double fade = 1;
+    int explosionStage = 0;
+    
+    while(!WindowShouldClose()) {
+        if (counter1 <= 130) {
+            if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) {
+                pos.x+=5;
+            }
+            if (IsKeyDown(KEY_LEFT) && pos.x - 5 > 200) {
+                pos.x-=5;
+            }
+            if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) {
+                pos.y+=5;
+            }
+            if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) {
+                pos.y-=5;
+            }
+            BeginDrawing();
+                this->drawAll(true);
+                DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, WHITE);
+            EndDrawing();
+            counter1++;
+            continue;
+        }
+        if (fade >= -0.2) {
+            fade-=0.015;
+            BeginDrawing();
+                this->drawAll(true);
+                DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, Fade(WHITE, fade));
+            EndDrawing();
+            continue;
+        }
+        if (counter2 < 160) {
+            if (counter2 == 30) {
+                PlaySound(s);
+            }
+            if (counter2 % 20 == 0 && counter2 != 0) {
+                if (counter2 == 80) {
+                    explosionSource.x = 0;
+                    explosionSource.y = 275;
+                    int counter = 0;
+                    //deleting the blocks that were touched by explosion and adding score
+                    for (int i = 0; i < 20; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            if (CheckCollisionPointCircle({200+ 15.0f + j*30, 100+ 15.0f + i*30}, {pos.x, pos.y}, 100)) {
+                                counter++;
+                                if (grid[i][j] != 0) {
+                                    grid[i][j] = 0;
+                                    counter++;
+                                }
+                            }
+                        }
+                    }
+                scr->addScore(counter*20);
+                }
+                else {
+                    explosionSource.x+=250;
+                }
+            }
+            BeginDrawing();
+                this->drawAll(true);
+                DrawTexturePro(explosion, explosionSource, {pos.x, pos.y, 250, 225}, {125, 122}, 0, WHITE);
+            EndDrawing();
+            counter2++;
+            continue;
+        }
+        return 0;
+
     }
     return -1;
 }

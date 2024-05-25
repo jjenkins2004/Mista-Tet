@@ -432,5 +432,9 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
         delete p;
         return grid->lasers();
     }
+    if (p->id == "bomb") {
+        delete p;
+        return grid->bomb();
+    }
     return 0;
 }
