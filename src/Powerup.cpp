@@ -108,7 +108,7 @@ void Powerup::spawnPowerup() {
         positive = true;
     }
     //temp poweruptest
-    spawnedPower.push_back(new Laser(1200, lasers));
+    spawnedPower.push_back(new Nuke(1000, nuke));
 
     /*
     if (positive) {

@@ -582,10 +582,12 @@ int Grid::bomb() {
             continue;
         }
         if (counter2 < 160) {
-            camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-            camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-            camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-            if (counter2 == 30) {
+            if (counter2 > 20) {
+                camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            }
+            if (counter2 == 20) {
                 PlaySound(s);
             }
             if (counter2 % 20 == 0 && counter2 != 0) {
@@ -635,7 +637,83 @@ int Grid::bomb() {
 }
 
 int Grid::nuke() {
+    Texture2D explosion = LoadTexture("resources/powerup/NuclearExplosion.png");
+    Sound alarm = LoadSound("resources/audio/alarm.wav");
+    Sound explosionSound = LoadSound("resources/audio/nukeSound.wav");
+    int counter1 = 0;
+    int counter2 = 0;
+    Rectangle source = {0, 0, 150, 120};
+    double fade1 = 1;
+    double fade2 = 0;
 
+     //camera for screen shake
+    Camera2D camera = { 0 };
+    camera.target = (Vector2){400, 400};
+    camera.offset = (Vector2){400, 400};
+    camera.rotation = 0;
+    camera.zoom = 1;
+    float maxAngle = 2;
+    float maxOffset = 25;
+
+    while (!WindowShouldClose()) {
+        if (counter1 < 180) {
+            counter1++;
+            if (counter1 == 30) {
+                PlaySound(alarm);
+            }
+            BeginDrawing();
+                this->drawAll(true);
+            EndDrawing();
+            continue;
+        }
+        if (counter2 < 400) {
+            if (counter2 == 60) {
+                PlaySound(explosionSound);
+            }
+            if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) {
+                source.x += 150;
+            }
+            if (counter2 > 200) {
+                fade1-=0.005;
+            }
+            if (counter2 >= 60) {
+                camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            }
+            if (counter2 >= 300) {
+                if (maxOffset > 1) {
+                    maxOffset-=0.4;
+                }
+                if (maxAngle > 0.5) {
+                    maxAngle-=0.02;
+                }
+            }
+            fade2+=0.005;
+            BeginDrawing();
+                BeginMode2D(camera);
+                    this->drawAll(true);
+                    for (int i = 1; i < 21; i++) {
+                        for (int j = 0; j < 10; j++) {
+                            if (grid[i][j] != 0) {
+                                DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
+                            }
+                        }
+                    }
+                    DrawTexturePro(explosion, source, {350, 700, 300, 500}, {150, 500}, 0, Fade(WHITE, fade1));
+                EndMode2D();
+            EndDrawing();
+            counter2++;
+            continue;
+        }
+         for (int i = 1; i < 21; i++) {
+            for (int j = 0; j < 10; j++) {
+                grid[i][j] = 0;
+            }
+         }
+        return 0;
+    }
+    return -1;
 }
 
 /*****
