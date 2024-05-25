@@ -87,6 +87,7 @@ class Grid {
         //powerup functions
         int lasers();
         int bomb();
+        int nuke();
         
         //the class that keeps track of the current moving block
         class Block {

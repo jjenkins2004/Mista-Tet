@@ -9,7 +9,7 @@
 
 struct Text {
     Text(std::string t, int x, int y, int f, Color c): text(t), xpos(x), ypos(y), fsize(f), alpha(1), color(c) {
-        std::cout << "text is " << t << std::endl;
+        
     }
     std::string text;
     int xpos;

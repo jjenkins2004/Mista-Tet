@@ -436,5 +436,9 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
         delete p;
         return grid->bomb();
     }
+    if (p->id == "nuke") {
+        delete p;
+        return grid->nuke();
+    }
     return 0;
 }

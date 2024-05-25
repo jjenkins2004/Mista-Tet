@@ -500,7 +500,14 @@ int Grid::lasers() {
                 return 0;
             }
     
-
+            if (fade > 0.5) {
+                if (maxOffset > 1) {
+                    maxOffset-=0.3;
+                }
+                if (maxAngle > 0.5) {
+                    maxAngle-=0.025;
+                }
+            }
         BeginDrawing();
             BeginMode2D(camera);
                 this->drawAll(true);
@@ -508,10 +515,6 @@ int Grid::lasers() {
                     for (int j = 1; j < 21; j++) {
                         if (grid[j][col[i]] != 0) {
                             DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
-                            if (fade > 0.5 && maxOffset > 1 && maxAngle > 0.5) {
-                                maxOffset-=0.2;
-                                maxAngle-=0.02;
-                            }
                         }
                     }
                     DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 690.0f-25, 50, 70}, laserBodyOrigin, 0, WHITE);
@@ -527,6 +530,7 @@ int Grid::lasers() {
 }
 
 int Grid::bomb() {
+    Sound tick = LoadSound("resources/audio/Ticking.wav");
     Sound s = LoadSound("resources/audio/explosion.wav");
     Texture2D target = LoadTexture("resources/powerup/target.png");
     Texture2D explosion = LoadTexture("resources/powerup/Explosion.png");
@@ -536,9 +540,20 @@ int Grid::bomb() {
     Rectangle explosionSource = {0, 0, 250, 275};
     double fade = 1;
     int explosionStage = 0;
+
+    //camera for screen shake
+    Camera2D camera = { 0 };
+    camera.target = (Vector2){400, 400};
+    camera.offset = (Vector2){400, 400};
+    camera.rotation = 0;
+    camera.zoom = 1;
+    float maxAngle = 2;
+    float maxOffset = 15;
+
     
+    PlaySound(tick);
     while(!WindowShouldClose()) {
-        if (counter1 <= 130) {
+        if (counter1 <= 150) {
             if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) {
                 pos.x+=5;
             }
@@ -567,6 +582,9 @@ int Grid::bomb() {
             continue;
         }
         if (counter2 < 160) {
+            camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             if (counter2 == 30) {
                 PlaySound(s);
             }
@@ -593,9 +611,19 @@ int Grid::bomb() {
                     explosionSource.x+=250;
                 }
             }
+            if (counter2 > 100) {
+                if (maxOffset > 1) {
+                    maxOffset-=0.3;
+                }
+                if (maxAngle > 1) {
+                    maxAngle-=0.05;
+                }
+            }
             BeginDrawing();
-                this->drawAll(true);
-                DrawTexturePro(explosion, explosionSource, {pos.x, pos.y, 250, 225}, {125, 122}, 0, WHITE);
+                BeginMode2D(camera);
+                    this->drawAll(true);
+                    DrawTexturePro(explosion, explosionSource, {pos.x, pos.y, 250, 225}, {125, 122}, 0, WHITE);
+                EndMode2D();
             EndDrawing();
             counter2++;
             continue;
@@ -604,6 +632,10 @@ int Grid::bomb() {
 
     }
     return -1;
+}
+
+int Grid::nuke() {
+
 }
 
 /*****
