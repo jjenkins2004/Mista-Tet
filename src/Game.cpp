@@ -141,7 +141,7 @@ int main() {
         }
 
         else if (IsKeyDown(KEY_LEFT)) {
-            if (horizontalcounter == 4) {
+            if (horizontalcounter == 3) {
                 horizontalcounter = 0;
                 grid->moveLeft();
             }
@@ -157,7 +157,7 @@ int main() {
         }
 
         else if (IsKeyDown(KEY_DOWN)) {
-            if (downcounter == 4) {
+            if (downcounter == 3) {
                 downcounter = 0;
                 grid->moveDown();
                 score->addScore(1);
@@ -169,6 +169,8 @@ int main() {
         }
 
         else if (IsKeyPressed(KEY_SPACE)) {
+            Sound drop = LoadSound("resources/audio/blockdropping.wav");
+            PlaySound(drop);
             score->addScore(grid->drop()*1.5);
             checkRows = true;
         }
@@ -428,6 +430,7 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
         return 0;
     }
     if (p->id == "multiplier") {
+        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         Multiplier* m = dynamic_cast<Multiplier*>(p);
         src->addMultiplier(m->multiplier);
         delete m;
@@ -445,6 +448,7 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
         return grid->nuke();
     }
     if (p->id == "threeblock") {
+        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
         grid->changeNext(t->blockID);
         delete t;
