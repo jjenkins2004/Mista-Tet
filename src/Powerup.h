@@ -162,6 +162,13 @@ struct Nuke: PowerupItem {
 
 };
 
+struct ThreeBlock: PowerupItem {
+    ThreeBlock(int time, Texture2D texture, int id): PowerupItem("threeblock", texture, time) {
+        blockID = id;
+    }
+    int blockID;
+};
+
 
 
 //list we will use to store current powerups
@@ -187,7 +194,6 @@ struct powerList {
     void remove(item* i) {
         if (i == head) {
             head = i->next;
-
         }
         if (i == tail) {
             tail = i->prev;
@@ -236,6 +242,11 @@ class Powerup {
     Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
     Texture2D bomb = LoadTexture("resources/powerup/Bomb.png");
     Texture2D nuke = LoadTexture("resources/powerup/Nuke.png");
+    Texture2D Jblock = LoadTexture("resources/powerup/Jblock.png");
+    Texture2D Lblock = LoadTexture("resources/powerup/Lblock.png");
+    Texture2D Oblock = LoadTexture("resources/powerup/Oblock.png");
+    Texture2D Tblock = LoadTexture("resources/powerup/Tblock.png");
+    Texture2D Iblock = LoadTexture("resources/powerup/Iblock.png");
 
     //level
     int level;

@@ -29,9 +29,13 @@ class Grid {
         //convinient funciton that draws everything
         void drawAll(bool block) {
             drawGrid(block);
+            std::cout << "drew grid" << std::endl;
             scr->drawScore();
+            std::cout << "drew score" << std::endl;
             tet->drawTet();
+            std::cout << "drew tet" << std::endl;
             pow->drawPowerup();
+            std::cout << "drew powerup" << std::endl;
         }
         //draws the grid and bool tells grid if block should also be drawn
         void drawGrid(bool block);
@@ -88,6 +92,7 @@ class Grid {
         int lasers();
         int bomb();
         int nuke();
+        void changeNext(int i);
         
         //the class that keeps track of the current moving block
         class Block {

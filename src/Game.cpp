@@ -43,6 +43,7 @@ int main() {
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
+        std::cout << "start of game loop" << std::endl;
         // Main Menu into tet monologue
         //----------------------------------------------------------------------------------
         if (start) {
@@ -108,13 +109,15 @@ int main() {
             grid->updatelevel(level);
         }
         levelcounter++;
+        std::cout << "updated level" << std::endl;
 
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup();
-            powerupcounter = 999;
-            spawnpower = GetRandomValue(10*60, 15*60);
+            powerupcounter = 0;
+            spawnpower = GetRandomValue(3*60, 5*60);
         }
         powerupcounter++;
+        std::cout << "spawned powerup" << std::endl;
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
@@ -178,9 +181,9 @@ int main() {
         if (IsKeyPressed(KEY_C)) {
             grid->hold();
         }
-
+        std::cout << "checked for movement" << std::endl;
         //check if any powerups are being used
-        PowerupItem* p;
+        PowerupItem* p = nullptr;
         if (IsKeyPressed(KEY_ONE)) {
             p = powerUp->usePowerup(1);
         }
@@ -194,6 +197,7 @@ int main() {
             break;
         }
         score->updateMultiplier();
+        std::cout << "used powerup" << std::endl;
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {
@@ -221,6 +225,8 @@ int main() {
                 }
             }
         }
+
+        std::cout << "after checkRows" << std::endl;
 
         //checking if the game should be over
         if (grid->checkGameOver()) {
@@ -254,12 +260,10 @@ int main() {
         // Draw
         //----------------------------------------------------------------------------------
             BeginDrawing();
-
-                ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                 grid->drawAll(true);
-
             EndDrawing();
         //----------------------------------------------------------------------------------
+        std::cout << "drew everything" << std::endl;
     }
 
     // De-Initialization
@@ -439,6 +443,11 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
     if (p->id == "nuke") {
         delete p;
         return grid->nuke();
+    }
+    if (p->id == "threeblock") {
+        ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
+        grid->changeNext(t->blockID);
+        delete t;
     }
     return 0;
 }

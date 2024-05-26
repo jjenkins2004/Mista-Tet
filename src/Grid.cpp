@@ -716,6 +716,13 @@ int Grid::nuke() {
     return -1;
 }
 
+void Grid::changeNext(int i) {
+    for (int j = 0; j < 3; j++) {
+        next.pop_front();
+        next.push_back(i);
+    }
+}
+
 /*****
 *** END OF GRID CLASS 
 ******/

@@ -35,10 +35,10 @@ void Powerup::drawPowerup() {
             currPower[i]->DrawItem();
         }
     }
-
     item* it = spawnedPower.head;
     bool removed = false;
     while(it != nullptr) {
+        std::cout << "before removed" << std::endl;
         if (it->curr->removed) {
             it->curr->spaz();
             if (it->curr->fade <= 0) {
@@ -47,7 +47,6 @@ void Powerup::drawPowerup() {
                     bool added = false;
                     if (temp->curr->id == "multiplier" && !temp->curr->positive) {
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
-                        std::cout << "added " << m->multiplier << std::endl;
                         src->addMultiplier(m->multiplier);
                     }
                     else {
@@ -84,6 +83,7 @@ void Powerup::drawPowerup() {
                 it->curr->removed = true;
             }
         }
+        std::cout << "after removed" << std::endl;
         if (it != nullptr && it->curr->time <= 0 && !it->curr->removed) {
             it->curr->fade-=0.01;
             if (it->curr->fade <= 0) {
@@ -100,49 +100,64 @@ void Powerup::drawPowerup() {
             removed = false;
         }
     }
+    std::cout << "after loop" << std::endl;
 }
 
 void Powerup::spawnPowerup() {
     bool positive = false;
-    if (GetRandomValue(1,2) == 1) {
-        positive = true;
-    }
-    //temp poweruptest
-    spawnedPower.push_back(new Nuke(1000, nuke));
-
-    /*
-    if (positive) {
-        int rand = GetRandomValue(1, 50);
+    int rand1 = GetRandomValue(1, 9);
+    
+    if (rand1 <= 3) {
+        int rand2 = GetRandomValue(1, 50);
         //x2 multiplier
-        if (rand <= 10) {
+        if (rand2 <= 5) {
             spawnedPower.push_back(new Multiplier(2, 600, x2));
         }
         //x1.5 multiplier
-        else if (rand <= 25 && rand > 10) {
+        else if (rand2 <= 15) {
             spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
         }
         //x1.2 multiplier
-        else if (rand <=50 && rand > 25) {
+        else if (rand2 <= 30) {
             spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
         }  
-        else if () {
-            spawnedPower.push_back(new Laser(1200, lasers));
-        }
-        else if () {
-            spawnedPowerup.push_back(new Bomb(1200, bomb));
-        }
-        //
-    }
-    else {
-        int rand = GetRandomValue(1, 3);
-        //negative multiplier
-        if (rand <= 1) {
+        else if (rand2 <= 40) {
             spawnedPower.push_back(new Multiplier(-1, 1500, xNegative));
         }
-        else if (rand <= 3) {
+        else {
             spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
         }
-    }*/
+    }
+    else if (rand1 <= 6) {
+        int rand2 = GetRandomValue(1, 50);
+        if (rand2 <= 10) {
+            spawnedPower.push_back(new ThreeBlock(1200, Iblock, 1));
+        }
+        else if (rand2 <= 20) {
+            spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
+        }
+        else if (rand2 <= 30) {
+            spawnedPower.push_back(new ThreeBlock(1200, Lblock, 3));
+        }
+        else if (rand2 <= 40) {
+            spawnedPower.push_back(new ThreeBlock(1200, Oblock, 4));
+        }
+        else if (rand2 <= 50) {
+            spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
+        }
+    }
+    else if (rand1 <= 9) { 
+        int rand2 = GetRandomValue(1, 50);
+        if (rand2 <= 20) {
+            spawnedPower.push_back(new Laser(1200, lasers));
+        }
+        else if (rand2 <= 40) {
+            spawnedPower.push_back(new Bomb(1200, bomb));
+        }
+        else {
+            spawnedPower.push_back(new Nuke(1000, nuke));
+        }
+    }
 }
 
 PowerupItem* Powerup::usePowerup(int k) {
