@@ -1,0 +1,6 @@
+.DS_Store
+.vscode/
+bin/.DS_Store
+bin/resources/.DS_Store
+bin/resources/audio/.DS_Store
+bin/resources/powerup/.DS_Store
