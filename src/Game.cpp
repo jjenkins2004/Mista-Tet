@@ -42,7 +42,6 @@ int main() {
     // Main game loop
     while (!WindowShouldClose())    // Detect window close button or ESC key
     {
-        std::cout << "start of game loop" << std::endl;
         // Main Menu into tet monologue
         //----------------------------------------------------------------------------------
         if (start) {
@@ -108,7 +107,6 @@ int main() {
             grid->updatelevel(level);
         }
         levelcounter++;
-        std::cout << "updated level" << std::endl;
 
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup();
@@ -116,7 +114,6 @@ int main() {
             spawnpower = GetRandomValue(3*60, 5*60);
         }
         powerupcounter++;
-        std::cout << "spawned powerup" << std::endl;
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
@@ -182,7 +179,6 @@ int main() {
         if (IsKeyPressed(KEY_C)) {
             grid->hold();
         }
-        std::cout << "checked for movement" << std::endl;
         //check if any powerups are being used
         PowerupItem* p = nullptr;
         if (IsKeyPressed(KEY_ONE)) {
@@ -198,7 +194,6 @@ int main() {
             break;
         }
         score->updateMultiplier();
-        std::cout << "used powerup" << std::endl;
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {
@@ -227,7 +222,6 @@ int main() {
             }
         }
 
-        std::cout << "after checkRows" << std::endl;
 
         //checking if the game should be over
         if (grid->checkGameOver()) {
@@ -264,7 +258,6 @@ int main() {
                 grid->drawAll(true);
             EndDrawing();
         //----------------------------------------------------------------------------------
-        std::cout << "drew everything" << std::endl;
     }
 
     // De-Initialization

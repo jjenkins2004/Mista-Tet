@@ -38,7 +38,6 @@ void Powerup::drawPowerup() {
     item* it = spawnedPower.head;
     bool removed = false;
     while(it != nullptr) {
-        std::cout << "before removed" << std::endl;
         if (it->curr->removed) {
             it->curr->spaz();
             if (it->curr->fade <= 0) {
@@ -85,7 +84,6 @@ void Powerup::drawPowerup() {
                 it->curr->removed = true;
             }
         }
-        std::cout << "after removed" << std::endl;
         if (it != nullptr && it->curr->time <= 0 && !it->curr->removed) {
             it->curr->fade-=0.01;
             if (it->curr->fade <= 0) {
@@ -102,7 +100,6 @@ void Powerup::drawPowerup() {
             removed = false;
         }
     }
-    std::cout << "after loop" << std::endl;
 }
 
 void Powerup::spawnPowerup() {

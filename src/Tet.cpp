@@ -7,13 +7,60 @@ using namespace std;
 Tet::Tet(Score* s): src(s) {
      tet1 = LoadTexture("resources/mistaTet1.png");
      tetFont = LoadFont("resources/allFont.ttf");
+     for (int i = 0; i < 20; i++) {
+        vals.push_back(i);
+     }
 }
 
 void Tet::drawTet() {
-    Rectangle source = (Rectangle) {0, 0, tdim, tdim};
-    Rectangle dest = (Rectangle) {650, 400, tdim*3.5, tdim*3.5};
-    DrawTexturePro(tet1, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, 0,  WHITE);
-    DrawTextPro(tetFont, "hello i like poo", (Vector2){550, 50}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+    
+    //tet and what he is saying
+    DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, 0,  WHITE);
+
+    if (wait) {
+        if (time == waitTime) {
+            time = 0;
+            wait = false;
+            tetText = "";
+        }
+        time++;
+        SetTextLineSpacing(20);
+        DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+    }
+    else if (time == timebetweenText) {
+        if (txtCounter == 3) {
+            if (txtTracker < noEffectText[noEffect].size()) {
+                tetText+= noEffectText[noEffect].substr(txtTracker, 1);
+                txtTracker++;
+            }
+            else {
+                time = 0;
+                txtTracker = 0;
+                wait = true;
+                waitTime = 300 + tetText.size()*3;
+            }
+            txtCounter = 0;
+        }
+        else {
+            ++txtCounter;
+        }
+        SetTextLineSpacing(20);
+        DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+    }
+    else {
+        time++;
+        if (time == timebetweenText) {
+            //choosing which text we should put on screen
+            if (vals.size() == 0) {
+                for (int i = 0; i < 20; i++) {
+                    vals.push_back(i);
+                }
+            }
+            std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
+            noEffect = *it;
+            vals.erase(it);
+        }
+    }
 }
 
 int Tet::tetMonologue() {
