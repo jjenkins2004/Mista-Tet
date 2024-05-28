@@ -57,6 +57,10 @@ class Score {
         void addMultiplier(double i);
         //updating the multipliers
         void updateMultiplier();
+        //getting score
+        float getScore() {
+            return score;
+        }
 
         
     private:

@@ -104,6 +104,9 @@ int main() {
             grid->moveDown();
             score->addScore(1);
             checkRows = true;
+            if (level < int(score->getScore()/2500)+1) {
+                level = int(score->getScore()/2500)+1;
+            }
             grid->updatelevel(level);
         }
         levelcounter++;
@@ -167,7 +170,7 @@ int main() {
         else if (IsKeyPressed(KEY_SPACE)) {
             Sound drop = LoadSound("resources/audio/blockdropping.wav");
             PlaySound(drop);
-            score->addScore(grid->drop()*1.5);
+            score->addScore(grid->drop()*2);
             checkRows = true;
         }
 

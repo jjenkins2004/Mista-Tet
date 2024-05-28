@@ -104,16 +104,16 @@ void Powerup::drawPowerup() {
 
 void Powerup::spawnPowerup() {
     bool positive = false;
-    int rand1 = GetRandomValue(1, 9);
+    int rand1 = GetRandomValue(1, 10);
     
-    if (rand1 <= 3) {
+    if (rand1 <= 4) {
         int rand2 = GetRandomValue(1, 50);
         //x2 multiplier
-        if (rand2 <= 5) {
+        if (rand2 <= 10) {
             spawnedPower.push_back(new Multiplier(2, 600, x2));
         }
         //x1.5 multiplier
-        else if (rand2 <= 15) {
+        else if (rand2 <= 20) {
             spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
         }
         //x1.2 multiplier
@@ -127,7 +127,7 @@ void Powerup::spawnPowerup() {
             spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
         }
     }
-    else if (rand1 <= 6) {
+    else if (rand1 <= 8) {
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 10) {
             spawnedPower.push_back(new ThreeBlock(1200, Iblock, 1));
@@ -145,7 +145,7 @@ void Powerup::spawnPowerup() {
             spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
         }
     }
-    else if (rand1 <= 9) { 
+    else if (rand1 <= 10) { 
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 20) {
             spawnedPower.push_back(new Laser(1200, lasers));

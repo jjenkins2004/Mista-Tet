@@ -377,16 +377,16 @@ int Grid::fixRows(std::vector<int> rows) {
                 if (leave) {
                     counter = 0;
                     if (rows.size() == 1) {
-                        scr->addScore(50);
-                    }
-                    else if (rows.size() == 2) {
                         scr->addScore(150);
                     }
+                    else if (rows.size() == 2) {
+                        scr->addScore(400);
+                    }
                     else if (rows.size() == 3) {
-                        scr->addScore(300);
+                        scr->addScore(600);
                     }
                     else {
-                        scr->addScore(500);
+                        scr->addScore(1000);
                     }
                     while (!WindowShouldClose()) {
                         if (counter == 15) {
@@ -498,7 +498,7 @@ int Grid::lasers() {
                 }
                 //the more blocks you break, the higher score and greater multiplier buff
                 this->scr->addMultiplier(1+counter*0.025);
-                this->scr->addScore(counter*10);
+                this->scr->addScore(counter*30);
                 return 0;
             }
     
@@ -609,7 +609,7 @@ int Grid::bomb() {
                             }
                         }
                     }
-                scr->addScore(counter*20);
+                scr->addScore(counter*25);
                 }
                 else {
                     explosionSource.x+=250;
@@ -708,11 +708,16 @@ int Grid::nuke() {
             counter2++;
             continue;
         }
-         for (int i = 1; i < 21; i++) {
+        int gridCounter = 0;
+        for (int i = 1; i < 21; i++) {
             for (int j = 0; j < 10; j++) {
+                if (grid[i][j] != 0) {
+                    gridCounter++;
+                }
                 grid[i][j] = 0;
             }
-         }
+        }
+        scr->addScore(gridCounter*10);
         return 0;
     }
     return -1;

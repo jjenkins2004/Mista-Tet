@@ -74,13 +74,15 @@ class Tet {
     tetPower bottomblind1 = {"Bottom fourth of the\nboard is now blocked.", "bottomblind1"};
     tetPower bottomblind2 = {"Bottom half of the\nboard is now blocked", "bottomblind2"};
     tetPower flip = {"TURN THE SCREEN!", "turn"};
-    
+    tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};
+    tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};
+
 
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     const std::vector<std::vector<tetPower>> tetPowers1 = { 
-                                                        {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1}, 
-                                                        {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip}};
+                                                        {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock}, 
+                                                        {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock}};
 
     //for tet's face
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
