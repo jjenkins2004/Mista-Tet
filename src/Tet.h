@@ -64,14 +64,23 @@ class Tet {
     };
 
     //defining our tetPowers
-    tetPower halfMultiplier = {"You're progressing too quickly\nfor my liking. Half multiplier!", "half"};
+    tetPower lessMultiplier = {"Wow, you're score is so\nhigh. Let's slow down.", "less"};
+    tetPower halfMultiplier = {"You're progressing too\nquickly for my liking.\nHalf multiplier!", "half"};
+    tetPower negativeMultiplier = {"Mhhhh... That score is\ngetting too high for\nmy liking.", "negative"};
+    tetPower increaseLevel1 = {"How about we spice\nthings up a little?", "level1"};
+    tetPower increaseLevel2 = {"Okay, let's spice\nthings up a lot!", "level2"};
+    tetPower topblind1 = {"Top fourth of the\nboard is now blocked.", "topblind1"};
+    tetPower topblind2 = {"Top half of the\nboard is now blocked.", "topblind2"};
+    tetPower bottomblind1 = {"Bottom fourth of the\nboard is now blocked.", "bottomblind1"};
+    tetPower bottomblind2 = {"Bottom half of the\nboard is now blocked", "bottomblind2"};
+    tetPower flip = {"TURN THE SCREEN!", "turn"};
+    
 
-    //4 vector<tetPower> inside a vector which represents the different stages, progressively gets better powers
+
+    //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     const std::vector<std::vector<tetPower>> tetPowers1 = { 
-                                                        {}, 
-                                                        {}, 
-                                                        {}, 
-                                                        {}};
+                                                        {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1}, 
+                                                        {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip}};
 
     //for tet's face
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
