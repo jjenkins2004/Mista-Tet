@@ -26,9 +26,38 @@ void Tet::drawTet() {
         DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
     }
     else if (time == timebetweenText) {
-        if (txtCounter == 3) {
-            if (txtTracker < noEffectText[noEffect].size()) {
-                tetText+= noEffectText[noEffect].substr(txtTracker, 1);
+        if (txtCounter == txtCounterWait) {
+            if (!stop) {
+                if (tetpowertoggle) {
+                    if (tetStage <=2) {
+                        tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
+                        if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
+                            std::cout << "stopping" << std::endl;
+                            tetpowertoggle = false;
+                            stop = true;
+                        }
+                    }
+                    else {
+                        tetText += tetPowers2[txtIndex].dialogue.substr(txtTracker, 1);
+                        if (txtTracker == tetPowers2[txtIndex].dialogue.length()-1) {
+                            tetpowertoggle = false;
+                            stop = true;
+                        }
+                    }
+                }
+                else {
+                    tetText+= noEffectText[txtIndex].substr(txtTracker, 1);
+                    if (txtTracker == noEffectText[txtIndex].length()-1) {
+                        stop = true;
+                    }
+                }
+                string lastletter = tetText.substr(tetText.length()-1, 1);
+                if (lastletter == "." || lastletter == "?" || lastletter == "!") {
+                    txtCounterWait = 15;
+                }
+                else {
+                    txtCounterWait = 3;
+                }
                 txtTracker++;
             }
             else {
@@ -36,6 +65,7 @@ void Tet::drawTet() {
                 txtTracker = 0;
                 wait = true;
                 waitTime = 300 + tetText.size()*3;
+                timebetweenText = GetRandomValue(1*60, 3*60);
             }
             txtCounter = 0;
         }
@@ -48,15 +78,31 @@ void Tet::drawTet() {
     else {
         time++;
         if (time == timebetweenText) {
+            stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) {
                 for (int i = 0; i < 20; i++) {
                     vals.push_back(i);
                 }
             }
-            std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
-            noEffect = *it;
-            vals.erase(it);
+            int num = 3;
+            if (tetStage >= 3) {
+                num = 5;
+            }
+            if (GetRandomValue(1, 10) <= num) {
+                tetpowertoggle = true;
+                if (tetStage <=2) {
+                    txtIndex = /*GetRandomValue(0, 6)*/0;
+                }
+                else {
+                    txtIndex = GetRandomValue(0, 7);
+                }
+            }
+            else {
+                std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
+                txtIndex = *it;
+                vals.erase(it);
+            }
         }
     }
 }

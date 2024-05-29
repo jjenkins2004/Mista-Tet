@@ -28,11 +28,13 @@ class Tet {
     //during the game for when tet is talking
     std::string tetText;
     int txtCounter = 0;
+    int txtCounterWait = 3;
     int txtTracker = 0;
-    int noEffect; //which index in noEffectText are we using right now
+    int txtIndex; //which index are we using right now
     std::vector<int> vals; //which dialougues tet can say (to make sure two dont repeat back to back)
-    int timebetweenText = GetRandomValue(2*60, 3*60);
+    int timebetweenText = GetRandomValue(1*60, 3*60);
     int time = 0; int waitTime; bool wait;
+    bool stop;
 
 
     //possible tet text that has no effect
@@ -77,12 +79,12 @@ class Tet {
     tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};
 
+    bool tetpowertoggle = false; //to determine if next dialogue should be a tetPower
 
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
-    const std::vector<std::vector<tetPower>> tetPowers1 = { 
-                                                        {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock}, 
-                                                        {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock}};
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock};
+    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock};
 
     //for tet's face
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
