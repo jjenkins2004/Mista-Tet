@@ -90,6 +90,9 @@ class Tet {
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock};
 
     //for tet's face
+    void tetBob(); int bobCounter = 0; double yvel = -0.25; bool bobWait = false;
+    void tetTalk(bool wait); int tetCounter = 0; int tetCounterMax = GetRandomValue(3, 7); int facePhase = 0;
+    bool spaceWait = false; //make sure tet's mouth is closed when there is a period.
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
     Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};
     Texture2D t = LoadTexture("resources/mistaTet1.png");

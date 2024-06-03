@@ -15,6 +15,9 @@ void Tet::drawTet() {
     //tet and what he is saying
     DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, 0,  WHITE);
 
+    //tetbobbing
+    tetBob();
+
     if (wait) {
         if (time == waitTime) {
             time = 0;
@@ -27,6 +30,7 @@ void Tet::drawTet() {
     }
     else if (time == timebetweenText) {
         if (txtCounter == txtCounterWait) {
+            spaceWait = false;
             if (!stop) {
                 if (tetpowertoggle) {
                     if (tetStage <=2) {
@@ -56,6 +60,13 @@ void Tet::drawTet() {
                 }
                 string lastletter = tetText.substr(tetText.length()-1, 1);
                 if (lastletter == "." || lastletter == "?" || lastletter == "!") {
+                    if (tetStage <= 2) {
+                        spaceWait = true;
+                        if (facePhase == 1) {
+                           source.x-=tdim; 
+                        }
+                        tetCounter = 0; tetCounterMax = GetRandomValue(3, 7); facePhase = 0;
+                    }
                     txtCounterWait = 15;
                 }
                 else {
@@ -66,6 +77,7 @@ void Tet::drawTet() {
                     else {
                         talk++;
                     }
+
                     txtCounterWait = 3;
                 }
                 txtTracker++;
@@ -85,6 +97,7 @@ void Tet::drawTet() {
         }
         SetTextLineSpacing(20);
         DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+        tetTalk(spaceWait);
     }
     else {
         time++;
@@ -218,5 +231,63 @@ void Tet::usePower(tetPower p) {
     }
     else if (p.power == "negative") {
         src->addMultiplier(-1);
+    }
+}
+
+void Tet::tetTalk(bool wait) {
+    if (tetStage <= 2 && !wait) {
+        if (tetCounter == tetCounterMax) {
+            if (facePhase == 0) {
+                source.x+=tdim;
+                facePhase = 1;
+                tetCounterMax = GetRandomValue(8, 12);
+            }
+            else {
+                source.x-=tdim;
+                facePhase = 0;
+                tetCounterMax = GetRandomValue(3, 7);
+            }
+            tetCounter = 0;
+        }
+        else {
+            tetCounter++;
+        }
+    }
+}
+
+void Tet::tetBob() {
+    double maxBobSpeed = 0.25;
+    if (bobWait) {
+            if (bobCounter == 50) {
+                bobCounter = 0;
+                bobWait = false;
+            }
+            else {
+                bobCounter++;
+            }
+    }
+    else {
+        dest.y += yvel;
+        if (dest.y <= 335 && yvel < 0) {
+            yvel+=maxBobSpeed/50;
+            if (yvel > -maxBobSpeed/100) {
+                yvel = maxBobSpeed/50;
+                bobWait = true;
+            }
+        }
+        else if (dest.y >= 343.75 && yvel > 0) {
+            yvel-=maxBobSpeed/50;
+            if (yvel < maxBobSpeed/100) {
+                dest.y = 350;
+                yvel = -maxBobSpeed/50;
+                bobWait = true;
+            }
+        }
+        else if (yvel < 0 && yvel >-maxBobSpeed) {
+            yvel-=maxBobSpeed/50;
+        }
+        else if (yvel > 0 && yvel < maxBobSpeed) {
+            yvel+=maxBobSpeed/50;
+        }
     }
 }
