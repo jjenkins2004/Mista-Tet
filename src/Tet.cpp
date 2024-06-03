@@ -56,11 +56,19 @@ void Tet::drawTet() {
                     txtCounterWait = 15;
                 }
                 else {
+                    if (talk == 2) {
+                        PlaySound(LoadSound(tetSounds[GetRandomValue(0, 6)].c_str()));
+                        talk = 0;
+                    }
+                    else {
+                        talk++;
+                    }
                     txtCounterWait = 3;
                 }
                 txtTracker++;
             }
             else {
+                talk = 2;
                 time = 0;
                 txtTracker = 0;
                 wait = true;

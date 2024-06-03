@@ -92,6 +92,9 @@ class Tet {
     Texture2D t = LoadTexture("resources/mistaTet1.png");
     int tetStage = 1;
 
+    //for tet talking
+    std::vector<std::string> tetSounds = {"resources/audio/tetTalk1.wav", "resources/audio/tetTalk2.wav", "resources/audio/tetTalk3.wav", "resources/audio/tetTalk4.wav", "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", "resources/audio/tetTalk7.wav"};
+    int talk = 2;
 
     Score* src;
     Font tetFont = LoadFont("resources/allFont.ttf");
