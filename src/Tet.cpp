@@ -32,16 +32,19 @@ void Tet::drawTet() {
                     if (tetStage <=2) {
                         tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
-                            std::cout << "stopping" << std::endl;
+                            PlaySound(debuff);
                             tetpowertoggle = false;
                             stop = true;
+                            usePower(tetPowers1[txtIndex]);
                         }
                     }
                     else {
                         tetText += tetPowers2[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers2[txtIndex].dialogue.length()-1) {
+                            if (txtIndex != 5) PlaySound(debuff);
                             tetpowertoggle = false;
                             stop = true;
+                            usePower(tetPowers2[txtIndex]);
                         }
                     }
                 }
@@ -100,7 +103,7 @@ void Tet::drawTet() {
             if (GetRandomValue(1, 10) <= num) {
                 tetpowertoggle = true;
                 if (tetStage <=2) {
-                    txtIndex = /*GetRandomValue(0, 6)*/0;
+                    txtIndex = /*GetRandomValue(0, 6)*/1;
                 }
                 else {
                     txtIndex = GetRandomValue(0, 7);
@@ -204,4 +207,16 @@ int Tet::tetMonologue() {
         }
     }
     return -1;
+}
+
+void Tet::usePower(tetPower p) {
+    if (p.power == "less") {
+        src->addMultiplier(0.7);
+    }
+    else if (p.power == "half") {
+        src->addMultiplier(0.5);
+    }
+    else if (p.power == "negative") {
+        src->addMultiplier(-1);
+    }
 }

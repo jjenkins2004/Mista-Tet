@@ -65,6 +65,8 @@ class Tet {
         std::string power;
     };
 
+    void usePower(tetPower p); //function we call to realize the effect of the tetPower
+
     //defining our tetPowers
     tetPower lessMultiplier = {"Wow, you're score is so\nhigh. Let's slow down.", "less"};
     tetPower halfMultiplier = {"You're progressing too\nquickly for my liking.\nHalf multiplier!", "half"};
@@ -81,6 +83,7 @@ class Tet {
 
     bool tetpowertoggle = false; //to determine if next dialogue should be a tetPower
 
+    Sound debuff = LoadSound("resources/audio/tetDeBuff.wav"); //play this when player is debuffed by tet
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock};
