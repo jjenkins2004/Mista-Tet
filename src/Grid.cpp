@@ -730,6 +730,31 @@ void Grid::changeNext(int i) {
     }
 }
 
+void Grid::updatelevel() {
+     if (rawLevel < int(scr->getScore()/2000)+1) {
+        rawLevel = int(scr->getScore()/2000)+1;
+    }
+    level = rawLevel;
+    for (std::vector<std::pair<int, int>>::iterator it = changeLevel.begin(); it != changeLevel.end(); it++) {
+        level+=it->first;
+        
+        if (level > 99) {
+            level = 99;
+        }
+        it->second--;
+        if (it->second == 0) {
+            changeLevel.erase(it);
+            it--;
+        }
+    }
+    scr->updateLevel(level);
+    pow->updateLevel(level);
+}
+
+void Grid::increaseLevel(int x) {
+    changeLevel.push_back(std::make_pair(x, 1800));
+}
+
 /*****
 *** END OF GRID CLASS 
 ******/

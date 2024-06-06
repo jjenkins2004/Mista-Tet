@@ -116,7 +116,7 @@ void Tet::drawTet() {
             if (GetRandomValue(1, 10) <= num) {
                 tetpowertoggle = true;
                 if (tetStage <=2) {
-                    txtIndex = /*GetRandomValue(0, 6)*/1;
+                    txtIndex = /*GetRandomValue(0, 6)*/2;
                 }
                 else {
                     txtIndex = GetRandomValue(0, 7);
@@ -232,6 +232,9 @@ void Tet::usePower(tetPower p) {
     else if (p.power == "negative") {
         src->addMultiplier(-1);
     }
+    else {
+        currPower = p.power;
+    }
 }
 
 void Tet::tetTalk(bool wait) {
@@ -290,4 +293,10 @@ void Tet::tetBob() {
             yvel+=maxBobSpeed/50;
         }
     }
+}
+
+std::string Tet::checkTetPower() {
+    std::string temp = currPower;
+    currPower = "none";
+    return temp;
 }

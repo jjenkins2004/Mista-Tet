@@ -75,11 +75,15 @@ class Grid {
         }
 
         //update level
-        void updatelevel(int l) {
-            level = l;
-            scr->updateLevel(l);
-            pow->updateLevel(l);
+        void updatelevel();
+
+        //get level
+        int getLevel() {
+            return level;
         }
+
+        //increase level for 30 seconds (tet power)
+        void increaseLevel(int x);
 
         //add the current block to the hold and current block in the hold becomes active block
         void hold();
@@ -156,6 +160,10 @@ class Grid {
         RandomBlock randBlock = RandomBlock();
         //level
         int level = 0;
+        //raw level without tet
+        int rawLevel = 0;
+        //for powerups that change the level
+        std::vector<std::pair<int, int>> changeLevel;
         //is it game over?
         bool gameover = false;
         //our grid of placed blocks

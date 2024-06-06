@@ -98,16 +98,15 @@ int main() {
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
         //using level as x that approaches 120
+        grid->updatelevel();
+        level = grid->getLevel();
         int num = 240/(1+pow(M_E, (-0.05*level)))-120;
+        std::cout << 120-num << std::endl;
         if (levelcounter == 120-(num)) {
             levelcounter = 0;
             grid->moveDown();
             score->addScore(1);
             checkRows = true;
-            if (level < int(score->getScore()/2500)+1) {
-                level = int(score->getScore()/2500)+1;
-            }
-            grid->updatelevel(level);
         }
         levelcounter++;
 
@@ -117,6 +116,15 @@ int main() {
             spawnpower = GetRandomValue(3*60, 5*60);
         }
         powerupcounter++;
+
+        //for tetPower
+        std::string power = tet->checkTetPower();
+        if (power == "level1") {
+            grid->increaseLevel(15);
+        }
+        else if (power == "level2") {
+            grid->increaseLevel(25);
+        }
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {

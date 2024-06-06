@@ -21,6 +21,8 @@ class Tet {
         void drawTet();
         //tet monologue
         int tetMonologue();
+        //check if a tet power is activated
+        std::string checkTetPower();
 
 
     private:
@@ -86,6 +88,7 @@ class Tet {
     Sound debuff = LoadSound("resources/audio/tetDeBuff.wav"); //play this when player is debuffed by tet
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
+    std::string currPower = "null";
     const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock};
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock};
 
