@@ -218,6 +218,29 @@ void Grid::drawGrid(bool drawBlock) {
             }
         }
     }
+
+    //blind tet power
+    for (std::vector<std::tuple<int, int, double>>::iterator it = blindRows.begin(); it != blindRows.end(); it++) {
+        for (int i = 0; i < 10; i++) {
+            DrawTexturePro(fog, {0, 0, 30, 30}, {float(xpos) + 30*i, float(ypos) + 30*(std::get<0>(*it)-1), 30, 30}, {0, 0}, 0, Fade(WHITE, std::get<2>(*it)));
+        }
+        //checking if time is up otherwise decrement time
+        if (std::get<1>(*it) == 0) {
+            std::get<2>(*it)-=0.015;
+            //if time is up and fade is less than 0 then this row's blind is over
+            if (std::get<2>(*it) < 0) {
+                blindRows.erase(it);
+                it--;
+            }
+        }
+        //time is not up so need to check if we need to fade in the texture
+        else {
+            std::get<1>(*it)--;
+            if (std::get<2>(*it) < 1) {
+                std::get<2>(*it)+=0.015;
+            }
+        }
+    }
     //grid border
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 }
@@ -755,6 +778,18 @@ void Grid::increaseLevel(int x) {
     changeLevel.push_back(std::make_pair(x, 1800));
 }
 
+void Grid::blind(int num) {
+    std::vector<int> rows;
+    for (int i = 1; i <= 20; i++) {
+        rows.push_back(i);
+    }
+    for (int i = 0; i < num; i++) {
+        std::vector<int>::iterator it = rows.begin()+GetRandomValue(0, rows.size()-1);
+        blindRows.push_back(std::make_tuple(*it, 1800, 0));
+        rows.erase(it);
+    }
+
+}
 /*****
 *** END OF GRID CLASS 
 ******/

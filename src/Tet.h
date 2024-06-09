@@ -75,10 +75,8 @@ class Tet {
     tetPower negativeMultiplier = {"Mhhhh... That score is\ngetting too high for\nmy liking.", "negative"};
     tetPower increaseLevel1 = {"How about we spice\nthings up a little?", "level1"};
     tetPower increaseLevel2 = {"Okay, let's spice\nthings up a lot!", "level2"};
-    tetPower topblind1 = {"Top fourth of the\nboard is now blocked.", "topblind1"};
-    tetPower topblind2 = {"Top half of the\nboard is now blocked.", "topblind2"};
-    tetPower bottomblind1 = {"Bottom fourth of the\nboard is now blocked.", "bottomblind1"};
-    tetPower bottomblind2 = {"Bottom half of the\nboard is now blocked", "bottomblind2"};
+    tetPower blind1 = {"Would it be easier\nif you couldn't see?!", "blind1"};
+    tetPower blind2 = {"You don't need to\nsee the blocks anyways\nright?", "blind2"};
     tetPower flip = {"TURN THE SCREEN!", "turn"};
     tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};
@@ -89,8 +87,8 @@ class Tet {
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, topblind1, bottomblind1, Zblock, Sblock};
-    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, topblind2, bottomblind2, flip, Zblock, Sblock};
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock};
+    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock};
 
     //for tet's face
     void tetBob(); int bobCounter = 0; double yvel = -0.25; bool bobWait = false;
@@ -98,7 +96,7 @@ class Tet {
     bool spaceWait = false; //make sure tet's mouth is closed when there is a period.
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
     Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};
-    Texture2D t = LoadTexture("resources/mistaTet1.png");
+    Texture2D t = LoadTexture("resources/tet/mistaTet1.png");
     int tetStage = 1;
 
     //for tet talking

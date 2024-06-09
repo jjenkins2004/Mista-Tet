@@ -101,7 +101,6 @@ int main() {
         grid->updatelevel();
         level = grid->getLevel();
         int num = 240/(1+pow(M_E, (-0.05*level)))-120;
-        std::cout << 120-num << std::endl;
         if (levelcounter == 120-(num)) {
             levelcounter = 0;
             grid->moveDown();
@@ -124,6 +123,12 @@ int main() {
         }
         else if (power == "level2") {
             grid->increaseLevel(25);
+        }
+        else if (power == "blind1") {
+            grid->blind(GetRandomValue(5, 7));
+        }
+        else if (power == "blind2") {
+            grid->blind(GetRandomValue(8, 12));
         }
 
         //checking if keys are pressed and doing the corresponding action

@@ -85,6 +85,9 @@ class Grid {
         //increase level for 30 seconds (tet power)
         void increaseLevel(int x);
 
+        //blind random rows on board, parameter is number of rows
+        void blind(int num);
+
         //add the current block to the hold and current block in the hold becomes active block
         void hold();
 
@@ -135,6 +138,11 @@ class Grid {
 
 
     private:
+        //tet power related variables
+        std::vector<std::pair<int, int>> changeLevel;
+        std::vector<std::tuple<int, int, double>> blindRows; //first int is row number, second int is time left being blind, third double is the fade of the texture
+        Texture2D fog = LoadTexture("resources/tet/fog.png");
+
         //font
         Font allFont = LoadFont("resources/allFont.ttf");
         //scoreboard pointer
@@ -162,8 +170,6 @@ class Grid {
         int level = 0;
         //raw level without tet
         int rawLevel = 0;
-        //for powerups that change the level
-        std::vector<std::pair<int, int>> changeLevel;
         //is it game over?
         bool gameover = false;
         //our grid of placed blocks

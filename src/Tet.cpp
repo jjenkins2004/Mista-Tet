@@ -36,7 +36,7 @@ void Tet::drawTet() {
                     if (tetStage <=2) {
                         tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
-                            PlaySound(debuff);
+                            if (txtIndex != 3) PlaySound(debuff);
                             tetpowertoggle = false;
                             stop = true;
                             usePower(tetPowers1[txtIndex]);
@@ -109,14 +109,14 @@ void Tet::drawTet() {
                     vals.push_back(i);
                 }
             }
-            int num = 3;
+            int num = 10;
             if (tetStage >= 3) {
                 num = 5;
             }
             if (GetRandomValue(1, 10) <= num) {
                 tetpowertoggle = true;
                 if (tetStage <=2) {
-                    txtIndex = /*GetRandomValue(0, 6)*/2;
+                    txtIndex = /*GetRandomValue(0, 6)*/3;
                 }
                 else {
                     txtIndex = GetRandomValue(0, 7);
@@ -149,7 +149,7 @@ int Tet::tetMonologue() {
     double fade = 0;
 
     //opening monologue file
-    ifstream mono("resources/tetMonologue.txt");
+    ifstream mono("resources/tet/tetMonologue.txt");
     string txt;
     char ch;
 
