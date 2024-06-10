@@ -632,7 +632,6 @@ int Grid::bomb() {
                         }
                     }
                 scr->addScore(counter*25);
-                std::cout << "counter is " << counter << std::endl;
                 }
                 else {
                     explosionSource.x+=250;

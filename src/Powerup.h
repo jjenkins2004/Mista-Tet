@@ -182,8 +182,9 @@ struct Mystery: PowerupItem {
     Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {};
 
     void collect() {
-        if (fade == 1) {
-            int rand = /*GetRandomValue(1, 15)*/ 12;
+        if (!createMystery) {
+            int rand = GetRandomValue(1, 15);
+            std::cout << "rand is " << rand << std::endl;
             if (rand == 1) {
                 mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
             }
@@ -232,9 +233,11 @@ struct Mystery: PowerupItem {
             else if (rand == 16) {
     
             }
+            fade = 1;
             mystery->removed = true;
             mystery->fade = 0;
             mystery->pos = pos;
+            createMystery = true;
             PlaySound(LoadSound("resources/audio/MysteryReveal.wav"));
         }
         mystery->fade+=0.0125;
@@ -243,6 +246,7 @@ struct Mystery: PowerupItem {
         mystery->DrawItem();
     }
 
+    bool createMystery = false;
     PowerupItem* mystery;
 };
 
