@@ -59,7 +59,7 @@ void Score::addScore(int score) {
 }
 
 void Score::updateMultiplier() {
-    multiplier = 1;
+    multiplier = baseMultiplier;
     for (std::deque<std::pair<double, int>>::iterator it = currmultipliers.begin(); it != currmultipliers.end(); it++) {
         if (it == currmultipliers.begin() && it->second <= 0) {
             currmultipliers.pop_front();
@@ -92,4 +92,9 @@ std::string Score::convertDecimal(float i) {
         } 
     }
     return s;
+}
+
+void Score::addPermanentMultiplier(double m) {
+    baseMultiplier+= m;
+    std::cout << "baseMultiplier is " << baseMultiplier << std::endl;
 }

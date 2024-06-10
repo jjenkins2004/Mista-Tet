@@ -39,8 +39,22 @@ void Powerup::drawPowerup() {
     bool removed = false;
     while(it != nullptr) {
         if (it->curr->removed) {
-            it->curr->spaz();
-            if (it->curr->fade <= 0) {
+            if (it->curr->id == "mystery") {
+                Mystery* m = dynamic_cast<Mystery*>(it->curr);
+                if (m->fade <= 0) {
+                    spawnedPower.push_back(m->mystery);
+                    item* temp = it;
+                    it = it->next;
+                    spawnedPower.remove(temp);
+                    continue;
+                }
+                else {
+                    m->collect();
+                }
+            }
+            else {
+                it->curr->spaz();
+                if (it->curr->fade <= 0) {
                     item* temp = it; it = it->next;
                     removed = true;
                     bool added = false;
@@ -73,14 +87,13 @@ void Powerup::drawPowerup() {
                     }
                     spawnedPower.remove(temp);
                 }
+            }
         }
         else {
             it->curr->moveItem();
             it->curr->DrawItem();
             it->curr->time--;
             if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                Sound powerupSFX = LoadSound("resources/audio/powerupCollection.wav");
-                PlaySound(powerupSFX);
                 it->curr->removed = true;
             }
         }
@@ -104,13 +117,12 @@ void Powerup::drawPowerup() {
 
 void Powerup::spawnPowerup() {
     bool positive = false;
-    int rand1 = GetRandomValue(1, 10);
-    
+    int rand1 = /*GetRandomValue(1, 13)*/ 13;
     if (rand1 <= 4) {
         int rand2 = GetRandomValue(1, 50);
         //x2 multiplier
         if (rand2 <= 10) {
-            spawnedPower.push_back(new Multiplier(2, 600, x2));
+            spawnedPower.push_back(new Multiplier(2, 800, x2));
         }
         //x1.5 multiplier
         else if (rand2 <= 20) {
@@ -130,7 +142,7 @@ void Powerup::spawnPowerup() {
     else if (rand1 <= 8) {
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 10) {
-            spawnedPower.push_back(new ThreeBlock(1200, Iblock, 1));
+            spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
         }
         else if (rand2 <= 20) {
             spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
@@ -148,14 +160,26 @@ void Powerup::spawnPowerup() {
     else if (rand1 <= 10) { 
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 20) {
-            spawnedPower.push_back(new Laser(1200, lasers));
+            spawnedPower.push_back(new Laser(1000, lasers));
         }
         else if (rand2 <= 40) {
-            spawnedPower.push_back(new Bomb(1200, bomb));
+            spawnedPower.push_back(new Bomb(1000, bomb));
         }
         else {
-            spawnedPower.push_back(new Nuke(1000, nuke));
+            spawnedPower.push_back(new Nuke(800, nuke));
         }
+    }
+    else if (rand1 <= 11) {
+        int rand2 = GetRandomValue(1, 4);
+        if (rand2 <= 3) {
+            spawnedPower.push_back(new PlusMultiplier(0.1, 1000, plus0_1));
+        }
+        else {
+            spawnedPower.push_back(new PlusMultiplier(0.2, 800, plus0_2));
+        }
+    }
+    else if (rand1 <= 13) {
+        spawnedPower.push_back(new Mystery(1000, mystery));
     }
 }
 

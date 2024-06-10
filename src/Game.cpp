@@ -433,14 +433,14 @@ int pause() {
     return -1;
 }
 
-int usePower(PowerupItem* p, Score* src, Grid* grid) {
+int usePower(PowerupItem* p, Score* scr, Grid* grid) {
     if (p == nullptr) {
         return 0;
     }
     if (p->id == "multiplier") {
         PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         Multiplier* m = dynamic_cast<Multiplier*>(p);
-        src->addMultiplier(m->multiplier);
+        scr->addMultiplier(m->multiplier);
         delete m;
     }
     if (p->id == "laser") {
@@ -460,6 +460,11 @@ int usePower(PowerupItem* p, Score* src, Grid* grid) {
         ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
         grid->changeNext(t->blockID);
         delete t;
+    }
+    if (p->id == "plusmultiplier") {
+        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
+        PlusMultiplier* m = dynamic_cast<PlusMultiplier*>(p);
+        scr->addPermanentMultiplier(m->multiplier);
     }
     return 0;
 }

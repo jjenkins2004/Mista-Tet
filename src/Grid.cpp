@@ -624,7 +624,6 @@ int Grid::bomb() {
                     for (int i = 0; i < 21; i++) {
                         for (int j = 0; j < 10; j++) {
                             if (CheckCollisionPointCircle({200+ 15.0f + j*30, 100+ 15.0f + i*30}, {pos.x, pos.y}, 100)) {
-                                counter++;
                                 if (grid[i][j] != 0) {
                                     grid[i][j] = 0;
                                     counter++;
@@ -633,6 +632,7 @@ int Grid::bomb() {
                         }
                     }
                 scr->addScore(counter*25);
+                std::cout << "counter is " << counter << std::endl;
                 }
                 else {
                     explosionSource.x+=250;

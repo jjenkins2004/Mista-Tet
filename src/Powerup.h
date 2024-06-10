@@ -70,6 +70,8 @@ struct PowerupItem {
     void spaz() {
         //checks if it is our first time calling spaz
         if (!spazzed) {
+            Sound powerupSFX = LoadSound("resources/audio/powerupCollection.wav");
+            PlaySound(powerupSFX);
             spazzed = true;
             time = 45;
             vel.first = 1;
@@ -169,6 +171,80 @@ struct ThreeBlock: PowerupItem {
     int blockID;
 };
 
+struct PlusMultiplier: PowerupItem {
+    PlusMultiplier(double m, int time, Texture2D texture): PowerupItem("plusmultiplier", texture, time) {
+        multiplier = m;
+    }
+    double multiplier;
+};
+
+struct Mystery: PowerupItem {
+    Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {};
+
+    void collect() {
+        if (fade == 1) {
+            int rand = /*GetRandomValue(1, 15)*/ 12;
+            if (rand == 1) {
+                mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
+            }
+            else if (rand == 2) {
+                mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/x1,5Multiplier.png"));
+            }
+            else if (rand == 3) {
+                mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/x1,2Multiplier.png"));
+            }
+            else if (rand == 4) {
+                mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/x0,7Multiplier.png"));
+            }
+            else if (rand == 5) {
+                mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/-Multiplier.png"));
+            }
+            else if (rand == 6) {
+                mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/Iblock.png"), 1);
+            }
+            else if (rand == 7) {
+                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Jblock.png"), 2);
+            }
+            else if (rand == 8) {
+                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Lblock.png"), 3);
+            }
+            else if (rand == 9) {
+                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Oblock.png"), 4);
+            }
+            else if (rand == 10) {
+                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Tblock.png"), 6);
+            }
+            else if (rand == 11) {
+                mystery = new Laser(1000, LoadTexture("resources/powerup/Lasers.png"));
+            }
+            else if (rand == 12) {
+                mystery = new Bomb(1000, LoadTexture("resources/powerup/Bomb.png"));
+            }
+            else if (rand == 13) {
+                mystery = new Nuke(800, LoadTexture("resources/powerup/Nuke.png"));
+            }
+            else if (rand == 14) {
+                mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/+0,1Multiplier.png"));
+            }
+            else if (rand == 15) {
+                mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
+            }
+            else if (rand == 16) {
+    
+            }
+            mystery->removed = true;
+            mystery->fade = 0;
+            mystery->pos = pos;
+            PlaySound(LoadSound("resources/audio/MysteryReveal.wav"));
+        }
+        mystery->fade+=0.0125;
+        fade-=0.0125;
+        this->DrawItem();
+        mystery->DrawItem();
+    }
+
+    PowerupItem* mystery;
+};
 
 
 //list we will use to store current powerups
@@ -247,6 +323,10 @@ class Powerup {
     Texture2D Oblock = LoadTexture("resources/powerup/Oblock.png");
     Texture2D Tblock = LoadTexture("resources/powerup/Tblock.png");
     Texture2D Iblock = LoadTexture("resources/powerup/Iblock.png");
+    Texture2D plus0_2 = LoadTexture("resources/powerup/+0,2Multiplier.png");
+    Texture2D plus0_1 = LoadTexture("resources/powerup/+0,1Multiplier.png");
+    Texture2D mystery = LoadTexture("resources/powerup/Mystery.png");
+    Texture2D fiveRandom = LoadTexture("resources/powerup/5Random.png");
 
     //level
     int level;
