@@ -182,60 +182,42 @@ struct FiveRandom: PowerupItem {
     FiveRandom(int time, Texture2D texture): PowerupItem("fiverandom", texture, time) {}
 };
 
+struct SpeedChange: PowerupItem {
+    SpeedChange(int var, int time, Texture2D texture): PowerupItem("speedchange", texture, time) {
+        variant = var;
+    };
+    int variant; //0 for pause, 1 for fast1, 2 for fast2, -1 for slow1, -2 for slow2
+};
+
 struct Mystery: PowerupItem {
     Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {};
 
     void collect() {
         if (!createMystery) {
-            int rand = GetRandomValue(1, 15);
-            if (rand == 1) {
-                mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
-            }
-            else if (rand == 2) {
-                mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/x1,5Multiplier.png"));
-            }
-            else if (rand == 3) {
-                mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/x1,2Multiplier.png"));
-            }
-            else if (rand == 4) {
-                mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/x0,7Multiplier.png"));
-            }
-            else if (rand == 5) {
-                mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/-Multiplier.png"));
-            }
-            else if (rand == 6) {
-                mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/Iblock.png"), 1);
-            }
-            else if (rand == 7) {
-                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Jblock.png"), 2);
-            }
-            else if (rand == 8) {
-                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Lblock.png"), 3);
-            }
-            else if (rand == 9) {
-                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Oblock.png"), 4);
-            }
-            else if (rand == 10) {
-                mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Tblock.png"), 6);
-            }
-            else if (rand == 11) {
-                mystery = new Laser(1000, LoadTexture("resources/powerup/Lasers.png"));
-            }
-            else if (rand == 12) {
-                mystery = new Bomb(1000, LoadTexture("resources/powerup/Bomb.png"));
-            }
-            else if (rand == 13) {
-                mystery = new Nuke(800, LoadTexture("resources/powerup/Nuke.png"));
-            }
-            else if (rand == 14) {
-                mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/+0,1Multiplier.png"));
-            }
-            else if (rand == 15) {
-                mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
-            }
-            else if (rand == 16) {
-                mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5Random.png"));
-            }
+            int rand = GetRandomValue(1, 21);
+
+            if (rand == 1) mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
+            else if (rand == 2) mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/x1,5Multiplier.png"));
+            else if (rand == 3) mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/x1,2Multiplier.png"));
+            else if (rand == 4) mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/x0,7Multiplier.png"));
+            else if (rand == 5) mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/-Multiplier.png"));
+            else if (rand == 6) mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/Iblock.png"), 1);
+            else if (rand == 7) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Jblock.png"), 2);
+            else if (rand == 8) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Lblock.png"), 3);
+            else if (rand == 9) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Oblock.png"), 4);
+            else if (rand == 10) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Tblock.png"), 6);
+            else if (rand == 11) mystery = new Laser(1000, LoadTexture("resources/powerup/Lasers.png"));
+            else if (rand == 12) mystery = new Bomb(1000, LoadTexture("resources/powerup/Bomb.png"));
+            else if (rand == 13) mystery = new Nuke(800, LoadTexture("resources/powerup/Nuke.png"));
+            else if (rand == 14) mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/+0,1Multiplier.png"));
+            else if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
+            else if (rand == 16) mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5Random.png"));
+            else if (rand == 17) mystery = new SpeedChange(0, 800, LoadTexture("resources/powerup/Pause.png"));
+            else if (rand == 18) mystery = new SpeedChange(1, 800, LoadTexture("resources/powerup/Fast1.png"));
+            else if (rand == 19) mystery = new SpeedChange(2, 800, LoadTexture("resources/powerup/Fast2.png"));
+            else if (rand == 20) mystery = new SpeedChange(-1, 800, LoadTexture("resources/powerup/Slow1.png"));
+            else if (rand == 21) mystery = new SpeedChange(-2, 800, LoadTexture("resources/powerup/Slow2.png"));
+
             fade = 1;
             mystery->removed = true;
             mystery->fade = 0;
@@ -334,6 +316,11 @@ class Powerup {
     Texture2D plus0_1 = LoadTexture("resources/powerup/+0,1Multiplier.png");
     Texture2D mystery = LoadTexture("resources/powerup/Mystery.png");
     Texture2D fiveRandom = LoadTexture("resources/powerup/5Random.png");
+    Texture2D slow1 = LoadTexture("resources/powerup/Slow1.png");
+    Texture2D slow2 = LoadTexture("resources/powerup/Slow2.png");
+    Texture2D fast1 = LoadTexture("resources/powerup/Fast1.png");
+    Texture2D fast2 = LoadTexture("resources/powerup/Fast2.png");
+    Texture2D pause = LoadTexture("resources/powerup/Pause.png");
 
     //level
     int level;

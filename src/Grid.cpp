@@ -1305,9 +1305,7 @@ checkRotationalCollision(std::pair<int, int>* position, const int grid[21][10]) 
 bool Grid::Block::isRotationalCollision(const std::pair<int, int>* position, const int grid[21][10]) {
     for (int i = 0; i < 4; i++) {
         //checking for out of bounds and collision with another block
-        if (position[i].first > 9 || position[i].first < 0 || position[i].second < 0 || position[i].second > 20 || grid[position[i].second][position[i].first] != 0) {
-            return true;
-        }
+        if (position[i].first > 9 || position[i].first < 0 || position[i].second < 0 || position[i].second > 20 || grid[position[i].second][position[i].first] != 0) return true;
     }
     return false;
 }

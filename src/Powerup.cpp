@@ -125,76 +125,58 @@ void Powerup::spawnPowerup(bool include5Rand) {
     int rand1;
     spawnedPower.push_back(new Nuke(800, nuke));
     return;
-    if (include5Rand) {
-        rand1 = GetRandomValue(1, 100);
+    if (include5Rand) rand1 = GetRandomValue(1, 100);
+    else rand1 = GetRandomValue(1, 13);
+
+    //multiplier powerup
+    if (rand1 <= 25) {
+        int rand2 = GetRandomValue(1, 5);
+
+        if (rand2 <= 1) spawnedPower.push_back(new Multiplier(2, 800, x2));
+        else if (rand2 <= 2) spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
+        else if (rand2 <= 3) spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
+        else if (rand2 <= 4) spawnedPower.push_back(new Multiplier(-1, 1500, xNegative));
+        else spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
     }
-    else {
-        rand1 = GetRandomValue(1, 13);
+    //next three blocks powerup
+    else if (rand1 <= 45) {
+        int rand2 = GetRandomValue(1, 5);
+
+        if (rand2 <= 1) spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
+        else if (rand2 <= 2) spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
+        else if (rand2 <= 3) spawnedPower.push_back(new ThreeBlock(1200, Lblock, 3));
+        else if (rand2 <= 4) spawnedPower.push_back(new ThreeBlock(1200, Oblock, 4));
+        else if (rand2 <= 5) spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
     }
-    if (rand1 <= 30) {
-        int rand2 = GetRandomValue(1, 50);
-        //x2 multiplier
-        if (rand2 <= 10) {
-            spawnedPower.push_back(new Multiplier(2, 800, x2));
-        }
-        //x1.5 multiplier
-        else if (rand2 <= 20) {
-            spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
-        }
-        //x1.2 multiplier
-        else if (rand2 <= 30) {
-            spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
-        }  
-        else if (rand2 <= 40) {
-            spawnedPower.push_back(new Multiplier(-1, 1500, xNegative));
-        }
-        else {
-            spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
-        }
+    //change block movedown speed powerup
+    else if (rand1 <= 65) {
+        int rand2 = GetRandomValue(1, 5);
+
+        if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, pause));
+        if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, fast1));
+        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, fast2));
+        if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, slow1));
+        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(-2, 1000, slow2));
     }
-    else if (rand1 <= 60) {
-        int rand2 = GetRandomValue(1, 50);
-        if (rand2 <= 10) {
-            spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
-        }
-        else if (rand2 <= 20) {
-            spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
-        }
-        else if (rand2 <= 30) {
-            spawnedPower.push_back(new ThreeBlock(1200, Lblock, 3));
-        }
-        else if (rand2 <= 40) {
-            spawnedPower.push_back(new ThreeBlock(1200, Oblock, 4));
-        }
-        else if (rand2 <= 50) {
-            spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
-        }
+    //bomb, nuke, and laser powerups
+    else if (rand1 <= 80) { 
+        int rand2 = GetRandomValue(1, 5);
+
+        if (rand2 <= 2) spawnedPower.push_back(new Laser(1000, lasers));
+        else if (rand2 <= 4) spawnedPower.push_back(new Bomb(1000, bomb));
+        else spawnedPower.push_back(new Nuke(800, nuke));
     }
-    else if (rand1 <= 75) { 
-        int rand2 = GetRandomValue(1, 50);
-        if (rand2 <= 20) {
-            spawnedPower.push_back(new Laser(1000, lasers));
-        }
-        else if (rand2 <= 40) {
-            spawnedPower.push_back(new Bomb(1000, bomb));
-        }
-        else {
-            spawnedPower.push_back(new Nuke(800, nuke));
-        }
-    }
-    else if (rand1 <= 11) {
+    //permanent multiplier boost powerup
+    else if (rand1 <= 86) {
         int rand2 = GetRandomValue(1, 4);
-        if (rand2 <= 3) {
-            spawnedPower.push_back(new PlusMultiplier(0.1, 1000, plus0_1));
-        }
-        else {
-            spawnedPower.push_back(new PlusMultiplier(0.2, 800, plus0_2));
-        }
+
+        if (rand2 <= 3) spawnedPower.push_back(new PlusMultiplier(0.1, 1000, plus0_1));
+        else spawnedPower.push_back(new PlusMultiplier(0.2, 800, plus0_2));
     }
-    else if (rand1 <= 13) {
+    else if (rand1 <= 95) {
         spawnedPower.push_back(new Mystery(1000, mystery));
     }
-    else if (rand1 <= 15) {
+    else if (rand1 <= 100) {
         spawnedPower.push_back(new FiveRandom(1000, fiveRandom));
     }
 }
