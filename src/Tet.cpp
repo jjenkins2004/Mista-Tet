@@ -114,7 +114,7 @@ void Tet::drawTet() {
                     vals.push_back(i);
                 }
             }
-            int num = 0;
+            int num = 10;
             if (tetStage >= 3) {
                 num = 5;
             }

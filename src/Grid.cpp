@@ -719,9 +719,7 @@ int Grid::nuke() {
                     this->drawAll(true);
                     for (int i = 1; i < 21; i++) {
                         for (int j = 0; j < 10; j++) {
-                            if (grid[i][j] != 0) {
-                                DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
-                            }
+                            DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
                         }
                     }
                     DrawTexturePro(explosion, source, {350, 700, 300, 500}, {150, 500}, 0, Fade(WHITE, fade1));
@@ -730,6 +728,7 @@ int Grid::nuke() {
             counter2++;
             continue;
         }
+        blindRows.clear();
         int gridCounter = 0;
         for (int i = 1; i < 21; i++) {
             for (int j = 0; j < 10; j++) {

@@ -123,6 +123,8 @@ void Powerup::drawPowerup() {
 void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
     int rand1;
+    spawnedPower.push_back(new Nuke(800, nuke));
+    return;
     if (include5Rand) {
         rand1 = GetRandomValue(1, 100);
     }
