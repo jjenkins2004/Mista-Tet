@@ -62,7 +62,7 @@ void Powerup::drawPowerup() {
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
                         src->addMultiplier(m->multiplier);
                     }
-                    else if (it->curr->id == "fiverandom") {
+                    else if (temp->curr->id == "fiverandom") {
                         for (int i = 0; i < 5; i++) {
                             spawnPowerup(false);
                         }

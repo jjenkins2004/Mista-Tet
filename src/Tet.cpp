@@ -70,11 +70,11 @@ void Tet::drawTet() {
                     txtCounterWait = 15;
                 }
                 else {
-                    if (talk == 3) {
-                        std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size());
+                    if (talk == 2) {
+                        std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
                         PlaySound(LoadSound(it->c_str()));
                         tetSounds.erase(it);
-                        if (tetSounds.size() == 4) {
+                        if (tetSounds.size() == 3) {
                             tetSounds = tetSoundsOriginal;
                         }
                         talk = 0;
