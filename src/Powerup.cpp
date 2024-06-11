@@ -62,6 +62,11 @@ void Powerup::drawPowerup() {
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
                         src->addMultiplier(m->multiplier);
                     }
+                    else if (it->curr->id == "fiverandom") {
+                        for (int i = 0; i < 5; i++) {
+                            spawnPowerup(false);
+                        }
+                    }
                     else {
                         for (int i = 0; i < 3; i++) {
                             if (currPower[i]->id == "null") {
@@ -93,7 +98,7 @@ void Powerup::drawPowerup() {
             it->curr->moveItem();
             it->curr->DrawItem();
             it->curr->time--;
-            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) /*&& IsMouseButtonPressed(MOUSE_BUTTON_LEFT)*/) {
+            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 it->curr->removed = true;
             }
         }
@@ -115,9 +120,15 @@ void Powerup::drawPowerup() {
     }
 }
 
-void Powerup::spawnPowerup() {
+void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
-    int rand1 = /*GetRandomValue(1, 13)*/ 13;
+    int rand1;
+    if (include5Rand) {
+        rand1 = /*GetRandomValue(1, 15)*/ 15;
+    }
+    else {
+        rand1 = GetRandomValue(1, 13);
+    }
     if (rand1 <= 4) {
         int rand2 = GetRandomValue(1, 50);
         //x2 multiplier
@@ -180,6 +191,9 @@ void Powerup::spawnPowerup() {
     }
     else if (rand1 <= 13) {
         spawnedPower.push_back(new Mystery(1000, mystery));
+    }
+    else if (rand1 <= 15) {
+        spawnedPower.push_back(new FiveRandom(1000, fiveRandom));
     }
 }
 

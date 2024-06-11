@@ -110,7 +110,7 @@ int main() {
         levelcounter++;
 
         if (powerupcounter == spawnpower) {
-            powerUp->spawnPowerup();
+            powerUp->spawnPowerup(true);
             powerupcounter = 0;
             spawnpower = GetRandomValue(3*60, 5*60);
         }

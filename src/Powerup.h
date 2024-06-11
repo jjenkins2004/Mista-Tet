@@ -178,13 +178,16 @@ struct PlusMultiplier: PowerupItem {
     double multiplier;
 };
 
+struct FiveRandom: PowerupItem {
+    FiveRandom(int time, Texture2D texture): PowerupItem("fiverandom", texture, time) {}
+};
+
 struct Mystery: PowerupItem {
     Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {};
 
     void collect() {
         if (!createMystery) {
             int rand = GetRandomValue(1, 15);
-            std::cout << "rand is " << rand << std::endl;
             if (rand == 1) {
                 mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
             }
@@ -231,7 +234,7 @@ struct Mystery: PowerupItem {
                 mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
             }
             else if (rand == 16) {
-    
+                mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5Random.png"));
             }
             fade = 1;
             mystery->removed = true;
@@ -306,7 +309,7 @@ class Powerup {
 
         //powerup related functions
         void drawPowerup();
-        void spawnPowerup();
+        void spawnPowerup(bool include5Rand);
         PowerupItem* usePowerup(int k);
 
     private:
