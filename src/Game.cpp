@@ -65,13 +65,9 @@ int main() {
             downcounter = 0;
             //temp
             start = false; continue;
-            if (menu() == -1) {
-                break;
-            }
+            if (menu() == -1) break;
             start = false;
-            if (tet->tetMonologue() == -1) {
-                break;
-            }
+            if (tet->tetMonologue() == -1) break;
             double fade = 1;
             bool quit = true;
             while (!WindowShouldClose()) {
@@ -86,9 +82,7 @@ int main() {
                     break;
                 }
             }
-            if (quit) {
-                break;
-            }
+            if (quit) break;
 
         }
         //----------------------------------------------------------------------------------
@@ -118,18 +112,10 @@ int main() {
 
         //for tetPower
         std::string power = tet->checkTetPower();
-        if (power == "level1") {
-            grid->increaseLevel(15);
-        }
-        else if (power == "level2") {
-            grid->increaseLevel(25);
-        }
-        else if (power == "blind1") {
-            grid->blind(GetRandomValue(5, 7));
-        }
-        else if (power == "blind2") {
-            grid->blind(GetRandomValue(8, 12));
-        }
+        if (power == "level1") grid->increaseLevel(15);
+        else if (power == "level2") grid->increaseLevel(25);
+        else if (power == "blind1") grid->blind(GetRandomValue(5, 7));
+        else if (power == "blind2") grid->blind(GetRandomValue(8, 12));
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
@@ -142,9 +128,7 @@ int main() {
                 horizontalcounter = 0;
                 grid->moveRight();
             }
-            else {
-                ++horizontalcounter;
-            }
+            else ++horizontalcounter;
         }
 
         else if (IsKeyPressed(KEY_LEFT)) {
@@ -157,9 +141,7 @@ int main() {
                 horizontalcounter = 0;
                 grid->moveLeft();
             }
-            else {
-                ++horizontalcounter;
-            }
+            else ++horizontalcounter;
         }
     
         if (IsKeyPressed(KEY_DOWN)) {
@@ -175,9 +157,7 @@ int main() {
                 score->addScore(1);
                 checkRows = true;
             }
-            else {
-                ++downcounter;
-            }
+            else ++downcounter;
         }
 
         else if (IsKeyPressed(KEY_SPACE)) {
@@ -187,38 +167,23 @@ int main() {
             checkRows = true;
         }
 
-        if (IsKeyPressed(KEY_UP)) {
-            grid->rotate();
-        }
+        if (IsKeyPressed(KEY_UP)) grid->rotate();
 
         //hold current block
-        if (IsKeyPressed(KEY_C)) {
-            grid->hold();
-        }
+        if (IsKeyPressed(KEY_C)) grid->hold();
         //check if any powerups are being used
         PowerupItem* p = nullptr;
-        if (IsKeyPressed(KEY_ONE)) {
-            p = powerUp->usePowerup(1);
-        }
-        else if (IsKeyPressed(KEY_TWO)) {
-            p = powerUp->usePowerup(2);
-        }
-        else if (IsKeyPressed(KEY_THREE)) {
-            p = powerUp->usePowerup(3);
-        }
-        if (usePower(p, score, grid) == -1) {
-            break;
-        }
+        if (IsKeyPressed(KEY_ONE)) p = powerUp->usePowerup(1);
+        else if (IsKeyPressed(KEY_TWO)) p = powerUp->usePowerup(2);
+        else if (IsKeyPressed(KEY_THREE)) p = powerUp->usePowerup(3);
+        if (usePower(p, score, grid) == -1) break;
         score->updateMultiplier();
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {
             int p = pause();
-            if (p == -1) {
-                //quit game
-                break;
-            }
-            else if(p == 0) {
+            if (p == -1) break; //quit game
+            else if (p == 0) {
                 //quit to start
                 start = true;
                 continue;
@@ -257,13 +222,8 @@ int main() {
                     DrawTextEx(titleFont, "YOU LOSE", (Vector2){400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).x/2, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2}, 150, 5, Fade(WHITE, fade));
                 EndDrawing();
             }
-            if (quit) {
-                break;
-            }
-            else {
-                continue;
-            }
-
+            if (quit) break;
+            else continue;
         }
 
 
@@ -314,9 +274,7 @@ int menu() {
                 cubes.push_back(std::make_pair(c, colors[GetRandomValue(0, 6)]));
                 addCubeCounter = 0;
             }
-            else {
-                addCubeCounter++;
-            }
+            else addCubeCounter++;
 
             for (std::vector<std::pair<Rectangle, Color>>::iterator cube = cubes.begin(); cube != cubes.end(); cube++) {
                     cube->first.y+=1;
@@ -338,9 +296,7 @@ int menu() {
             float mX = GetMouseX(); float mY = GetMouseY();
             if (CheckCollisionPointRec((Vector2){mX, mY}, playbutton)) {
                 DrawRectangleRounded(playbutton, 0.2, 100, Fade(WHITE, 0.3));
-                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                    fade = true;
-                }
+                if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) fade = true;
             }
 
             //once play button is hit then fade to black for tet monologue
@@ -348,9 +304,7 @@ int menu() {
                 DrawRectangle(0, 0, 800, 800, Fade(BLACK, fadeTracker));
                 fadeTracker+=0.01;
             }
-            if (fadeTracker >= 1.5) {
-                return 0;
-            }
+            if (fadeTracker >= 1.5) return 0;
 
         EndDrawing();
     }
@@ -367,12 +321,8 @@ int pause() {
     while (!WindowShouldClose()) {
         if (counter == 15) {
                 src.x+=70*add;
-            if (src.x == 280) {
-                add = -1;
-            } 
-            if (src.x == 0) {
-                add = 1;
-            }
+            if (src.x == 280) add = -1;
+            if (src.x == 0) add = 1;
             counter = 0;
         }
         if (wait) {
@@ -383,12 +333,8 @@ int pause() {
         }
         else if (bobCounter == bobSpeed) {
             dest.y += yvel;
-            if ((dest.y <= 255 && yvel < 0) || (dest.y >= 270 && yvel > 0)) {
-                bobSpeed++;
-            }
-            else if (bobSpeed != 5) {
-                bobSpeed--;
-            }
+            if ((dest.y <= 255 && yvel < 0) || (dest.y >= 270 && yvel > 0)) bobSpeed++;
+            else if (bobSpeed != 5) bobSpeed--;
             if (dest.y == 250) {
                 wait = true;
                 yvel = 1;
@@ -401,17 +347,11 @@ int pause() {
         }
 
         if (startWait == 0) {
-            if (IsKeyPressed(KEY_P)) {
-            return 1;
-            }
-            else if (IsKeyPressed(KEY_M)) {
-                quit = true;
-            }
-            else if (IsKeyDown(KEY_Q)) {
-                return -1;
-            }
+            if (IsKeyPressed(KEY_P)) return 1;
+            else if (IsKeyPressed(KEY_M)) quit = true;
+            else if (IsKeyDown(KEY_Q)) return -1;
         }
-        else {--startWait;}
+        else --startWait;
         
         BeginDrawing();
             ClearBackground(BLACK);
@@ -422,9 +362,7 @@ int pause() {
             if (quit) {
                 DrawRectangle(0, 0, 800, 800, Fade(WHITE, fade));
                 fade+=0.01;
-                if (fade >= 1) {
-                    return 0;
-                }
+                if (fade >= 1) return 0;
             }
         EndDrawing();
         ++counter;
@@ -434,9 +372,7 @@ int pause() {
 }
 
 int usePower(PowerupItem* p, Score* scr, Grid* grid) {
-    if (p == nullptr) {
-        return 0;
-    }
+    if (p == nullptr) return 0;
     if (p->id == "multiplier") {
         PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         Multiplier* m = dynamic_cast<Multiplier*>(p);

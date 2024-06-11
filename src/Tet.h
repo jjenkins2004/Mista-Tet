@@ -91,15 +91,15 @@ class Tet {
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock};
 
     //for tet's face
-    void tetBob(); int bobCounter = 0; double yvel = -0.25; bool bobWait = false;
-    void tetTalk(bool wait); int tetCounter = 0; int tetCounterMax = GetRandomValue(3, 7); int facePhase = 0;
+    void tetBob(); int bobCounter = 0; double yvel = -0.25; bool bobWait = false; //for the constant up and down motion of the tet head
+    void tetTalk(bool wait); int tetCounter = 0; int tetCounterMax = GetRandomValue(3, 7); int facePhase = 0; //for tet's mouth moving when talking
     bool spaceWait = false; //make sure tet's mouth is closed when there is a period.
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};
     Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};
     Texture2D t = LoadTexture("resources/tet/mistaTet1.png");
     int tetStage = 1;
 
-    //for tet talking
+    //resources for tet talking
     std::vector<std::string> tetSounds = {"resources/audio/tetTalk1.wav", "resources/audio/tetTalk2.wav", "resources/audio/tetTalk3.wav", "resources/audio/tetTalk4.wav", "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", "resources/audio/tetTalk7.wav"};
     std::vector<std::string> tetSoundsOriginal = {"resources/audio/tetTalk1.wav", "resources/audio/tetTalk2.wav", "resources/audio/tetTalk3.wav", "resources/audio/tetTalk4.wav", "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", "resources/audio/tetTalk7.wav"};
     int talk = 2;

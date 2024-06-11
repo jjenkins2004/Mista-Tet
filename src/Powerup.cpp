@@ -30,16 +30,13 @@ void Powerup::drawPowerup() {
     DrawTextEx(allFont, "3", (Vector2){380, 715}, 15, 0, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
 
     //drawing powerups
-    for (int i = 0; i < 3; i++) {   
-        if (currPower[i]->id != "null") {
-            currPower[i]->DrawItem();
-        }
-    }
+    for (int i = 0; i < 3; i++) if (currPower[i]->id != "null") currPower[i]->DrawItem();
+
     item* it = spawnedPower.head;
     bool removed = false;
     while(it != nullptr) {
-        if (it->curr->removed) {
-            if (it->curr->id == "mystery") {
+        if (it->curr->removed) { //checks if the current powerup has been clicked
+            if (it->curr->id == "mystery") { //we need to do something special for mystery powerups
                 Mystery* m = dynamic_cast<Mystery*>(it->curr);
                 if (m->fade <= 0) {
                     spawnedPower.push_back(m->mystery);
@@ -48,24 +45,20 @@ void Powerup::drawPowerup() {
                     spawnedPower.remove(temp);
                     continue;
                 }
-                else {
-                    m->collect();
-                }
+                else m->collect();
             }
-            else {
+            else { //the animation that plays everytime powerup is collected
                 it->curr->spaz();
                 if (it->curr->fade <= 0) {
                     item* temp = it; it = it->next;
                     removed = true;
                     bool added = false;
-                    if (temp->curr->id == "multiplier" && !temp->curr->positive) {
+                    if (temp->curr->id == "multiplier" && !temp->curr->positive) { //we don't need to add bad multipliers to the collected powers, effects are realized immediately
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
                         src->addMultiplier(m->multiplier);
                     }
-                    else if (temp->curr->id == "fiverandom") {
-                        for (int i = 0; i < 5; i++) {
-                            spawnPowerup(false);
-                        }
+                    else if (temp->curr->id == "fiverandom") { //don't need to add fiverandom to collected powerups, effects are realized immediately
+                        for (int i = 0; i < 5; i++) spawnPowerup(false);
                     }
                     else {
                         for (int i = 0; i < 3; i++) {
@@ -87,9 +80,7 @@ void Powerup::drawPowerup() {
                             }
                         }
                     }
-                    if (!added) {
-                        delete temp->curr;
-                    }
+                    if (!added) delete temp->curr;
                     spawnedPower.remove(temp);
                 }
             }
@@ -111,12 +102,8 @@ void Powerup::drawPowerup() {
                  removed = true;
             }
         }
-        if (!removed) {
-            it = it->next;
-        }
-        else {
-            removed = false;
-        }
+        if (!removed) it = it->next; //if nothing has been removed, move on to next node
+        else removed = false; //otherwise iterator stays on current one as this will be the next node
     }
 }
 
@@ -131,7 +118,6 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //multiplier powerup
     if (rand1 <= 25) {
         int rand2 = GetRandomValue(1, 5);
-
         if (rand2 <= 1) spawnedPower.push_back(new Multiplier(2, 800, x2));
         else if (rand2 <= 2) spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
         else if (rand2 <= 3) spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
@@ -141,7 +127,6 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //next three blocks powerup
     else if (rand1 <= 45) {
         int rand2 = GetRandomValue(1, 5);
-
         if (rand2 <= 1) spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
         else if (rand2 <= 2) spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
         else if (rand2 <= 3) spawnedPower.push_back(new ThreeBlock(1200, Lblock, 3));
@@ -151,7 +136,6 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //change block movedown speed powerup
     else if (rand1 <= 65) {
         int rand2 = GetRandomValue(1, 5);
-
         if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, pause));
         if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, fast1));
         if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, fast2));
@@ -161,7 +145,6 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //bomb, nuke, and laser powerups
     else if (rand1 <= 80) { 
         int rand2 = GetRandomValue(1, 5);
-
         if (rand2 <= 2) spawnedPower.push_back(new Laser(1000, lasers));
         else if (rand2 <= 4) spawnedPower.push_back(new Bomb(1000, bomb));
         else spawnedPower.push_back(new Nuke(800, nuke));
@@ -169,16 +152,11 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //permanent multiplier boost powerup
     else if (rand1 <= 86) {
         int rand2 = GetRandomValue(1, 4);
-
         if (rand2 <= 3) spawnedPower.push_back(new PlusMultiplier(0.1, 1000, plus0_1));
         else spawnedPower.push_back(new PlusMultiplier(0.2, 800, plus0_2));
     }
-    else if (rand1 <= 95) {
-        spawnedPower.push_back(new Mystery(1000, mystery));
-    }
-    else if (rand1 <= 100) {
-        spawnedPower.push_back(new FiveRandom(1000, fiveRandom));
-    }
+    else if (rand1 <= 95) spawnedPower.push_back(new Mystery(1000, mystery));
+    else if (rand1 <= 100) spawnedPower.push_back(new FiveRandom(1000, fiveRandom));
 }
 
 PowerupItem* Powerup::usePowerup(int k) {

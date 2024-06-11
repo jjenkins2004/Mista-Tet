@@ -28,7 +28,7 @@ void Tet::drawTet() {
         SetTextLineSpacing(20);
         DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
     }
-    else if (time == timebetweenText) {
+    else if (time == timebetweenText) { //checks if we should make tet say something
         if (txtCounter == txtCounterWait) {
             spaceWait = false;
             if (!stop) {
@@ -54,17 +54,13 @@ void Tet::drawTet() {
                 }
                 else {
                     tetText+= noEffectText[txtIndex].substr(txtTracker, 1);
-                    if (txtTracker == noEffectText[txtIndex].length()-1) {
-                        stop = true;
-                    }
+                    if (txtTracker == noEffectText[txtIndex].length()-1) stop = true;
                 }
                 string lastletter = tetText.substr(tetText.length()-1, 1);
                 if (lastletter == "." || lastletter == "?" || lastletter == "!") {
                     if (tetStage <= 2) {
                         spaceWait = true;
-                        if (facePhase == 1) {
-                           source.x-=tdim; 
-                        }
+                        if (facePhase == 1) source.x-=tdim;
                         tetCounter = 0; tetCounterMax = GetRandomValue(3, 7); facePhase = 0;
                     }
                     txtCounterWait = 15;
@@ -79,9 +75,7 @@ void Tet::drawTet() {
                         }
                         talk = 0;
                     }
-                    else {
-                        talk++;
-                    }
+                    else talk++;
 
                     txtCounterWait = 3;
                 }
@@ -93,13 +87,11 @@ void Tet::drawTet() {
                 txtTracker = 0;
                 wait = true;
                 waitTime = 300 + tetText.size()*3;
-                timebetweenText = GetRandomValue(1*60, 3*60);
+                timebetweenText = GetRandomValue(1*60, 3*60); //how long should tet wait between dialogues
             }
             txtCounter = 0;
         }
-        else {
-            ++txtCounter;
-        }
+        else ++txtCounter;
         SetTextLineSpacing(20);
         DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
         tetTalk(spaceWait);
@@ -109,23 +101,13 @@ void Tet::drawTet() {
         if (time == timebetweenText) {
             stop = false;
             //choosing which text we should put on screen
-            if (vals.size() == 0) {
-                for (int i = 0; i < 20; i++) {
-                    vals.push_back(i);
-                }
-            }
+            if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
             int num = 10;
-            if (tetStage >= 3) {
-                num = 5;
-            }
-            if (GetRandomValue(1, 10) <= num) {
+            if (tetStage >= 3) num = 5; //later stages of the game make tet powers happen more often
+            if (GetRandomValue(1, 10) <= num) { //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (tetStage <=2) {
-                    txtIndex = /*GetRandomValue(0, 6)*/3;
-                }
-                else {
-                    txtIndex = GetRandomValue(0, 7);
-                }
+                if (tetStage <=2) txtIndex = /*GetRandomValue(0, 6)*/3; //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 7); //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -179,13 +161,10 @@ int Tet::tetMonologue() {
                 if (ch == '&') {
                     checkEnd = true;
                     wait = true;
-                } else {
-                     txt+=ch;
-                }
+                } 
+                else txt+=ch;
                 //stopping everytime there are two next lines in a row
-                if (txt.length() > 2 && *(txt.end()-1) == '\n' && *(txt.end()-2) == '\n') {
-                    wait = true;
-                }
+                if (txt.length() > 2 && *(txt.end()-1) == '\n' && *(txt.end()-2) == '\n') wait = true;
                 txtcounter = 0;
             }
             
@@ -197,13 +176,9 @@ int Tet::tetMonologue() {
                 faceCounter = 0;
                 wait = false;
             }
-            else {
-                end = true;
-            }
+            else end = true;
         }
-        if (IsKeyPressed(KEY_S)) {
-            end = true;
-        }
+        if (IsKeyPressed(KEY_S)) end = true;
 
 
         BeginDrawing();
@@ -219,27 +194,17 @@ int Tet::tetMonologue() {
         ++faceCounter;
         if (end) {
             fade+=0.01;
-            if (fade >= 1.5) {
-                return 0;
-            }
+            if (fade >= 1.5) return 0;
         }
     }
     return -1;
 }
 
 void Tet::usePower(tetPower p) {
-    if (p.power == "less") {
-        src->addMultiplier(0.7);
-    }
-    else if (p.power == "half") {
-        src->addMultiplier(0.5);
-    }
-    else if (p.power == "negative") {
-        src->addMultiplier(-1);
-    }
-    else {
-        currPower = p.power;
-    }
+    if (p.power == "less") src->addMultiplier(0.7);
+    else if (p.power == "half") src->addMultiplier(0.5);
+    else if (p.power == "negative") src->addMultiplier(-1);
+    else currPower = p.power;
 }
 
 void Tet::tetTalk(bool wait) {
@@ -257,9 +222,7 @@ void Tet::tetTalk(bool wait) {
             }
             tetCounter = 0;
         }
-        else {
-            tetCounter++;
-        }
+        else tetCounter++;
     }
 }
 

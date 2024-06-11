@@ -26,9 +26,7 @@ struct Text {
             yVelocity+=1;
             counter = 0;
         }
-        else {
-            counter++;
-        }
+        else counter++;
         alpha-=0.025;
     }
 

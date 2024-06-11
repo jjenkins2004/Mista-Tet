@@ -17,9 +17,7 @@ Grid::Grid() {
     }
 
     //setting up our next array for upcoming blocks and giving a starting block
-    for (int i = 0; i < 3; i++) {
-        next.push_back(randBlock.getBlock());
-    }
+    for (int i = 0; i < 3; i++) next.push_back(randBlock.getBlock());
     block = Block(randBlock.getBlock(), grid);
 }
 
@@ -107,9 +105,7 @@ void Grid::drawGrid(bool drawBlock) {
     //drawing level board
     height = 100;
     std::string l = "";
-    if (std::to_string(level).length() == 1) {
-        l+='0';
-    }
+    if (std::to_string(level).length() == 1) l+='0';
     DrawRectangleRoundedLines((Rectangle){30, 625, width+10, 90}, 0.2, 100, 5, borderColor);
     l+= std::to_string(level);
     DrawTextPro(allFont, "level", (Vector2){35+width/2, 650}, (Vector2){MeasureTextEx(allFont, "level", 35, 3).x/2, MeasureTextEx(allFont, "level", 35, 3).y/2}, 0, 35, 3, DarkRed);
@@ -203,11 +199,8 @@ void Grid::drawGrid(bool drawBlock) {
                     break;
                 }
             }
-            if (leave) {
-                break;
-            } else {
-                dist++;
-            }
+            if (leave) break;
+            else dist++;
         }
         for (int i = 0; i < 4; i++) {
             if (block.getPos()[i].second+dist != 0) {
@@ -262,23 +255,13 @@ void Grid::hold() {
 
 void Grid::placeBlock() {
     const std::pair<int, int>* pos = block.getPos();
-    for (int i = 0; i < 4; i++) {
-        grid[pos[i].second][pos[i].first] = block.getId();
-    }
+    for (int i = 0; i < 4; i++) grid[pos[i].second][pos[i].first] = block.getId();
 }
 
 void Grid::generateBlock() {
-    bool lose = false;
     block = Block(next.front(), grid);
     const std::pair<int, int>* pos = block.getPos();
-    for (int i = 0; i < 4; i++) {
-        if (grid[pos[i].second][pos[i].first] != 0) {
-            lose = true;
-        }
-    }
-    if (lose) {
-        gameover = true;
-    }
+    for (int i = 0; i < 4; i++) if (grid[pos[i].second][pos[i].first] != 0) gameover = true;
     next.pop_front();
     next.push_back(randBlock.getBlock());
     ableToHold = true;
@@ -294,9 +277,7 @@ const std::vector<int> Grid::checkRowComplete() const{
                 break;
             }
         }
-        if (addRow) {
-            rows.push_back(i);
-        }
+        if (addRow) rows.push_back(i);
     }
     return rows;
 }
@@ -329,12 +310,8 @@ int Grid::removeRow(std::vector<int>& rows) {
         if (it == cells.end()) {
             counter = 0;
             while (!WindowShouldClose()) {
-                if (counter == 10) {
-                    return 0;
-                }
-                else {
-                    counter++;
-                }
+                if (counter == 10) return 0;
+                else counter++;
                 BeginDrawing();
                     drawAll(false);
                 EndDrawing();
@@ -371,20 +348,16 @@ int Grid::fixRows(std::vector<int> rows) {
     *****/
 
     std::queue<int> removedRows;
-    for (int i = rows.size()-1; i >= 0; i--) {
-        removedRows.push(rows[i]);
-    }
+    for (int i = rows.size()-1; i >= 0; i--) removedRows.push(rows[i]);
 
     int distance = 0;
     int row;
     int counter = 0;
 
     while(!WindowShouldClose()) {
-    
         //if our distance is 0 then either we are done or we need to move on to the next row in removedRows
         if (counter == 10) {
             if (distance == 0) {
-
                 //initial check to see if any fixing is actually required
                 bool leave = true;
                 for (int i = 0; i < removedRows.size(); i++) {
@@ -399,25 +372,13 @@ int Grid::fixRows(std::vector<int> rows) {
                 }
                 if (leave) {
                     counter = 0;
-                    if (rows.size() == 1) {
-                        scr->addScore(150);
-                    }
-                    else if (rows.size() == 2) {
-                        scr->addScore(400);
-                    }
-                    else if (rows.size() == 3) {
-                        scr->addScore(600);
-                    }
-                    else {
-                        scr->addScore(1000);
-                    }
+                    if (rows.size() == 1) scr->addScore(150);
+                    else if (rows.size() == 2) scr->addScore(400);
+                    else if (rows.size() == 3) scr->addScore(600);
+                    else scr->addScore(1000);
                     while (!WindowShouldClose()) {
-                        if (counter == 15) {
-                            return 0;
-                        }
-                        else {
-                            counter++;
-                        }
+                        if (counter == 15) return 0;
+                        else counter++;
                         BeginDrawing();
                             drawAll(false);
                         EndDrawing();
@@ -441,11 +402,7 @@ int Grid::fixRows(std::vector<int> rows) {
             }
 
             //moving the grid
-            for (int i = row; i >= 0; i--) {
-                for (int j = 0; j < 10; j++) {
-                    grid[i+1][j] = grid[i][j];
-                }
-            }
+            for (int i = row; i >= 0; i--) for (int j = 0; j < 10; j++) grid[i+1][j] = grid[i][j];
             PlaySound(LoadSound("resources/audio/blockdropping.wav"));
             distance--; row++; counter = 0;
         }
@@ -455,9 +412,7 @@ int Grid::fixRows(std::vector<int> rows) {
 
         //drawing
         BeginDrawing();
-
             drawAll(false);
-
         EndDrawing();
 
     }
@@ -526,26 +481,18 @@ int Grid::lasers() {
             }
     
             if (fade > 0.5) {
-                if (maxOffset > 1) {
-                    maxOffset-=0.3;
-                }
-                if (maxAngle > 0.5) {
-                    maxAngle-=0.025;
-                }
+                if (maxOffset > 1) maxOffset-=0.3;
+                if (maxAngle > 0.5) maxAngle-=0.025;
             }
         BeginDrawing();
             BeginMode2D(camera);
                 this->drawAll(true);
                 for (int i = 0; i < 3; i++) {
                     for (int j = 1; j < 21; j++) {
-                        if (grid[j][col[i]] != 0) {
-                            DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
-                        }
+                        if (grid[j][col[i]] != 0) DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
                     }
                     DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 690.0f-25, 50, 70}, laserBodyOrigin, 0, WHITE);
-                    for (int j = 1; j < 15; j++) {
-                        DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 665.0f-j*60, 50, 70}, laserBodyOrigin, 0, WHITE);
-                    }
+                    for (int j = 1; j < 15; j++) DrawTexturePro(laser, laserBodySource, {215.0f+col[i]*30, 665.0f-j*60, 50, 70}, laserBodyOrigin, 0, WHITE);
                     DrawTexturePro(laser, laserHeadSource, {215.0f+col[i]*30, 690, 50, 50}, laserHeadOrigin, 0, WHITE);
                 }
             EndMode2D();
@@ -575,22 +522,13 @@ int Grid::bomb() {
     float maxAngle = 2;
     float maxOffset = 15;
 
-    
     PlaySound(tick);
     while(!WindowShouldClose()) {
         if (counter1 <= 150) {
-            if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) {
-                pos.x+=5;
-            }
-            if (IsKeyDown(KEY_LEFT) && pos.x - 5 > 200) {
-                pos.x-=5;
-            }
-            if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) {
-                pos.y+=5;
-            }
-            if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) {
-                pos.y-=5;
-            }
+            if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) pos.x+=5;
+            if (IsKeyDown(KEY_LEFT) && pos.x - 5 > 200) pos.x-=5;
+            if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) pos.y+=5;
+            if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) pos.y-=5;
             BeginDrawing();
                 this->drawAll(true);
                 DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, WHITE);
@@ -638,12 +576,8 @@ int Grid::bomb() {
                 }
             }
             if (counter2 > 100) {
-                if (maxOffset > 1) {
-                    maxOffset-=0.3;
-                }
-                if (maxAngle > 1) {
-                    maxAngle-=0.05;
-                }
+                if (maxOffset > 1) maxOffset-=0.3;
+                if (maxAngle > 1) maxAngle-=0.05;
             }
             BeginDrawing();
                 BeginMode2D(camera);
@@ -682,46 +616,30 @@ int Grid::nuke() {
     while (!WindowShouldClose()) {
         if (counter1 < 180) {
             counter1++;
-            if (counter1 == 30) {
-                PlaySound(alarm);
-            }
+            if (counter1 == 30) PlaySound(alarm);
             BeginDrawing();
                 this->drawAll(true);
             EndDrawing();
             continue;
         }
         if (counter2 < 400) {
-            if (counter2 == 60) {
-                PlaySound(explosionSound);
-            }
-            if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) {
-                source.x += 150;
-            }
-            if (counter2 > 200) {
-                fade1-=0.005;
-            }
+            if (counter2 == 60) PlaySound(explosionSound);
+            if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) source.x += 150;
+            if (counter2 > 200) fade1-=0.005;
             if (counter2 >= 60) {
                 camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
                 camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
                 camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             }
             if (counter2 >= 300) {
-                if (maxOffset > 1) {
-                    maxOffset-=0.4;
-                }
-                if (maxAngle > 0.5) {
-                    maxAngle-=0.02;
-                }
+                if (maxOffset > 1) maxOffset-=0.4;
+                if (maxAngle > 0.5) maxAngle-=0.02;
             }
             fade2+=0.005;
             BeginDrawing();
                 BeginMode2D(camera);
                     this->drawAll(true);
-                    for (int i = 1; i < 21; i++) {
-                        for (int j = 0; j < 10; j++) {
-                            DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
-                        }
-                    }
+                    for (int i = 1; i < 21; i++) for (int j = 0; j < 10; j++) DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
                     DrawTexturePro(explosion, source, {350, 700, 300, 500}, {150, 500}, 0, Fade(WHITE, fade1));
                 EndMode2D();
             EndDrawing();
@@ -732,9 +650,7 @@ int Grid::nuke() {
         int gridCounter = 0;
         for (int i = 1; i < 21; i++) {
             for (int j = 0; j < 10; j++) {
-                if (grid[i][j] != 0) {
-                    gridCounter++;
-                }
+                if (grid[i][j] != 0) gridCounter++;
                 grid[i][j] = 0;
             }
         }
@@ -752,16 +668,11 @@ void Grid::changeNext(int i) {
 }
 
 void Grid::updatelevel() {
-     if (rawLevel < int(scr->getScore()/2000)+1) {
-        rawLevel = int(scr->getScore()/2000)+1;
-    }
+     if (rawLevel < int(scr->getScore()/2000)+1) rawLevel = int(scr->getScore()/2000)+1;
     level = rawLevel;
     for (std::vector<std::pair<int, int>>::iterator it = changeLevel.begin(); it != changeLevel.end(); it++) {
         level+=it->first;
-        
-        if (level > 99) {
-            level = 99;
-        }
+        if (level > 99) level = 99;
         it->second--;
         if (it->second == 0) {
             changeLevel.erase(it);
@@ -778,9 +689,7 @@ void Grid::increaseLevel(int x) {
 
 void Grid::blind(int num) {
     std::vector<int> rows;
-    for (int i = 1; i <= 20; i++) {
-        rows.push_back(i);
-    }
+    for (int i = 1; i <= 20; i++) rows.push_back(i);
     for (int i = 0; i < num; i++) {
         std::vector<int>::iterator it = rows.begin()+GetRandomValue(0, rows.size()-1);
         blindRows.push_back(std::make_tuple(*it, 1800, 0));
@@ -856,53 +765,35 @@ Grid::Block::Block(int id, int grid[21][10]): id(id), rotation(0) {
     }
 
     //see if we need to put the block one higher
-    if (checkVerticalCollision(grid)) {
-        for (int i = 0; i < 4; i++) {
-            pos[i].second--;
-        }
-    }
+    if (checkVerticalCollision(grid)) for (int i = 0; i < 4; i++) pos[i].second--;
 }
 
 /*
 * MOVEMENTS
 */
 bool Grid::Block::moveDown(const int grid[21][10]) {
-    if (checkVerticalCollision(grid)) {
-        return false;
-    }
+    if (checkVerticalCollision(grid)) return false;
     PlaySound(LoadSound("resources/audio/blockmove.wav"));
-    for (int i = 0; i < 4; i++) {
-        pos[i].second++;
-    }
+    for (int i = 0; i < 4; i++) pos[i].second++;
     return true;
 }
 
 void Grid::Block::moveRight(const int grid[21][10]) {
-    if (checkHorizontalCollision(1, grid)) {
-        return;
-    }
+    if (checkHorizontalCollision(1, grid)) return;
     PlaySound(LoadSound("resources/audio/blockmove.wav"));
-    for (int i = 0; i < 4; i++) {
-        pos[i].first++;
-    }   
+    for (int i = 0; i < 4; i++) pos[i].first++;
 }
 
 void Grid::Block::moveLeft(const int grid[21][10]) {
-    if (checkHorizontalCollision(0, grid)) {
-        return;
-    }
+    if (checkHorizontalCollision(0, grid)) return;
     PlaySound(LoadSound("resources/audio/blockmove.wav"));
-    for (int i = 0; i < 4; i++) {
-        pos[i].first--;
-    }
+    for (int i = 0; i < 4; i++) pos[i].first--;
 }
 
 int Grid::Block::drop(const int grid[21][10]) {
     int counter = 0;
     while (!checkVerticalCollision(grid)) {
-        for (int i = 0; i < 4; i++) {
-            pos[i].second++;
-        }
+        for (int i = 0; i < 4; i++) pos[i].second++;
         counter++;
     }
     return counter;
@@ -1225,9 +1116,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             }
         }
     }
-    for (int i = 0; i < 4; i++) {
-        pos[i] = backUpPos[i];
-    }
+    for (int i = 0; i < 4; i++) pos[i] = backUpPos[i];
 }
 
 /*
@@ -1236,30 +1125,18 @@ void Grid::Block::rotate(const int grid[21][10]) {
 
 bool Grid::Block::checkHorizontalCollision(int side, const int grid[21][10]) const{
     if (side == 0) {
-        for (int i = 0; i < 4; i++) {
-            if (pos[i].first == 0 || grid[pos[i].second][pos[i].first-1] != 0) {
-                return true;
-            }
-        }
+        for (int i = 0; i < 4; i++) if (pos[i].first == 0 || grid[pos[i].second][pos[i].first-1] != 0) return true;
         return false;
     }
     if (side == 1) {
-        for (int i = 0; i < 4; i++) {
-            if (pos[i].first == 9 || grid[pos[i].second][pos[i].first+1] != 0) {
-                return true;
-            }
-        }
+        for (int i = 0; i < 4; i++) if (pos[i].first == 9 || grid[pos[i].second][pos[i].first+1] != 0) return true;
         return false;
     }
     return false;
 }
 
 bool Grid::Block::checkVerticalCollision(const int grid[20][10]) const {
-    for (int i = 0; i < 4; i++) {
-        if (pos[i].second == 20 || grid[pos[i].second+1][pos[i].first] != 0) {
-            return true;
-        }
-    }
+    for (int i = 0; i < 4; i++) if (pos[i].second == 20 || grid[pos[i].second+1][pos[i].first] != 0) return true;
     return false;
 }
 
@@ -1270,9 +1147,7 @@ checkRotationalCollision(std::pair<int, int>* position, const int grid[21][10]) 
     std::vector<int> yVals = {0, 0, 0, 0};
 
     std::pair<int, int> positionCheck[4];
-    for (int i = 0; i < 4; i++) {
-        positionCheck[i] = position[i];
-    }
+    for (int i = 0; i < 4; i++) positionCheck[i] = position[i];
 
     //if there is a collision then proceed
     if (isRotationalCollision(position, grid)) {
@@ -1284,22 +1159,17 @@ checkRotationalCollision(std::pair<int, int>* position, const int grid[21][10]) 
             }
             if (isRotationalCollision(positionCheck, grid)) {
                 //revert back because this translation doesn't work
-                for (int i = 0; i < 4; i++) {
-                    positionCheck[i] = position[i];
-                }
+                for (int i = 0; i < 4; i++) positionCheck[i] = position[i];
             }
             else {
                 //the first translation that works will be the one that we use
-                for (int i = 0; i < 4; i++) {
-                    position[i] = positionCheck[i];
-                }
+                for (int i = 0; i < 4; i++) position[i] = positionCheck[i];
                 return true;
             }
         }
         return false;
-    } else {
-        return true;
-    }
+    } 
+    else return true;
 }
 
 bool Grid::Block::isRotationalCollision(const std::pair<int, int>* position, const int grid[21][10]) {
