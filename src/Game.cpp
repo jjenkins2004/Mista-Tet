@@ -29,6 +29,7 @@ int main() {
     int spawnpower = GetRandomValue(10*60, 15*60);
     bool start = true;
     int level = 0;
+    std::vector<std::pair<double, int>> speedChange; //for our speedchange powerup, double represents how changed and int is time left of effect
 
     Camera2D camera = {0};
     camera.target = (Vector2){screenWidth/2, screenHeight/2};
@@ -94,8 +95,18 @@ int main() {
         //using level as x that approaches 120
         grid->updatelevel();
         level = grid->getLevel();
-        int num = 240/(1+pow(M_E, (-0.05*level)))-120;
-        if (levelcounter == 120-(num)) {
+        int num = 120 - (240/(1+pow(M_E, (-0.05*level)))-120);
+        for (std::vector<std::pair<double, int>>::iterator it = speedChange.begin(); it != speedChange.end(); it++) {
+            if (!(num < 0 && it->first < 0)) num*=it->first;
+            if (num < 1 && num > 0) num = 1;
+            it->second--;
+            if (it->second == 0) {
+                if (it->first < 0) levelcounter = 0;
+                speedChange.erase(it);
+                it--;
+            }
+        }
+        if (levelcounter >= num) {
             levelcounter = 0;
             grid->moveDown();
             score->addScore(1);
@@ -171,12 +182,23 @@ int main() {
 
         //hold current block
         if (IsKeyPressed(KEY_C)) grid->hold();
+
+        //ask powerup class if there are any fast speedchange
+        std::vector<std::pair<double, int>> temp = powerUp->checkFastSpeed();
+        speedChange.insert(speedChange.end(), temp.begin(), temp.end());
+
         //check if any powerups are being used
         PowerupItem* p = nullptr;
         if (IsKeyPressed(KEY_ONE)) p = powerUp->usePowerup(1);
         else if (IsKeyPressed(KEY_TWO)) p = powerUp->usePowerup(2);
         else if (IsKeyPressed(KEY_THREE)) p = powerUp->usePowerup(3);
-        if (usePower(p, score, grid) == -1) break;
+        if (p != nullptr && p->id == "speedchange") {
+            SpeedChange* s = dynamic_cast<SpeedChange*>(p);
+            if (s->variant == 0) speedChange.push_back(std::make_pair(-1, 1800));
+            else if (s->variant == -1) speedChange.push_back(std::make_pair(1.3, 1800));
+            else if (s->variant == -2) speedChange.push_back(std::make_pair(1.5, 1800));
+        }
+        else if (usePower(p, score, grid) == -1) break;
         score->updateMultiplier();
 
         //pause menu
@@ -379,25 +401,25 @@ int usePower(PowerupItem* p, Score* scr, Grid* grid) {
         scr->addMultiplier(m->multiplier);
         delete m;
     }
-    if (p->id == "laser") {
+    else if (p->id == "laser") {
         delete p;
         return grid->lasers();
     }
-    if (p->id == "bomb") {
+    else if (p->id == "bomb") {
         delete p;
         return grid->bomb();
     }
-    if (p->id == "nuke") {
+    else if (p->id == "nuke") {
         delete p;
         return grid->nuke();
     }
-    if (p->id == "threeblock") {
+    else if (p->id == "threeblock") {
         PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
         grid->changeNext(t->blockID);
         delete t;
     }
-    if (p->id == "plusmultiplier") {
+    else if (p->id == "plusmultiplier") {
         PlaySound(LoadSound("resources/audio/usepowerup.wav"));
         PlusMultiplier* m = dynamic_cast<PlusMultiplier*>(p);
         scr->addPermanentMultiplier(m->multiplier);

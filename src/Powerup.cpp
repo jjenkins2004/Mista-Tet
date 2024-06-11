@@ -60,6 +60,10 @@ void Powerup::drawPowerup() {
                     else if (temp->curr->id == "fiverandom") { //don't need to add fiverandom to collected powerups, effects are realized immediately
                         for (int i = 0; i < 5; i++) spawnPowerup(false);
                     }
+                    else if (temp->curr->id == "speedchange") {
+                        SpeedChange* s = dynamic_cast<SpeedChange*>(temp->curr);
+                        if (s->variant > 0) fastSpeed.push_back(std::make_pair(s->variant == 1 ? 0.8: 0.65, 1800));
+                    }
                     else {
                         for (int i = 0; i < 3; i++) {
                             if (currPower[i]->id == "null") {
@@ -110,9 +114,7 @@ void Powerup::drawPowerup() {
 void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
     int rand1;
-    spawnedPower.push_back(new Nuke(800, nuke));
-    return;
-    if (include5Rand) rand1 = GetRandomValue(1, 100);
+    if (include5Rand) rand1 = /*GetRandomValue(1, 100)*/64;
     else rand1 = GetRandomValue(1, 13);
 
     //multiplier powerup
