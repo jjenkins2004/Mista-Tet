@@ -124,12 +124,12 @@ void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
     int rand1;
     if (include5Rand) {
-        rand1 = /*GetRandomValue(1, 15)*/ 15;
+        rand1 = GetRandomValue(1, 100);
     }
     else {
         rand1 = GetRandomValue(1, 13);
     }
-    if (rand1 <= 4) {
+    if (rand1 <= 30) {
         int rand2 = GetRandomValue(1, 50);
         //x2 multiplier
         if (rand2 <= 10) {
@@ -150,7 +150,7 @@ void Powerup::spawnPowerup(bool include5Rand) {
             spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
         }
     }
-    else if (rand1 <= 8) {
+    else if (rand1 <= 60) {
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 10) {
             spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
@@ -168,7 +168,7 @@ void Powerup::spawnPowerup(bool include5Rand) {
             spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
         }
     }
-    else if (rand1 <= 10) { 
+    else if (rand1 <= 75) { 
         int rand2 = GetRandomValue(1, 50);
         if (rand2 <= 20) {
             spawnedPower.push_back(new Laser(1000, lasers));
