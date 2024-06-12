@@ -106,7 +106,7 @@ void Tet::drawTet() {
             if (tetStage >= 3) num = 5; //later stages of the game make tet powers happen more often
             if (GetRandomValue(1, 10) <= num) { //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (tetStage <=2) txtIndex = /*GetRandomValue(0, 6)*/3; //choosing power from our early stage bag
+                if (tetStage <=2) txtIndex = GetRandomValue(4, 5); //choosing power from our early stage bag
                 else txtIndex = GetRandomValue(0, 7); //choosing power from our late stage bag
             }
             else {

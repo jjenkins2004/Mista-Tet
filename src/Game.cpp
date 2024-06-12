@@ -127,6 +127,8 @@ int main() {
         else if (power == "level2") grid->increaseLevel(25);
         else if (power == "blind1") grid->blind(GetRandomValue(5, 7));
         else if (power == "blind2") grid->blind(GetRandomValue(8, 12));
+        else if (power == "zblock") grid->changeNext(5);
+        else if (power == "sblock") grid->changeNext(7);
 
         //checking if keys are pressed and doing the corresponding action
         if (IsKeyPressed(KEY_RIGHT)) {
