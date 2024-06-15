@@ -27,14 +27,14 @@ class Grid {
             pow = p;
         }
         //convinient funciton that draws everything
-        void drawAll(bool block) {
-            drawGrid(block);
-            scr->drawScore();
-            tet->drawTet();
-            pow->drawPowerup();
-        }
+        void drawAll(bool block, bool useCamera);
         //draws the grid and bool tells grid if block should also be drawn
         void drawGrid(bool block);
+        //convinient function that calls all updating functions
+        void updateAll();
+        //functions for adjusting camera related to tet turn power
+        void updateCamera();
+        void randomRotate();
         //block movements (true if block needs to be generated, false otherwise)
         void moveDown() {
             if (!block.moveDown(grid)) {
@@ -142,7 +142,18 @@ class Grid {
         std::vector<std::pair<int, int>> changeLevel;
         std::vector<std::tuple<int, int, double>> blindRows; //first int is row number, second int is time left being blind, third double is the fade of the texture
         Texture2D fog = LoadTexture("resources/tet/fog.png");
+        std::vector<std::tuple<int, int, bool>> rotations; //first int is numeber of 90 degree rotations, second int is time, bool is for animation
+        int numRotations = 0;
+        bool subtract = false;
+        std::vector<std::tuple<int, int, bool>>::iterator rotationIt; std::vector<std::tuple<int, int, bool>> null;
+        double angVel = 0.05; double angAcc = 0.01;
+        bool shake = false; float maxOffsetRotation = 15;
+        Sound rotateSound = LoadSound("resources/audio/ScreenTurn.wav");
+        Sound rotationRumble = LoadSound("resources/audio/RotationRumble.wav");
 
+
+        //camera
+        Camera2D cameraMain = { 0 };
         //font
         Font allFont = LoadFont("resources/allFont.ttf");
         //scoreboard pointer

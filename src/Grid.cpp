@@ -19,6 +19,28 @@ Grid::Grid() {
     //setting up our next array for upcoming blocks and giving a starting block
     for (int i = 0; i < 3; i++) next.push_back(randBlock.getBlock());
     block = Block(randBlock.getBlock(), grid);
+
+    //initialize 2d camera
+    cameraMain.target = (Vector2){400, 400};
+    cameraMain.offset = (Vector2){400, 400};
+    cameraMain.rotation = 0;
+    cameraMain.zoom = 1;
+
+    rotationIt = null.end();
+}
+void Grid::drawAll(bool drawBlock, bool useCamera) {
+    if (useCamera) BeginMode2D(cameraMain);
+        drawGrid(drawBlock);
+        scr->drawScore();
+        tet->drawTet();
+        pow->drawPowerup();
+    if (useCamera) EndMode2D();
+}
+
+void Grid::updateAll() {
+    updatelevel();
+    updateCamera();
+    scr->updateMultiplier();
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -313,7 +335,7 @@ int Grid::removeRow(std::vector<int>& rows) {
                 if (counter == 10) return 0;
                 else counter++;
                 BeginDrawing();
-                    drawAll(false);
+                    drawAll(false, true);
                 EndDrawing();
             }
             return -1;
@@ -329,8 +351,7 @@ int Grid::removeRow(std::vector<int>& rows) {
         }
 
         BeginDrawing();
-            ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
-            drawAll(false);
+            drawAll(false, true);
         EndDrawing();
     }
     return -1;
@@ -380,7 +401,7 @@ int Grid::fixRows(std::vector<int> rows) {
                         if (counter == 15) return 0;
                         else counter++;
                         BeginDrawing();
-                            drawAll(false);
+                            drawAll(false, true);
                         EndDrawing();
                     }
                     return -1;
@@ -412,7 +433,7 @@ int Grid::fixRows(std::vector<int> rows) {
 
         //drawing
         BeginDrawing();
-            drawAll(false);
+            drawAll(false, true);
         EndDrawing();
 
     }
@@ -455,7 +476,7 @@ int Grid::lasers() {
             if (wait < 90) {
                 wait++;
                 BeginDrawing();
-                    this->drawAll(true);
+                    this->drawAll(true, true);
                 EndDrawing();
                 continue;
             }
@@ -486,7 +507,7 @@ int Grid::lasers() {
             }
         BeginDrawing();
             BeginMode2D(camera);
-                this->drawAll(true);
+                this->drawAll(true, false);
                 for (int i = 0; i < 3; i++) {
                     for (int j = 1; j < 21; j++) {
                         if (grid[j][col[i]] != 0) DrawRectangle(200+col[i]*30, 100+30*(j-1), 30, 30, Fade(BLACK, fade));
@@ -530,7 +551,7 @@ int Grid::bomb() {
             if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) pos.y+=5;
             if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) pos.y-=5;
             BeginDrawing();
-                this->drawAll(true);
+                this->drawAll(true, true);
                 DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, WHITE);
             EndDrawing();
             counter1++;
@@ -539,7 +560,7 @@ int Grid::bomb() {
         if (fade >= -0.2) {
             fade-=0.015;
             BeginDrawing();
-                this->drawAll(true);
+                this->drawAll(true, true);
                 DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, Fade(WHITE, fade));
             EndDrawing();
             continue;
@@ -581,7 +602,7 @@ int Grid::bomb() {
             }
             BeginDrawing();
                 BeginMode2D(camera);
-                    this->drawAll(true);
+                    this->drawAll(true, false);
                     DrawTexturePro(explosion, explosionSource, {pos.x, pos.y, 250, 225}, {125, 122}, 0, WHITE);
                 EndMode2D();
             EndDrawing();
@@ -605,20 +626,18 @@ int Grid::nuke() {
     double fade2 = 0;
 
      //camera for screen shake
-    Camera2D camera = { 0 };
-    camera.target = (Vector2){400, 400};
-    camera.offset = (Vector2){400, 400};
-    camera.rotation = 0;
-    camera.zoom = 1;
+    Camera2D camera;
     float maxAngle = 2;
     float maxOffset = 25;
 
     while (!WindowShouldClose()) {
+        updateAll();
+        camera = cameraMain;
         if (counter1 < 180) {
             counter1++;
             if (counter1 == 30) PlaySound(alarm);
             BeginDrawing();
-                this->drawAll(true);
+                this->drawAll(true, true);
             EndDrawing();
             continue;
         }
@@ -629,16 +648,16 @@ int Grid::nuke() {
             if (counter2 >= 60) {
                 camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
                 camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-                camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.rotation = cameraMain.rotation + maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             }
             if (counter2 >= 300) {
                 if (maxOffset > 1) maxOffset-=0.4;
-                if (maxAngle > 0.5) maxAngle-=0.02;
+                if (maxAngle > 0.25) maxAngle-=0.02;
             }
             fade2+=0.005;
             BeginDrawing();
                 BeginMode2D(camera);
-                    this->drawAll(true);
+                    this->drawAll(true, false);
                     for (int i = 1; i < 21; i++) for (int j = 0; j < 10; j++) DrawRectangle(200 + 30*j, 100 + 30 * (i-1), 30, 30, Fade(BLACK, fade2));
                     DrawTexturePro(explosion, source, {350, 700, 300, 500}, {150, 500}, 0, Fade(WHITE, fade1));
                 EndMode2D();
@@ -695,6 +714,80 @@ void Grid::blind(int num) {
         blindRows.push_back(std::make_tuple(*it, 1800, 0));
         rows.erase(it);
     }
+}
+
+void Grid::updateCamera() {
+    if (rotationIt == null.end()) {
+        bool cont = false;
+        for (rotationIt = rotations.begin(); rotationIt != rotations.end(); rotationIt++) {
+            if (std::get<2>(*rotationIt) || std::get<1>(*rotationIt) == 0) {
+                cont = true;
+                break;
+            }
+            else --std::get<1>(*rotationIt);
+        }
+        if (!cont) {
+            rotationIt = null.end();
+            return;
+        }
+    }
+    if (std::get<1>(*rotationIt) == 0) {
+        subtract = true;
+    }
+    if (!subtract && int(cameraMain.rotation)%90 > 88 && int(cameraMain.rotation+angVel)%90 < 2 ) {
+         if (cameraMain.rotation < 90) cameraMain.rotation = 90;
+         else if (cameraMain.rotation < 180) cameraMain.rotation = 180;
+         else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
+         else cameraMain.rotation = 0;
+         shake = true;
+         angVel = 0.05;
+        numRotations++;
+    }
+    else if (subtract && int(cameraMain.rotation)%90 < 2 && cameraMain.rotation != 0 && cameraMain.rotation != 90 && cameraMain.rotation != 180 && cameraMain.rotation != 270 && int(cameraMain.rotation+90-angVel)%90 > 88) {
+        if (cameraMain.rotation > 270) cameraMain.rotation = 270;
+        else if (cameraMain.rotation > 180) cameraMain.rotation = 180;
+        else if (cameraMain.rotation > 90) cameraMain.rotation = 90;
+        else cameraMain.rotation = 0;
+        shake = true;
+        angVel = 0.05;
+        numRotations++;
+    }
+    else if (shake) {
+        if (maxOffsetRotation == 15) PlaySound(rotationRumble);
+        cameraMain.offset.x = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        cameraMain.offset.y = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        maxOffsetRotation-=0.1875;
+        if (maxOffsetRotation <= 0) {
+            maxOffsetRotation = 15;
+            shake = false;
+            cameraMain.offset.x = 400;
+            cameraMain.offset.y = 400;
+             if (std::get<0>(*rotationIt) == numRotations) {
+                numRotations = 0;
+                std::get<2>(*rotationIt) = false;
+                if (subtract) {
+                    subtract = false;
+                    rotations.erase(rotationIt);
+                }
+                rotationIt = null.end();
+                return;
+            }
+        }
+    }
+    else {
+        if (cameraMain.rotation == 0 || cameraMain.rotation == 90 || cameraMain.rotation == 180 || cameraMain.rotation == 270) PlaySound(rotateSound);
+        if (subtract) {
+            cameraMain.rotation-=angVel;
+            if (cameraMain.rotation < 0) cameraMain.rotation+=360;
+        }
+        else cameraMain.rotation+= angVel;
+        if (angVel < 1.5) angVel+=angAcc;
+        else angVel = 1.5;
+    }
+}
+
+void Grid::randomRotate() {
+    rotations.push_back(std::make_tuple(GetRandomValue(1, 3), GetRandomValue(20*60, 50*60), true));
 
 }
 /*****

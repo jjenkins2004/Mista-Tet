@@ -77,7 +77,7 @@ class Tet {
     tetPower increaseLevel2 = {"Okay, let's spice\nthings up a lot!", "level2"};
     tetPower blind1 = {"Would it be easier\nif you couldn't see?!", "blind1"};
     tetPower blind2 = {"You don't need to\nsee the blocks anyways\nright?", "blind2"};
-    tetPower flip = {"TURN THE SCREEN!", "turn"};
+    tetPower flip = {"FLIP THE SCREEN!", "turn"};
     tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};
 

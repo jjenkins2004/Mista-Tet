@@ -65,6 +65,7 @@ int main() {
             horizontalcounter = 0;
             downcounter = 0;
             //temp
+            grid->randomRotate();
             start = false; continue;
             if (menu() == -1) break;
             start = false;
@@ -74,7 +75,7 @@ int main() {
             while (!WindowShouldClose()) {
                 BeginDrawing();
                     ClearBackground(BLACK);
-                    grid->drawAll(true);
+                    grid->drawAll(true, true);
                     DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
                 EndDrawing();
                 fade-=0.01;
@@ -91,9 +92,11 @@ int main() {
         //----------------------------------------------------------------------------------
         bool checkRows = false;
 
+        //updating functions
+        grid->updateAll();
+
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
         //using level as x that approaches 120
-        grid->updatelevel();
         level = grid->getLevel();
         int num = 120 - (240/(1+pow(M_E, (-0.05*level)))-120);
         for (std::vector<std::pair<double, int>>::iterator it = speedChange.begin(); it != speedChange.end(); it++) {
@@ -201,7 +204,6 @@ int main() {
             else if (s->variant == -2) speedChange.push_back(std::make_pair(1.5, 1800));
         }
         else if (usePower(p, score, grid) == -1) break;
-        score->updateMultiplier();
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {
@@ -241,7 +243,7 @@ int main() {
                 }
                 BeginDrawing();
                     ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
-                    grid->drawAll(true);
+                    grid->drawAll(true, true);
                     DrawRectangle(0, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2-10, 800, MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y+20, Fade(BLACK, fade));
                     DrawTextEx(titleFont, "YOU LOSE", (Vector2){400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).x/2, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2}, 150, 5, Fade(WHITE, fade));
                 EndDrawing();
@@ -255,7 +257,7 @@ int main() {
         // Draw
         //----------------------------------------------------------------------------------
             BeginDrawing();
-                grid->drawAll(true);
+                grid->drawAll(true, true);
             EndDrawing();
         //----------------------------------------------------------------------------------
     }
