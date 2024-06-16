@@ -2,10 +2,14 @@
 
 
 
-/*****
-*** START OF GRID CLASS 
-******/
+/*********************************************************************************************
+***** START OF GRID CLASS 
+*********************************************************************************************/
 
+
+        //--------------------------------------------------------------------------
+        // Constructor
+        //--------------------------------------------------------------------------
 
 
 Grid::Grid() {
@@ -28,6 +32,13 @@ Grid::Grid() {
 
     rotationIt = null.end();
 }
+
+
+        //--------------------------------------------------------------------------
+        // Drawing Functions
+        //--------------------------------------------------------------------------
+
+
 void Grid::drawAll(bool drawBlock, bool useCamera) {
     if (useCamera) BeginMode2D(cameraMain);
         drawGrid(drawBlock);
@@ -35,12 +46,6 @@ void Grid::drawAll(bool drawBlock, bool useCamera) {
         tet->drawTet();
         pow->drawPowerup();
     if (useCamera) EndMode2D();
-}
-
-void Grid::updateAll() {
-    updatelevel();
-    updateCamera();
-    scr->updateMultiplier();
 }
 
 void Grid::drawGrid(bool drawBlock) {
@@ -260,6 +265,111 @@ void Grid::drawGrid(bool drawBlock) {
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 }
 
+
+        //--------------------------------------------------------------------------
+        // Updating Functions
+        //--------------------------------------------------------------------------
+
+
+void Grid::updateAll() {
+    updatelevel();
+    updateCamera();
+    scr->updateMultiplier();
+}
+
+void Grid::updateCamera() {
+    if (rotationIt == null.end()) {
+        bool cont = false;
+        for (rotationIt = rotations.begin(); rotationIt != rotations.end(); rotationIt++) {
+            if (std::get<2>(*rotationIt) || std::get<1>(*rotationIt) == 0) {
+                cont = true;
+                break;
+            }
+            else --std::get<1>(*rotationIt);
+        }
+        if (!cont) {
+            rotationIt = null.end();
+            return;
+        }
+    }
+    if (std::get<1>(*rotationIt) == 0) {
+        subtract = true;
+    }
+    if (!subtract && int(cameraMain.rotation)%90 > 88 && int(cameraMain.rotation+angVel)%90 < 2 ) {
+         if (cameraMain.rotation < 90) cameraMain.rotation = 90;
+         else if (cameraMain.rotation < 180) cameraMain.rotation = 180;
+         else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
+         else cameraMain.rotation = 0;
+         shake = true;
+         angVel = 0.05;
+        numRotations++;
+    }
+    else if (subtract && int(cameraMain.rotation)%90 < 2 && cameraMain.rotation != 0 && cameraMain.rotation != 90 && cameraMain.rotation != 180 && cameraMain.rotation != 270 && int(cameraMain.rotation+90-angVel)%90 > 88) {
+        if (cameraMain.rotation > 270) cameraMain.rotation = 270;
+        else if (cameraMain.rotation > 180) cameraMain.rotation = 180;
+        else if (cameraMain.rotation > 90) cameraMain.rotation = 90;
+        else cameraMain.rotation = 0;
+        shake = true;
+        angVel = 0.05;
+        numRotations++;
+    }
+    else if (shake) {
+        if (maxOffsetRotation == 15) PlaySound(rotationRumble);
+        cameraMain.offset.x = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        cameraMain.offset.y = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        maxOffsetRotation-=0.1875;
+        if (maxOffsetRotation <= 0) {
+            maxOffsetRotation = 15;
+            shake = false;
+            cameraMain.offset.x = 400;
+            cameraMain.offset.y = 400;
+             if (std::get<0>(*rotationIt) == numRotations) {
+                numRotations = 0;
+                std::get<2>(*rotationIt) = false;
+                if (subtract) {
+                    subtract = false;
+                    rotations.erase(rotationIt);
+                }
+                rotationIt = null.end();
+                return;
+            }
+        }
+    }
+    else {
+        if (cameraMain.rotation == 0 || cameraMain.rotation == 90 || cameraMain.rotation == 180 || cameraMain.rotation == 270) PlaySound(rotateSound);
+        if (subtract) {
+            cameraMain.rotation-=angVel;
+            if (cameraMain.rotation < 0) cameraMain.rotation+=360;
+        }
+        else cameraMain.rotation+= angVel;
+        if (angVel < 1.5) angVel+=angAcc;
+        else angVel = 1.5;
+    }
+    pow->updateRotation(cameraMain.rotation);
+}
+
+void Grid::updatelevel() {
+     if (rawLevel < int(scr->getScore()/2000)+1) rawLevel = int(scr->getScore()/2000)+1;
+    level = rawLevel;
+    for (std::vector<std::pair<int, int>>::iterator it = changeLevel.begin(); it != changeLevel.end(); it++) {
+        level+=it->first;
+        if (level > 99) level = 99;
+        it->second--;
+        if (it->second == 0) {
+            changeLevel.erase(it);
+            it--;
+        }
+    }
+    scr->updateLevel(level);
+    pow->updateLevel(level);
+}
+
+
+        //--------------------------------------------------------------------------
+        // Block Related Functions
+        //--------------------------------------------------------------------------
+
+
 void Grid::moveDown() {
     if (!block.moveDown(grid)) {
         this->placeBlock();
@@ -329,6 +439,12 @@ const std::vector<int> Grid::checkRowComplete() const{
     }
     return rows;
 }
+
+
+        //--------------------------------------------------------------------------
+        // Row Related Functions
+        //--------------------------------------------------------------------------
+
 
 int Grid::removeRow(std::vector<int>& rows) {
     std::vector<int*> cells;
@@ -465,6 +581,12 @@ int Grid::fixRows(std::vector<int> rows) {
     }
     return -1;
 }
+
+
+        //--------------------------------------------------------------------------
+        // Player and Tet Powerups
+        //--------------------------------------------------------------------------
+
 
 int Grid::lasers() {
     Rectangle laserHeadSource = {0, 60, 50, 50};
@@ -712,22 +834,6 @@ void Grid::changeNext(int i) {
     }
 }
 
-void Grid::updatelevel() {
-     if (rawLevel < int(scr->getScore()/2000)+1) rawLevel = int(scr->getScore()/2000)+1;
-    level = rawLevel;
-    for (std::vector<std::pair<int, int>>::iterator it = changeLevel.begin(); it != changeLevel.end(); it++) {
-        level+=it->first;
-        if (level > 99) level = 99;
-        it->second--;
-        if (it->second == 0) {
-            changeLevel.erase(it);
-            it--;
-        }
-    }
-    scr->updateLevel(level);
-    pow->updateLevel(level);
-}
-
 void Grid::increaseLevel(int x) {
     changeLevel.push_back(std::make_pair(x, 1800));
 }
@@ -742,88 +848,25 @@ void Grid::blind(int num) {
     }
 }
 
-void Grid::updateCamera() {
-    if (rotationIt == null.end()) {
-        bool cont = false;
-        for (rotationIt = rotations.begin(); rotationIt != rotations.end(); rotationIt++) {
-            if (std::get<2>(*rotationIt) || std::get<1>(*rotationIt) == 0) {
-                cont = true;
-                break;
-            }
-            else --std::get<1>(*rotationIt);
-        }
-        if (!cont) {
-            rotationIt = null.end();
-            return;
-        }
-    }
-    if (std::get<1>(*rotationIt) == 0) {
-        subtract = true;
-    }
-    if (!subtract && int(cameraMain.rotation)%90 > 88 && int(cameraMain.rotation+angVel)%90 < 2 ) {
-         if (cameraMain.rotation < 90) cameraMain.rotation = 90;
-         else if (cameraMain.rotation < 180) cameraMain.rotation = 180;
-         else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
-         else cameraMain.rotation = 0;
-         shake = true;
-         angVel = 0.05;
-        numRotations++;
-    }
-    else if (subtract && int(cameraMain.rotation)%90 < 2 && cameraMain.rotation != 0 && cameraMain.rotation != 90 && cameraMain.rotation != 180 && cameraMain.rotation != 270 && int(cameraMain.rotation+90-angVel)%90 > 88) {
-        if (cameraMain.rotation > 270) cameraMain.rotation = 270;
-        else if (cameraMain.rotation > 180) cameraMain.rotation = 180;
-        else if (cameraMain.rotation > 90) cameraMain.rotation = 90;
-        else cameraMain.rotation = 0;
-        shake = true;
-        angVel = 0.05;
-        numRotations++;
-    }
-    else if (shake) {
-        if (maxOffsetRotation == 15) PlaySound(rotationRumble);
-        cameraMain.offset.x = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-        cameraMain.offset.y = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-        maxOffsetRotation-=0.1875;
-        if (maxOffsetRotation <= 0) {
-            maxOffsetRotation = 15;
-            shake = false;
-            cameraMain.offset.x = 400;
-            cameraMain.offset.y = 400;
-             if (std::get<0>(*rotationIt) == numRotations) {
-                numRotations = 0;
-                std::get<2>(*rotationIt) = false;
-                if (subtract) {
-                    subtract = false;
-                    rotations.erase(rotationIt);
-                }
-                rotationIt = null.end();
-                return;
-            }
-        }
-    }
-    else {
-        if (cameraMain.rotation == 0 || cameraMain.rotation == 90 || cameraMain.rotation == 180 || cameraMain.rotation == 270) PlaySound(rotateSound);
-        if (subtract) {
-            cameraMain.rotation-=angVel;
-            if (cameraMain.rotation < 0) cameraMain.rotation+=360;
-        }
-        else cameraMain.rotation+= angVel;
-        if (angVel < 1.5) angVel+=angAcc;
-        else angVel = 1.5;
-    }
-    pow->updateRotation(cameraMain.rotation);
-}
-
 void Grid::randomRotate() {
     rotations.push_back(std::make_tuple(GetRandomValue(1, 3), GetRandomValue(20*60, 50*60), true));
 
 }
-/*****
-*** END OF GRID CLASS 
-******/
 
-/*****
-*** START OF BLOCK CLASS 
-******/
+
+/*********************************************************************************************
+***** END OF GRID CLASS 
+*********************************************************************************************/
+
+
+/*********************************************************************************************
+***** START OF BLOCK CLASS 
+*********************************************************************************************/
+
+
+        //--------------------------------------------------------------------------
+        // Constructor
+        //--------------------------------------------------------------------------
 
 Grid::Block::Block(int id, int grid[21][10]): id(id), rotation(0) {
 
@@ -888,9 +931,12 @@ Grid::Block::Block(int id, int grid[21][10]): id(id), rotation(0) {
     if (checkVerticalCollision(grid)) for (int i = 0; i < 4; i++) pos[i].second--;
 }
 
-/*
-* MOVEMENTS
-*/
+
+        //--------------------------------------------------------------------------
+        // Block Movement Functions
+        //--------------------------------------------------------------------------
+
+
 bool Grid::Block::moveDown(const int grid[21][10]) {
     if (checkVerticalCollision(grid)) return false;
     PlaySound(LoadSound("resources/audio/blockmove.wav"));
@@ -1239,9 +1285,11 @@ void Grid::Block::rotate(const int grid[21][10]) {
     for (int i = 0; i < 4; i++) pos[i] = backUpPos[i];
 }
 
-/*
-* COLLISION CHECKS
-*/
+
+        //--------------------------------------------------------------------------
+        // Collision Checks
+        //--------------------------------------------------------------------------
+
 
 bool Grid::Block::checkHorizontalCollision(int side, const int grid[21][10]) const{
     if (side == 0) {
@@ -1300,6 +1348,7 @@ bool Grid::Block::isRotationalCollision(const std::pair<int, int>* position, con
     return false;
 }
 
-/*****
-*** END OF BLOCK CLASS 
-******/
+
+/*********************************************************************************************
+***** END OF BLOCK CLASS 
+*********************************************************************************************/

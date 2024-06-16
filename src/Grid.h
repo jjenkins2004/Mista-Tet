@@ -35,15 +35,12 @@ class Grid {
         void updateAll();                                       //convinient function that calls all updating functions
         void updateCamera();                                    //called everyframe to update the camera
         void updatelevel();                                     //updating function for level and level related powers
-        int getLevel() { return level; }                        //get current level
-        void randomRotate();                                    //get a random tet rotate power, randomizes active length and number of 90 degree rotations  
+        int getLevel() { return level; }                        //get current level  
         bool checkGameOver() { return gameover; }               //check if player lost
-
 
         //--------------------------------------------------------------------------
         // Block Related Functions
         //--------------------------------------------------------------------------
-
 
         void moveDown();                                        //move block down one tile (calls move in block class)
         void moveRight();                                       //move block right one tile
@@ -65,7 +62,8 @@ class Grid {
         //--------------------------------------------------------------------------
         // Player powerup and Tet power functions
         //--------------------------------------------------------------------------
-
+        
+        void randomRotate();                                    //get a random tet rotate power, randomizes active length and number of 90 degree rotations
         void increaseLevel(int x);                          //increase level by x 30 seconds (tet power)
         void blind(int num);                                //blind random rows on board, parameter is number of rows (tet power)
         int lasers();                                       //shoots three lasers from sky, adds score and multiplier based on how many blocks were destroyed (player power)
