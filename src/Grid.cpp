@@ -260,6 +260,32 @@ void Grid::drawGrid(bool drawBlock) {
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 }
 
+void Grid::moveDown() {
+    if (!block.moveDown(grid)) {
+        this->placeBlock();
+        this->generateBlock();
+    }
+}
+
+void Grid::moveRight() {
+    block.moveRight(grid);
+}
+
+void Grid::moveLeft() {
+    block.moveLeft(grid);
+}
+
+void Grid::rotate() {
+    block.rotate(grid);
+}
+
+int Grid::drop() {
+    int r = block.drop(grid);
+    this->placeBlock();
+    this->generateBlock();
+    return r;
+}
+
 void Grid::hold() {
     if (ableToHold) {
         int temp = block.getId();
@@ -784,6 +810,7 @@ void Grid::updateCamera() {
         if (angVel < 1.5) angVel+=angAcc;
         else angVel = 1.5;
     }
+    pow->updateRotation(cameraMain.rotation);
 }
 
 void Grid::randomRotate() {

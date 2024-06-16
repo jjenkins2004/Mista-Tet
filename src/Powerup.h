@@ -277,6 +277,9 @@ class Powerup {
             fastSpeed.clear();
             return temp;
         }; 
+        void updateRotation(float r) {
+            rotation = r;
+        }
 
     private:
     //font
@@ -322,6 +325,8 @@ class Powerup {
     std::vector<PowerupItem*> currPower;
     std::vector<std::pair<double, int>> fastSpeed;
 
+    //current rotation of camera, needed for mouse collision with powerup balls
+    float rotation = 0;
 
     //other classes
     Score* src;
