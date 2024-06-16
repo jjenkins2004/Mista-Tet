@@ -39,9 +39,11 @@ class Grid {
         void randomRotate();                                    //get a random tet rotate power, randomizes active length and number of 90 degree rotations  
         bool checkGameOver() { return gameover; }               //check if player lost
 
+
         //--------------------------------------------------------------------------
         // Block Related Functions
         //--------------------------------------------------------------------------
+
 
         void moveDown();                                        //move block down one tile (calls move in block class)
         void moveRight();                                       //move block right one tile
@@ -157,8 +159,8 @@ class Grid {
         Powerup* pow;
 
         //constants
-        const int xpos = 200, ypos = 100;  //number of pixels from the left and top of the window to the top left corner of grid
-        const float gridsize = 30; //pixel size of each grid
+        const int xpos = 200, ypos = 100;               //number of pixels from the left and top of the window to the top left corner of grid
+        const float gridsize = 30;                      //pixel size of each grid
         //1: I-block 2: J-block 3: L-block 4: O-block 5: S-block 6: T-block 7: Z-block
         const std::vector<Color> colors = {WHITE, SKYBLUE, DARKBLUE, ORANGE, YELLOW, LIME, PURPLE, RED, DARKGRAY};
 
