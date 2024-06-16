@@ -1,3 +1,7 @@
+//--------------------------------------------------------------------------
+// includes and constants
+//--------------------------------------------------------------------------
+
 #ifndef POWERUP_H
 #define POWERUP_H
 
@@ -10,326 +14,191 @@
 #define RECWIDTH 240
 #define RECHEIGHT 70
 
+
+//--------------------------------------------------------------------------
+// PowerupItem parent struct and children
+//--------------------------------------------------------------------------
+
+//Individual PowerupItems that will go into the PowerupItem (see below) list when
+//spawned in. All items which its own unique powers has its own struct which
+//inherits the PowerupItem struct, for the movement and collection of each
+//powerup item is very similar. However, some need special functions and variables
+//that don't apply to every item. All items will be initially stored as PowerupItem
+//types. To figure out what specific powerupitem it is, the ID will idenfity it
+//and dynamic casting is used to access specific functions
+
 struct PowerupItem {
-    PowerupItem() {
-        id = "null";
-    }
-    virtual ~PowerupItem() {}
-    PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
-        if (i != "null") {
-            pos.first = GetRandomValue(30, 770);
-            pos.second = -25;
-            texture = txt;
-            int xrand = GetRandomValue(15, 20);
-            vel.first = xrand - 2*xrand*GetRandomValue(0, 1);
-            vel.second = GetRandomValue(10, 20);
-            rotation.first = 0; rotation.second = vel.first*2;
-        }
-    }
-    void DrawItem() {
-        if (id != "null") {
-            DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){pos.first, pos.second, 50, 50}, (Vector2){25, 25}, rotation.first, Fade(WHITE, fade));
-        }
-    }
-    void moveItem() {
-        pos.second+=vel.second; rotation.second = vel.first*2; pos.first+=vel.first; rotation.first += rotation.second;
-        if (vel.first < 0) {
-            vel.first+=0.02;
-            if (vel.first > 0) {
-                vel.first = 0;
-            }
-        }
-        else if (vel.first > 0) {
-            vel.first-=0.02;
-            if (vel.first < 0) {
-                vel.first = 0;
-            }
-        }
-        else {
-            vel.first = 0;
-        }
-        if (pos.first >= 775) {
-            pos.first = 775;
-            if (vel.first > 0) {
-                vel.first*=-1;
-            }
-        }
-        else if (pos.first <= 25) {
-            pos.first = 25;
-            if (vel.first < 0) {
-                vel.first*=-1;
-            }
-        }
-        if (pos.second >= 775) {
-            pos.second = 775;
-            vel.second*=-0.90;
-        }
-        vel.second++;
-    }
-    //gives a eerie animation when powerups are collected
-    void spaz() {
-        //checks if it is our first time calling spaz
-        if (!spazzed) {
-            Sound powerupSFX = LoadSound("resources/audio/powerupCollection.wav");
-            PlaySound(powerupSFX);
-            spazzed = true;
-            time = 45;
-            vel.first = 1;
-            vel.second = 1;
-            spazpos.x = pos.first;
-            spazpos.y = pos.second;
-        }
-        //if position goes some distance from the origin given by distFromOrigin, then reverse the velocity
-        if (time == 0) {
-            spazpos.x+=vel.first;
-            spazpos.y+=vel.second;
-            if (spazpos.x > (int)(pos.first)+distFromOrigin.x) {
-                vel.first = vel.first*-1-GetRandomValue(1, 2);
-                spazpos.x = pos.first+distFromOrigin.x-26;
-                distFromOrigin.x+=2;
-            }
-            else if (spazpos.x < (int)(pos.first)-distFromOrigin.x) {
-                vel.first = vel.first*-1+GetRandomValue(1, 2);
-                spazpos.x = pos.first-distFromOrigin.x+26;
-                distFromOrigin.x+=2;
-            }
-            if (spazpos.y > pos.second+distFromOrigin.y) {
-                vel.second = vel.second*-1-GetRandomValue(-2, 2);
-                spazpos.y = pos.second+distFromOrigin.y-26;
-                distFromOrigin.y+=2;
-            }
-            else if (spazpos.y < pos.second-distFromOrigin.y) {
-                vel.second = vel.second*-1+GetRandomValue(-2, 2);
-                spazpos.y = pos.second-distFromOrigin.y+26;
-                distFromOrigin.y+=2;
-            }
-            fade-=0.007;
-        }
-        //this is just for our iniitial pause before the spaz
-        else {
-            time--;
-        }
-        DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){spazpos.x, spazpos.y, 50, 50}, (Vector2){25, 25}, rotation.first, Fade(WHITE, fade));
-    }
-    
-    //positioning
-    std::pair<float, float> pos;
-    std::pair<float, float> vel;
-    //angular position and angular velocity
-    std::pair<float, float> rotation;
-    std::string id;
+    PowerupItem() { id = "null"; }                          //construct a null PowerupItem
+    virtual ~PowerupItem() {}                               //virtual destructor
+    PowerupItem(std::string i, Texture2D txt, int t);       //main constructor that takes ID, texture path, and time until despawn
+    void DrawItem();                                        //draw the item with its position
+    void moveItem();                                        //move the item based on its velocity
+    void spaz();                                            //eerie animation for when item is collected
+                                                            //handles storing the item or immediately starting its effects
+                                                            //handles appropriate actions when any powerup item is collected
+    //identifying variables
+    std::string id;                                         //ID of powerupitem
+    Texture2D texture;                                      //texture of the powerup
+    int time;                                               //frames left before despawn
+    double fade = 1;                                        //opacity of item 
+    bool positive;                                          //used to determine if the item should be immediately used or stored 
 
-    Texture2D texture;
-    //how many frames before item despawns (60 frames per second)
-    int time;
-    double fade = 1;
-    bool removed = false;
-    bool positive;
+    //positioning of powerupitem
+    std::pair<float, float> pos;                            //x and y pos
+    std::pair<float, float> vel;                            //x and y vel
+    std::pair<float, float> rotation;                       //angular position and angular velocity for rolling
 
-    //for da spaz
-    bool spazzed = false;
-    Vector2 spazpos;
-    Vector2 distFromOrigin = (Vector2) {5, 5};
+    //spaz function variables
+    bool spazzed = false;                                   //to determine if it is the first time calling spaz()
+    Vector2 spazpos;                                        //position of item during animation
+    Vector2 distFromOrigin = (Vector2) {5, 5};              //how far should the item spaz away from its original position
+    bool removed = false;                                   //should item be removed from list now
 };
 
+//multiplicative multiplier that is only active for a certain amount of time
 struct Multiplier: PowerupItem {
-    Multiplier(double m, int time, Texture2D texture): PowerupItem("multiplier", texture, time) {
-        if (m < 1) {
-            positive = false;
-        }
-        else {
-            positive = true;
-        }
-        multiplier = m;
-    }
-    double multiplier;
+    Multiplier(double m, int time, Texture2D texture);      //Multiplier constructor
+    double multiplier;                                      //multiplier of the item
 };
 
+//shoots three lasers from the sky and gives a multiplier based on how many blocks were destroyed
 struct Laser: PowerupItem {
-    Laser(int time, Texture2D texture): PowerupItem("laser", texture, time) {}
+    Laser(int time, Texture2D texture);                     //Laser constructor
 };
 
+//large bomb whose location is chosen by the player 
 struct Bomb: PowerupItem{
-    Bomb(int time, Texture2D texture): PowerupItem("bomb", texture, time) {}
+    Bomb(int time, Texture2D texture);                      //Bomb constructor
 };
 
+//Nuke that destroyes everything
 struct Nuke: PowerupItem {
-    Nuke(int time, Texture2D texture): PowerupItem("nuke", texture, time) {}
+    Nuke(int time, Texture2D texture);                      //Nuke constructor
 };
 
+//changes the next three blocks
 struct ThreeBlock: PowerupItem {
-    ThreeBlock(int time, Texture2D texture, int id): PowerupItem("threeblock", texture, time), blockID(id) {}
-    int blockID;
+    ThreeBlock(int time, Texture2D texture, int id);        //ThreeBlock constructor
+    int blockID;                                            //block ID of the three blocks being added
 };
 
+//permanent additive multiplier
 struct PlusMultiplier: PowerupItem {
-    PlusMultiplier(double m, int time, Texture2D texture): PowerupItem("plusmultiplier", texture, time), multiplier(m) {}
-    double multiplier;
+    PlusMultiplier(double m, int time, Texture2D texture);  //PlusMultiplier constructor
+    double multiplier;                                      //amount of permanent multiplier to add
 };
 
+//spawns five random powerups on activation
 struct FiveRandom: PowerupItem {
-    FiveRandom(int time, Texture2D texture): PowerupItem("fiverandom", texture, time) {}
+    FiveRandom(int time, Texture2D texture);                //FiveRandom constructor
 };
 
+//changes the speed at which the current block automatically falls
 struct SpeedChange: PowerupItem {
-    SpeedChange(int var, int time, Texture2D texture): PowerupItem("speedchange", texture, time), variant(var) {}
-    int variant; //0 for pause, 1 for fast1, 2 for fast2, -1 for slow1, -2 for slow2
+    SpeedChange(int var, int time, Texture2D texture);      //SpeedChange constructor
+    int variant;                                            //0 for pause, 1 for fast1, 2 for fast2, -1 for slow1, -2 for slow2
 };
 
+//changes into a random powerup on activation, all powerups have an equal chance
 struct Mystery: PowerupItem {
-    Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {};
-
-    void collect() {
-        if (!createMystery) {
-            int rand = GetRandomValue(1, 21);
-
-            if (rand == 1) mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
-            if (rand == 2) mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/x1,5Multiplier.png"));
-            if (rand == 3) mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/x1,2Multiplier.png"));
-            if (rand == 4) mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/x0,7Multiplier.png"));
-            if (rand == 5) mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/-Multiplier.png"));
-            if (rand == 6) mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/Iblock.png"), 1);
-            if (rand == 7) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Jblock.png"), 2);
-            if (rand == 8) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Lblock.png"), 3);
-            if (rand == 9) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Oblock.png"), 4);
-            if (rand == 10) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Tblock.png"), 6);
-            if (rand == 11) mystery = new Laser(1000, LoadTexture("resources/powerup/Lasers.png"));
-            if (rand == 12) mystery = new Bomb(1000, LoadTexture("resources/powerup/Bomb.png"));
-            if (rand == 13) mystery = new Nuke(800, LoadTexture("resources/powerup/Nuke.png"));
-            if (rand == 14) mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/+0,1Multiplier.png"));
-            if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
-            if (rand == 16) mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5Random.png"));
-            if (rand == 17) mystery = new SpeedChange(0, 800, LoadTexture("resources/powerup/Pause.png"));
-            if (rand == 18) mystery = new SpeedChange(1, 800, LoadTexture("resources/powerup/Fast1.png"));
-            if (rand == 19) mystery = new SpeedChange(2, 800, LoadTexture("resources/powerup/Fast2.png"));
-            if (rand == 20) mystery = new SpeedChange(-1, 800, LoadTexture("resources/powerup/Slow1.png"));
-            if (rand == 21) mystery = new SpeedChange(-2, 800, LoadTexture("resources/powerup/Slow2.png"));
-
-            fade = 1;
-            mystery->removed = true;
-            mystery->fade = 0;
-            mystery->pos = pos;
-            createMystery = true;
-            PlaySound(LoadSound("resources/audio/MysteryReveal.wav"));
-        }
-        mystery->fade+=0.0125;
-        fade-=0.0125;
-        this->DrawItem();
-        mystery->DrawItem();
-    }
-
-    bool createMystery = false;
-    PowerupItem* mystery;
+    Mystery(int time, Texture2D texture);                   //Mystery constructor
+    void collect();                                         //called when mystery is collected and to fade in the new powerupitem
+    PowerupItem* mystery = nullptr;                         //stores the powerupitem that mystery will change into
 };
 
+//--------------------------------------------------------------------------
+// PowerupItem list
+//--------------------------------------------------------------------------
 
-//list we will use to store current powerups
+//Doubly Linked List which stores current spawned PowerupItems. It is 
+//iterated through by Powerup class when drawing all spawned powerups.
+//List supports adding to the back and removing a specific item which are
+//the only functions needed
+
+//individual powerup item
 struct item {
-    PowerupItem* curr;
-    item* next;
-    item* prev;
+    PowerupItem* curr;                                      //current item
+    item* next;                                             //next item
+    item* prev;                                             //previous item
 };
 
+//list
 struct powerList {
-    void push_back(PowerupItem* i) {
-        if (tail != nullptr) {
-            tail->next = new item();
-            tail->next->next = nullptr; tail->next->curr = i; tail->next->prev = tail;
-            tail = tail->next;
-        }
-        else {
-            head = new item();
-            tail = head;
-            head->curr = i; head->next = nullptr; head->prev = nullptr;
-        }
-    }
-    void remove(item* i) {
-        if (i == head) head = i->next;
-        if (i == tail) tail = i->prev;
-        if (i->prev != nullptr) i->prev->next = i->next;
-        if (i->next != nullptr) i->next->prev = i->prev;
-        delete i;
-    }
-    item* head = nullptr;
-    item* tail = nullptr;
+    void push_back(PowerupItem* i);                         //adds new powerupitem to the back of the list
+    void remove(item* i);                                   //deletes the given item
+    item* head = nullptr;                                   //head of the list
+    item* tail = nullptr;                                   //tail of the list
 };
 
 
+//--------------------------------------------------------------------------
+// Powerup Class
+//--------------------------------------------------------------------------
 
 class Powerup {
     public:
+        //constructor
         Powerup();
-        void updateLevel(int l) {
-            level = l;
-        }
 
-        //setting access to other classes
-        void setScore(Score* s) {
-            src = s;
-        }
+        //updating and setting
+        void updateRotation(float r) {rotation = r;}
+        void updateLevel(int l) {level = l;}
+        void setScore(Score* s) {src = s;}
 
         //powerup related functions
-        void drawPowerup();
-        void spawnPowerup(bool include5Rand);
-        PowerupItem* usePowerup(int k);
-        std::vector<std::pair<double, int>> checkFastSpeed() { //function is used so our changespeed powerup that makes speed faster isn't added to powerup collection and effects are immediate
-            std::vector<std::pair<double, int>> temp = fastSpeed;
-            fastSpeed.clear();
-            return temp;
-        }; 
-        void updateRotation(float r) {
-            rotation = r;
-        }
+        void drawPowerup();                                     //draw everything related to player powerups
+        void spawnPowerup(bool include5Rand);                   //spawn a powerup with set chances, bool tells whether to include the five
+                                                                //random powerups power, set to false when a five random powerup is used to
+                                                                //prevent overpowered chaining
+        PowerupItem* usePowerup(int k);                         //use the powerup at the kth circle in the powerupboard
+        std::vector<std::pair<double, int>> checkFastSpeed();   //special function for negative speed change powers
 
     private:
-    //font
-    Font allFont = LoadFont("resources/allFont.ttf");
 
-    //textures
-    Texture2D x2 = LoadTexture("resources/powerup/x2Multiplier.png");
-    Texture2D x1_5 = LoadTexture("resources/powerup/x1,5Multiplier.png");
-    Texture2D x1_2 = LoadTexture("resources/powerup/x1,2Multiplier.png");
-    Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
-    Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
-    Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
-    Texture2D bomb = LoadTexture("resources/powerup/Bomb.png");
-    Texture2D nuke = LoadTexture("resources/powerup/Nuke.png");
-    Texture2D Jblock = LoadTexture("resources/powerup/Jblock.png");
-    Texture2D Lblock = LoadTexture("resources/powerup/Lblock.png");
-    Texture2D Oblock = LoadTexture("resources/powerup/Oblock.png");
-    Texture2D Tblock = LoadTexture("resources/powerup/Tblock.png");
-    Texture2D Iblock = LoadTexture("resources/powerup/Iblock.png");
-    Texture2D plus0_2 = LoadTexture("resources/powerup/+0,2Multiplier.png");
-    Texture2D plus0_1 = LoadTexture("resources/powerup/+0,1Multiplier.png");
-    Texture2D mystery = LoadTexture("resources/powerup/Mystery.png");
-    Texture2D fiveRandom = LoadTexture("resources/powerup/5Random.png");
-    Texture2D slow1 = LoadTexture("resources/powerup/Slow1.png");
-    Texture2D slow2 = LoadTexture("resources/powerup/Slow2.png");
-    Texture2D fast1 = LoadTexture("resources/powerup/Fast1.png");
-    Texture2D fast2 = LoadTexture("resources/powerup/Fast2.png");
-    Texture2D pause = LoadTexture("resources/powerup/Pause.png");
+        //font
+        Font allFont = LoadFont("resources/allFont.ttf");
 
-    //level
-    int level;
+        //textures
+        Texture2D x2 = LoadTexture("resources/powerup/x2Multiplier.png");
+        Texture2D x1_5 = LoadTexture("resources/powerup/x1,5Multiplier.png");
+        Texture2D x1_2 = LoadTexture("resources/powerup/x1,2Multiplier.png");
+        Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
+        Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
+        Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
+        Texture2D bomb = LoadTexture("resources/powerup/Bomb.png");
+        Texture2D nuke = LoadTexture("resources/powerup/Nuke.png");
+        Texture2D Jblock = LoadTexture("resources/powerup/Jblock.png");
+        Texture2D Lblock = LoadTexture("resources/powerup/Lblock.png");
+        Texture2D Oblock = LoadTexture("resources/powerup/Oblock.png");
+        Texture2D Tblock = LoadTexture("resources/powerup/Tblock.png");
+        Texture2D Iblock = LoadTexture("resources/powerup/Iblock.png");
+        Texture2D plus0_2 = LoadTexture("resources/powerup/+0,2Multiplier.png");
+        Texture2D plus0_1 = LoadTexture("resources/powerup/+0,1Multiplier.png");
+        Texture2D mystery = LoadTexture("resources/powerup/Mystery.png");
+        Texture2D fiveRandom = LoadTexture("resources/powerup/5Random.png");
+        Texture2D slow1 = LoadTexture("resources/powerup/Slow1.png");
+        Texture2D slow2 = LoadTexture("resources/powerup/Slow2.png");
+        Texture2D fast1 = LoadTexture("resources/powerup/Fast1.png");
+        Texture2D fast2 = LoadTexture("resources/powerup/Fast2.png");
+        Texture2D pause = LoadTexture("resources/powerup/Pause.png");
 
-    //locations for powerboard
-    Rectangle powerBoard = (Rectangle) {350-RECWIDTH/2, 705, RECWIDTH, RECHEIGHT};
-    Vector2 circle1 = (Vector2) {280, 740};
-    Vector2 circle2 = (Vector2) {350, 740};
-    Vector2 circle3 = (Vector2) {420, 740};
-    Color circleColor = (Color) {40, 40, 40, 255};
-    
+        //locations for powerboard
+        Rectangle powerBoard = (Rectangle) {350-RECWIDTH/2, 705, RECWIDTH, RECHEIGHT};  //board of stored powerups location
+        Vector2 circle1 = (Vector2) {280, 740};                                         //circle1 location in board
+        Vector2 circle2 = (Vector2) {350, 740};                                         //circle2 location in board
+        Vector2 circle3 = (Vector2) {420, 740};                                         //circle3 location in board
+        Color circleColor = (Color) {40, 40, 40, 255};                                  //color of circle outline
+        
 
-    //storage for spawned powerups
-    powerList spawnedPower;
-    std::vector<PowerupItem*> currPower;
-    std::vector<std::pair<double, int>> fastSpeed;
+        //storage for spawned powerups
+        powerList spawnedPower;                         //the list of spawned powerups
+        std::vector<PowerupItem*> currPower;            //vector of stored powerups
+        std::vector<std::pair<double, int>> fastSpeed;  //special container for debuff speedChange powers
 
-    //current rotation of camera, needed for mouse collision with powerup balls
-    float rotation = 0;
-
-    //other classes
-    Score* src;
+        //other variables
+        float rotation = 0;                             //current rotation of camera, needed for mouse collision with powerup balls
+        int level;                                      //current level
+        Score* src;                                     //score class pointer
 };
 
 #endif
