@@ -314,7 +314,7 @@ void Powerup::drawPowerup() {
             it->curr->moveItem();
             it->curr->DrawItem();
             it->curr->time--;
-            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointCircle(getAdjustedCoordinates(GetMousePosition(), rotation), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 it->curr->removed = true;
             }
         }

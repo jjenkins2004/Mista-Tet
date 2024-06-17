@@ -7,7 +7,7 @@
 //--------------------------------------------------------------------------
 
 #include "raylib.h"
-#include "RandomBlock.h"
+#include "Tools.h"
 #include <vector>
 #include <ctime>
 #include <queue>
@@ -63,7 +63,7 @@ class Grid {
         // Player powerup and Tet power functions
         //--------------------------------------------------------------------------
         
-        void randomRotate();                                    //get a random tet rotate power, randomizes active length and number of 90 degree rotations
+        void randomRotate();                                //get a random tet rotate power, randomizes active length and number of 90 degree rotations
         void increaseLevel(int x);                          //increase level by x 30 seconds (tet power)
         void blind(int num);                                //blind random rows on board, parameter is number of rows (tet power)
         int lasers();                                       //shoots three lasers from sky, adds score and multiplier based on how many blocks were destroyed (player power)

@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <iostream>
+#include "Tools.h"
 
 #define RECWIDTH 240
 #define RECHEIGHT 70

@@ -275,6 +275,9 @@ void Grid::updateAll() {
     updatelevel();
     updateCamera();
     scr->updateMultiplier();
+    pow->updateRotation(cameraMain.rotation);
+    scr->updateLevel(level);
+    pow->updateLevel(level);
 }
 
 void Grid::updateCamera() {
@@ -360,8 +363,6 @@ void Grid::updatelevel() {
             it--;
         }
     }
-    scr->updateLevel(level);
-    pow->updateLevel(level);
 }
 
 
@@ -849,8 +850,7 @@ void Grid::blind(int num) {
 }
 
 void Grid::randomRotate() {
-    rotations.push_back(std::make_tuple(GetRandomValue(1, 3), GetRandomValue(20*60, 50*60), true));
-
+    rotations.push_back(std::make_tuple(GetRandomValue(2, 2), GetRandomValue(50*60, 50*60), true));
 }
 
 
