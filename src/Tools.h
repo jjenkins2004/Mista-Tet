@@ -18,7 +18,13 @@ struct RandomBlock {
         std::vector<int> blocks;
 };
 
-//to get accurate mouse coordinates when there is a camera rotation
+//to get accurate coordinates relative to the screen when there is a camera rotation
 Vector2 getAdjustedCoordinates(Vector2 coor, double rotation);
+
+//take derivative of distance between center of circle and line. If closest distance is less than radius of circle then there is a collision
+bool checkCollisionLineCircle(Vector2 p1, Vector2 p2, Vector2 c, double r);
+
+//return Vector2 of the closest point of line to center of circle
+Vector2 closestPointLineCircle(Vector2 p1, Vector2 p2, Vector2 c);
 
 #endif

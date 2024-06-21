@@ -13,56 +13,124 @@
 
 PowerupItem::PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
     if (i != "null") {
-        pos.first = GetRandomValue(30, 770);
-        pos.second = -25;
+        pos.x = GetRandomValue(30, 770);
+        pos.y = -25;
         texture = txt;
         int xrand = GetRandomValue(15, 20);
-        vel.first = xrand - 2*xrand*GetRandomValue(0, 1);
-        vel.second = GetRandomValue(10, 20);
-        rotation.first = 0; rotation.second = vel.first*2;
+        vel.x = xrand - 2*xrand*GetRandomValue(0, 1);
+        vel.y = GetRandomValue(10, 20);
+        rotation.x = 0; rotation.y = vel.x*2;
     }
 }
 
-void PowerupItem::DrawItem() {
+void PowerupItem::DrawItem(bool withRotation) {
     if (id != "null") {
-        DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){pos.first, pos.second, 50, 50}, (Vector2){25, 25}, rotation.first, Fade(WHITE, fade));
+        if (withRotation) {
+            Vector2 position = getAdjustedCoordinates({pos.x, pos.y}, cameraRotation);
+            DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
+        }
+        else {
+            DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){pos.x, pos.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
+        }
     }
 }
 
 void PowerupItem::moveItem() {
-    pos.second+=vel.second; rotation.second = vel.first*2; pos.first+=vel.first; rotation.first += rotation.second;
-    if (vel.first < 0) {
-        vel.first+=0.02;
-        if (vel.first > 0) {
-            vel.first = 0;
-        }
+
+    //getting adjusted coordinates of the 4 out of bound corner borders
+    std::vector<Vector2> borders = {getAdjustedCoordinates({0, 0}, cameraRotation), getAdjustedCoordinates({800, 0}, cameraRotation),
+                                    getAdjustedCoordinates({800, 800}, cameraRotation), getAdjustedCoordinates({0, 800}, cameraRotation)};
+    
+    //checking for collisions against border
+    std::pair<Vector2, Vector2> line;
+    if (checkCollisionLineCircle(borders[0], borders[1], pos, 25)) line = std::make_pair(borders[0], borders[1]);
+    else if (checkCollisionLineCircle(borders[1], borders[2], pos, 25)) line = std::make_pair(borders[1], borders[2]);
+    else if (checkCollisionLineCircle(borders[2], borders[3], pos, 25)) line = std::make_pair(borders[2], borders[3]);
+    else if (checkCollisionLineCircle(borders[3], borders[0], pos, 25)) line = std::make_pair(borders[3], borders[1]);
+
+    //move position of item perpendicular to the line to the point where it is not colliding with the border anymore 
+    Vector2 perpVec = {1, -(line.first.x-line.second.x)/(line.first.y-line.second.y)};      //the perpendicular vector of the line
+    
+    double dist1 = sqrt(pow(line.first.x+perpVec.x-400 , 2) + pow(line.first.y+perpVec.y-400, 2));
+    double dist2 = sqrt(pow(line.first.x-perpVec.x-400 , 2) + pow(line.first.y-perpVec.y-400, 2));
+    if (dist2 < dist1) {                //making sure perpendicular vector points inwards towards (400, 400) by comparing distances
+        perpVec.x*=-1;                  //of some point on the border's line translated towards perpVec's direction with some point
+        perpVec.y*=-1;                  //translated in negative direction. The point with the closer distance gives correct direction
     }
-    else if (vel.first > 0) {
-        vel.first-=0.02;
-        if (vel.first < 0) {
-            vel.first = 0;
-        }
-    }
-    else {
-        vel.first = 0;
-    }
-    if (pos.first >= 775) {
-        pos.first = 775;
-        if (vel.first > 0) {
-            vel.first*=-1;
-        }
-    }
-    else if (pos.first <= 25) {
-        pos.first = 25;
-        if (vel.first < 0) {
-            vel.first*=-1;
-        }
-    }
-    if (pos.second >= 775) {
-        pos.second = 775;
-        vel.second*=-0.90;
-    }
-    vel.second++;
+    //getting unit vector of perpVec
+    float mag = sqrt(pow(perpVec.x, 2) + pow(perpVec.y, 2));
+    Vector2 unitPerp = {(1/mag)*perpVec.x, (1/mag)*perpVec.y};
+
+    //translating item using negative of velocity vector so it is just touching the border
+    float m = (line.first.y-line.second.y)/(line.first.x-line.second.x);                                        //finding slope of our border line
+    float t = (line.first.y-pos.y+m*pos.x-m*line.first.x)/(vel.y-m*vel.x);                                      //parameter of item's movement vector line when it intersects with the border line
+    Vector2 intersection = {pos.x+vel.x*t, pos.y+vel.y*t};                                                      //intersection point of item's path and border line
+    float velDotLine = vel.x*1 + vel.y*m, velMag = sqrt(vel.x*vel.x + vel.y*vel.y), lineMag = sqrt(1 + m*m);    //values needed to find angle between item's path and border line
+    float theta = acos(velDotLine/(velMag*lineMag));                                                            //angle between item's path and border line
+    float hypotenuse = 25.1/sin(theta);                                                                         //finding distance from intersection point to new point using angle
+                                                                                                                //the 25.1 sets the closest distance the item will be to the border, translating it on its current path of travel
+                                                                                                                //this basically backtracks the item to the point where it is almost touching the border
+                                                                                                                //the trajectory, border, and perpendicular vector of magnitude 25.1 form a right triangle
+                                                                                                                //one corner of the triangle is the intersection point, another corner is the closest point on the border
+                                                                                                                //to our point of interest. We will use the hypotenuse and angle between trajectory and border to find where
+                                                                                                                //this point is
+    float newVelMag = hypotenuse/sqrt(vel.x*vel.x + vel.y*vel.y);                                               //magnitude of translation from itersection point
+    Vector2 newVel = {-newVelMag*vel.x, -newVelMag*vel.y};                                                      //reversing the direction of velocity as we are going backwards
+    Vector2 newPos = {intersection.x+newVel.x, intersection.y+newVel.y};                                        //new position
+
+    //finding magnitude of overreach for item for later, magnitude of newPos - oldPos vector
+    Vector2 overVec = {newPos.x-pos.x, newPos.y-pos.y};
+    float overMag = sqrt(pow(overVec.x, 2) + pow(overVec.y, 2));
+
+    //changing direction of velocity using vector reflection formula
+    float dotProd = vel.x*unitPerp.x + vel.y*unitPerp.y;
+    vel.x = vel.x-2*dotProd*unitPerp.x;
+    vel.y = vel.y-2*dotProd*unitPerp.y;
+
+    //moving item amount it was supposed to move but couldn't due to collision
+
+
+
+
+    
+
+    
+
+
+
+    // pos.second+=vel.second; rotation.second = vel.first*2; pos.first+=vel.first; rotation.first += rotation.second;
+    // if (vel.first < 0) {
+    //     vel.first+=0.02;
+    //     if (vel.first > 0) {
+    //         vel.first = 0;
+    //     }
+    // }
+    // else if (vel.first > 0) {
+    //     vel.first-=0.02;
+    //     if (vel.first < 0) {
+    //         vel.first = 0;
+    //     }
+    // }
+    // else {
+    //     vel.first = 0;
+    // }
+    // if (pos.first >= 775) {
+    //     pos.first = 775;
+    //     if (vel.first > 0) {
+    //         vel.first*=-1;
+    //     }
+    // }
+    // else if (pos.first <= 25) {
+    //     pos.first = 25;
+    //     if (vel.first < 0) {
+    //         vel.first*=-1;
+    //     }
+    // }
+    // if (pos.second >= 775) {
+    //     pos.second = 775;
+    //     vel.second*=-0.90;
+    // }
+    // vel.second++;
 }
 //gives a eerie animation when powerups are collected
 void PowerupItem::spaz() {
@@ -72,33 +140,33 @@ void PowerupItem::spaz() {
         PlaySound(powerupSFX);
         spazzed = true;
         time = 45;
-        vel.first = 1;
-        vel.second = 1;
-        spazpos.x = pos.first;
-        spazpos.y = pos.second;
+        vel.x = 1;
+        vel.y = 1;
+        spazpos.x = pos.x;
+        spazpos.y = pos.y;
     }
     //if position goes some distance from the origin given by distFromOrigin, then reverse the velocity
     if (time == 0) {
-        spazpos.x+=vel.first;
-        spazpos.y+=vel.second;
-        if (spazpos.x > (int)(pos.first)+distFromOrigin.x) {
-            vel.first = vel.first*-1-GetRandomValue(1, 2);
-            spazpos.x = pos.first+distFromOrigin.x-26;
+        spazpos.x+=vel.x;
+        spazpos.y+=vel.y;
+        if (spazpos.x > (int)(pos.x)+distFromOrigin.x) {
+            vel.x = vel.x*-1-GetRandomValue(1, 2);
+            spazpos.x = pos.x+distFromOrigin.x-26;
             distFromOrigin.x+=2;
         }
-        else if (spazpos.x < (int)(pos.first)-distFromOrigin.x) {
-            vel.first = vel.first*-1+GetRandomValue(1, 2);
-            spazpos.x = pos.first-distFromOrigin.x+26;
+        else if (spazpos.x < (int)(pos.x)-distFromOrigin.x) {
+            vel.x = vel.x*-1+GetRandomValue(1, 2);
+            spazpos.x = pos.x-distFromOrigin.x+26;
             distFromOrigin.x+=2;
         }
-        if (spazpos.y > pos.second+distFromOrigin.y) {
-            vel.second = vel.second*-1-GetRandomValue(-2, 2);
-            spazpos.y = pos.second+distFromOrigin.y-26;
+        if (spazpos.y > pos.y+distFromOrigin.y) {
+            vel.y = vel.y*-1-GetRandomValue(-2, 2);
+            spazpos.y = pos.y+distFromOrigin.y-26;
             distFromOrigin.y+=2;
         }
-        else if (spazpos.y < pos.second-distFromOrigin.y) {
-            vel.second = vel.second*-1+GetRandomValue(-2, 2);
-            spazpos.y = pos.second-distFromOrigin.y+26;
+        else if (spazpos.y < pos.y-distFromOrigin.y) {
+            vel.y = vel.y*-1+GetRandomValue(-2, 2);
+            spazpos.y = pos.y-distFromOrigin.y+26;
             distFromOrigin.y+=2;
         }
         fade-=0.007;
@@ -107,8 +175,11 @@ void PowerupItem::spaz() {
     else {
         time--;
     }
-    DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){spazpos.x, spazpos.y, 50, 50}, (Vector2){25, 25}, rotation.first, Fade(WHITE, fade));
+    Vector2 position = getAdjustedCoordinates({spazpos.x, spazpos.y}, cameraRotation);
+    DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
 }
+
+double PowerupItem::cameraRotation = 0;
 
         //--------------------------------------------------------------------------
         // Child structs
@@ -175,8 +246,8 @@ void Mystery::collect() {
     //reduces opacity of the mystery powerup texture and increases opacity of new powerup texture
     mystery->fade+=0.0125;
     fade-=0.0125;
-    this->DrawItem();
-    mystery->DrawItem();
+    this->DrawItem(true);
+    mystery->DrawItem(true);
 }
 
 
@@ -251,7 +322,7 @@ void Powerup::drawPowerup() {
     DrawTextEx(allFont, "3", (Vector2){380, 715}, 15, 0, Fade((Color){65, 170, 255, 255}, 1-level/60.0));
 
     //drawing powerups
-    for (int i = 0; i < 3; i++) if (currPower[i]->id != "null") currPower[i]->DrawItem();
+    for (int i = 0; i < 3; i++) if (currPower[i]->id != "null") currPower[i]->DrawItem(false);
 
     item* it = spawnedPower.head;
     bool removed = false;
@@ -290,16 +361,16 @@ void Powerup::drawPowerup() {
                             if (currPower[i]->id == "null") {
                                 currPower[i] = temp->curr;
                                 if (i == 0) {
-                                    currPower[i]->pos.first = circle1.x; currPower[i]->pos.second = circle1.y;
+                                    currPower[i]->pos.x = circle1.x; currPower[i]->pos.y = circle1.y;
                                 }
                                 else if (i == 1) {
-                                    currPower[i]->pos.first = circle2.x; currPower[i]->pos.second = circle2.y;
+                                    currPower[i]->pos.x = circle2.x; currPower[i]->pos.y = circle2.y;
                                 }
                                 else if (i == 2) {
-                                    currPower[i]->pos.first = circle3.x; currPower[i]->pos.second = circle3.y;
+                                    currPower[i]->pos.x = circle3.x; currPower[i]->pos.y = circle3.y;
                                 }
                                 currPower[i]->fade = 1;
-                                currPower[i]->rotation.first = 0;
+                                currPower[i]->rotation.x = 0;
                                 added = true;
                                 break;
                             }
@@ -312,9 +383,9 @@ void Powerup::drawPowerup() {
         }
         else {
             it->curr->moveItem();
-            it->curr->DrawItem();
+            it->curr->DrawItem(true);
             it->curr->time--;
-            if (CheckCollisionPointCircle(getAdjustedCoordinates(GetMousePosition(), rotation), (Vector2){it->curr->pos.first, it->curr->pos.second}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.x, it->curr->pos.y}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
                 it->curr->removed = true;
             }
         }

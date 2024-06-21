@@ -32,7 +32,8 @@ struct PowerupItem {
     PowerupItem() { id = "null"; }                          //construct a null PowerupItem
     virtual ~PowerupItem() {}                               //virtual destructor
     PowerupItem(std::string i, Texture2D txt, int t);       //main constructor that takes ID, texture path, and time until despawn
-    void DrawItem();                                        //draw the item with its position
+    void DrawItem(bool withRotation);                       //draw the item with its position
+                                                            //with rotation tells whether to draw item with consideration of the board's rotation or to ignore
     void moveItem();                                        //move the item based on its velocity
     void spaz();                                            //eerie animation for when item is collected
                                                             //handles storing the item or immediately starting its effects
@@ -45,9 +46,10 @@ struct PowerupItem {
     bool positive;                                          //used to determine if the item should be immediately used or stored 
 
     //positioning of powerupitem
-    std::pair<float, float> pos;                            //x and y pos
-    std::pair<float, float> vel;                            //x and y vel
-    std::pair<float, float> rotation;                       //angular position and angular velocity for rolling
+    Vector2 pos;                                            //x and y pos
+    Vector2 vel;                                            //x and y vel
+    Vector2 rotation;                                       //angular position and angular velocity for rolling
+    static double cameraRotation;                           //current rotation of the screen
 
     //spaz function variables
     bool spazzed = false;                                   //to determine if it is the first time calling spaz()

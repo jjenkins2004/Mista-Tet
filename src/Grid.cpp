@@ -40,6 +40,7 @@ Grid::Grid() {
 
 
 void Grid::drawAll(bool drawBlock, bool useCamera) {
+    //std::cout << "top right corner is " << getAdjustedCoordinates({800, 0}, cameraMain.rotation).x << " " << getAdjustedCoordinates({800, 0}, cameraMain.rotation).y << std::endl;
     if (useCamera) BeginMode2D(cameraMain);
         drawGrid(drawBlock);
         scr->drawScore();
@@ -263,6 +264,10 @@ void Grid::drawGrid(bool drawBlock) {
     }
     //grid border
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
+
+    //outer border
+    float bordwidth = 20;
+    DrawRectangleLinesEx({0-bordwidth, 0-bordwidth, 800 + 2*bordwidth, 800 + 2*bordwidth}, bordwidth, borderColor);
 }
 
 
@@ -278,6 +283,7 @@ void Grid::updateAll() {
     pow->updateRotation(cameraMain.rotation);
     scr->updateLevel(level);
     pow->updateLevel(level);
+    PowerupItem::cameraRotation = cameraMain.rotation;
 }
 
 void Grid::updateCamera() {
