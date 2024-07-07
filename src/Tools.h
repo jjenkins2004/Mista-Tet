@@ -6,6 +6,11 @@
 #include <math.h>
 #include <iostream>
 
+typedef struct v2 {
+    long double x;
+    long double y;
+} v2;
+
 //to get a random block from a bag
 struct RandomBlock {
     public:
@@ -22,7 +27,7 @@ struct RandomBlock {
 Vector2 getAdjustedCoordinates(Vector2 coor, double rotation);
 
 //take derivative of distance between center of circle and line. If closest distance is less than radius of circle then there is a collision
-bool checkCollisionLineCircle(Vector2 p1, Vector2 p2, Vector2 c, double r);
+bool checkCollisionLineCircle(Vector2 p1, Vector2 p2, Vector2 c, float r);
 
 //return Vector2 of the closest point of line to center of circle
 Vector2 closestPointLineCircle(Vector2 p1, Vector2 p2, Vector2 c);

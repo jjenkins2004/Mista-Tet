@@ -40,7 +40,6 @@ Grid::Grid() {
 
 
 void Grid::drawAll(bool drawBlock, bool useCamera) {
-    //std::cout << "top right corner is " << getAdjustedCoordinates({800, 0}, cameraMain.rotation).x << " " << getAdjustedCoordinates({800, 0}, cameraMain.rotation).y << std::endl;
     if (useCamera) BeginMode2D(cameraMain);
         drawGrid(drawBlock);
         scr->drawScore();
@@ -266,7 +265,7 @@ void Grid::drawGrid(bool drawBlock) {
     DrawRectangleRoundedLines((Rectangle){static_cast<float>(xpos), ypos-borderWidth, 10*gridsize, 20*gridsize+borderWidth}, 0.1, 100, borderWidth, borderColor);
 
     //outer border
-    float bordwidth = 20;
+    float bordwidth = 5;
     DrawRectangleLinesEx({0-bordwidth, 0-bordwidth, 800 + 2*bordwidth, 800 + 2*bordwidth}, bordwidth, borderColor);
 }
 
@@ -280,10 +279,11 @@ void Grid::updateAll() {
     updatelevel();
     updateCamera();
     scr->updateMultiplier();
-    pow->updateRotation(cameraMain.rotation);
+    pow->updateRotation(cameraMain.rotation, angVel, subtract);
     scr->updateLevel(level);
     pow->updateLevel(level);
     PowerupItem::cameraRotation = cameraMain.rotation;
+    PowerupItem::rotationVel = subtract ? -angVel: angVel;
 }
 
 void Grid::updateCamera() {
@@ -310,7 +310,7 @@ void Grid::updateCamera() {
          else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
          else cameraMain.rotation = 0;
          shake = true;
-         angVel = 0.05;
+         angVel = 0;
         numRotations++;
     }
     else if (subtract && int(cameraMain.rotation)%90 < 2 && cameraMain.rotation != 0 && cameraMain.rotation != 90 && cameraMain.rotation != 180 && cameraMain.rotation != 270 && int(cameraMain.rotation+90-angVel)%90 > 88) {
@@ -319,7 +319,7 @@ void Grid::updateCamera() {
         else if (cameraMain.rotation > 90) cameraMain.rotation = 90;
         else cameraMain.rotation = 0;
         shake = true;
-        angVel = 0.05;
+        angVel = 0;
         numRotations++;
     }
     else if (shake) {
@@ -351,10 +351,9 @@ void Grid::updateCamera() {
             if (cameraMain.rotation < 0) cameraMain.rotation+=360;
         }
         else cameraMain.rotation+= angVel;
-        if (angVel < 1.5) angVel+=angAcc;
-        else angVel = 1.5;
+        if (angVel < 1) angVel+=angAcc;
+        else angVel = 1;
     }
-    pow->updateRotation(cameraMain.rotation);
 }
 
 void Grid::updatelevel() {
@@ -856,7 +855,7 @@ void Grid::blind(int num) {
 }
 
 void Grid::randomRotate() {
-    rotations.push_back(std::make_tuple(GetRandomValue(2, 2), GetRandomValue(50*60, 50*60), true));
+    rotations.push_back(std::make_tuple(GetRandomValue(500, 500), GetRandomValue(50*60, 50*60), true));
 }
 
 

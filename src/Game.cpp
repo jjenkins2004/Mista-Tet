@@ -37,7 +37,7 @@ int main() {
     int downcounter = 0;                                    //cooldown for moving block down
     int powerupcounter = 0;                                 //keeps track of when to spawn new powerup
     bool start = true;                                      //bool to bring us to the start menu
-    int spawnpower = GetRandomValue(10*60, 15*60);          //how often we should spawn powerup
+    int spawnpower = -1;         //how often we should spawn powerup
 
     //other
     Font titleFont = LoadFont("resources/titleFont.ttf");   //title font
@@ -82,6 +82,7 @@ int main() {
             downcounter = 0;
 
             //temp
+            powerUp->spawnPowerup(true);
             grid->randomRotate();
             start = false; continue;
 
@@ -158,7 +159,7 @@ int main() {
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup(true);
             powerupcounter = 0;
-            spawnpower = GetRandomValue(3*60, 5*60);
+            //spawnpower = GetRandomValue(3*60, 5*60);
         }
         powerupcounter++;
 

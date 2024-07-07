@@ -1,5 +1,5 @@
 #include "Powerup.h"
-
+#include <iomanip>
 
 /*********************************************************************************************
 ***** START OF POWERUPITEM STRUCTS 
@@ -13,13 +13,14 @@
 
 PowerupItem::PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
     if (i != "null") {
-        pos.x = GetRandomValue(30, 770);
-        pos.y = -25;
+        pos.x = GetRandomValue(200, 600);
+        pos.y = GetRandomValue(200, 600);
         texture = txt;
-        int xrand = GetRandomValue(15, 20);
+        int xrand = GetRandomValue(20, 50);
         vel.x = xrand - 2*xrand*GetRandomValue(0, 1);
-        vel.y = GetRandomValue(10, 20);
-        rotation.x = 0; rotation.y = vel.x*2;
+        int yrand = GetRandomValue(10, 60);
+        vel.y = yrand-2*yrand*GetRandomValue(0, 1);
+        rotation.x = 0; rotation.y = GetRandomValue(-50, 50);
     }
 }
 
@@ -27,7 +28,7 @@ void PowerupItem::DrawItem(bool withRotation) {
     if (id != "null") {
         if (withRotation) {
             Vector2 position = getAdjustedCoordinates({pos.x, pos.y}, cameraRotation);
-            DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
+            DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x-cameraRotation, Fade(WHITE, fade));
         }
         else {
             DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){pos.x, pos.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
@@ -36,101 +37,171 @@ void PowerupItem::DrawItem(bool withRotation) {
 }
 
 void PowerupItem::moveItem() {
+    //air resistance
+    float velMagnitude = sqrt(pow(vel.x, 2) + pow(vel.y, 2));
+    Vector2 oppositeVel = {-vel.x, -vel.y};
+    oppositeVel.x/=sqrt(pow(oppositeVel.x, 2) + pow(oppositeVel.y, 2));
+    oppositeVel.y/=sqrt(pow(oppositeVel.x, 2) + pow(oppositeVel.y, 2));
+    vel.x+=pow(velMagnitude, 2)*oppositeVel.x/1200;
+    vel.y+=pow(velMagnitude, 2)*oppositeVel.y/1200;
+
+    Vector2 oldVel = vel;
 
     //getting adjusted coordinates of the 4 out of bound corner borders
-    std::vector<Vector2> borders = {getAdjustedCoordinates({0, 0}, cameraRotation), getAdjustedCoordinates({800, 0}, cameraRotation),
-                                    getAdjustedCoordinates({800, 800}, cameraRotation), getAdjustedCoordinates({0, 800}, cameraRotation)};
+    std::vector<Vector2> borders = {getAdjustedCoordinates({0, 0}, 360-cameraRotation), getAdjustedCoordinates({800, 0}, 360-cameraRotation),
+                                    getAdjustedCoordinates({800, 800}, 360-cameraRotation), getAdjustedCoordinates({0, 800}, 360-cameraRotation)};
+
+    std::vector<std::pair<Vector2, Vector2>> collisions;                //using vector just in case of corner collision
+
+    //checking if border was pushed into item and adjusting item so it is just touching border
+    //this is necessary becuase later code assumes that item is not colliding with border before moving
+    if (checkCollisionLineCircle(borders[0], borders[1], pos, 25)) collisions.push_back(std::make_pair(borders[0], borders[1]));
+    if (checkCollisionLineCircle(borders[1], borders[2], pos, 25)) collisions.push_back(std::make_pair(borders[1], borders[2]));
+    if (checkCollisionLineCircle(borders[2], borders[3], pos, 25)) collisions.push_back(std::make_pair(borders[2], borders[3]));
+    if (checkCollisionLineCircle(borders[3], borders[0], pos, 25)) collisions.push_back(std::make_pair(borders[3], borders[0]));
+
+    for (int i = 0; i < collisions.size(); i++) {
+        std::pair<Vector2, Vector2> line = collisions[i];
+        //finding perpendicular Vector to the border for later uses 
+        v2 perpVec;
+        if (line.first.y-line.second.y != 0 ) {                                             //check in case slope is 0
+            perpVec = {1, -(line.first.x-line.second.x)/(line.first.y-line.second.y)};      //the perpendicular vector of the line
+        }
+        else perpVec = {0, 1};
+        
+        //making sure perpendicular vector is pointing correct way
+        double dist1 = sqrt(pow(line.first.x+perpVec.x-400 , 2) + pow(line.first.y+perpVec.y-400, 2));
+        double dist2 = sqrt(pow(line.first.x-perpVec.x-400 , 2) + pow(line.first.y-perpVec.y-400, 2));
+        if (dist2 < dist1) {                //making sure perpendicular vector points inwards towards (400, 400) by comparing distances
+            perpVec.x*=-1;                  //of some point on the border's line translated towards perpVec's direction with some point
+            perpVec.y*=-1;                  //translated in negative direction. The point with the closer distance gives correct direction
+        }
+
+        //getting unit vector of perpVec
+        float mag = sqrt(pow(perpVec.x, 2) + pow(perpVec.y, 2));
+        v2 unitPerp = {(1/mag)*perpVec.x, (1/mag)*perpVec.y};
+
+        //item pos will be 25 units from this point in perpVec direction
+        Vector2 p = closestPointLineCircle(line.first, line.second, pos);
+
+        //moving item
+        pos = {p.x+float(25.01*unitPerp.x), p.y+float(25.01*unitPerp.y)};
+    }
+    collisions.clear();
+
+    //moving
+    Vector2 oldPos = pos;
+    pos.x+= vel.x; pos.y+=vel.y + 1.f/2; vel.y+=1;
+    rotation.x += rotation.y;
+
+    float t;                    //time from initial to collision
     
     //checking for collisions against border
-    std::pair<Vector2, Vector2> line;
-    if (checkCollisionLineCircle(borders[0], borders[1], pos, 25)) line = std::make_pair(borders[0], borders[1]);
-    else if (checkCollisionLineCircle(borders[1], borders[2], pos, 25)) line = std::make_pair(borders[1], borders[2]);
-    else if (checkCollisionLineCircle(borders[2], borders[3], pos, 25)) line = std::make_pair(borders[2], borders[3]);
-    else if (checkCollisionLineCircle(borders[3], borders[0], pos, 25)) line = std::make_pair(borders[3], borders[1]);
+    if (checkCollisionLineCircle(borders[0], borders[1], pos, 25)) collisions.push_back(std::make_pair(borders[0], borders[1]));
+    if (checkCollisionLineCircle(borders[1], borders[2], pos, 25)) collisions.push_back(std::make_pair(borders[1], borders[2]));
+    if (checkCollisionLineCircle(borders[2], borders[3], pos, 25)) collisions.push_back(std::make_pair(borders[2], borders[3]));
+    if (checkCollisionLineCircle(borders[3], borders[0], pos, 25)) collisions.push_back(std::make_pair(borders[3], borders[0]));
+    if (collisions.empty()) return;
 
-    //move position of item perpendicular to the line to the point where it is not colliding with the border anymore 
-    Vector2 perpVec = {1, -(line.first.x-line.second.x)/(line.first.y-line.second.y)};      //the perpendicular vector of the line
-    
-    double dist1 = sqrt(pow(line.first.x+perpVec.x-400 , 2) + pow(line.first.y+perpVec.y-400, 2));
-    double dist2 = sqrt(pow(line.first.x-perpVec.x-400 , 2) + pow(line.first.y-perpVec.y-400, 2));
-    if (dist2 < dist1) {                //making sure perpendicular vector points inwards towards (400, 400) by comparing distances
-        perpVec.x*=-1;                  //of some point on the border's line translated towards perpVec's direction with some point
-        perpVec.y*=-1;                  //translated in negative direction. The point with the closer distance gives correct direction
+    pos.x-=vel.x; vel.y-= 1; pos.y-=vel.y + 1.f/2;                      //moving item back to original position before collision  
+
+
+    for (int i = 0; i < collisions.size(); i++) {                       //we can do the exact same thing if we have a second border collision to simulate what would happen when hitting a corner
+        std::pair<Vector2, Vector2> line = collisions[i];
+
+        //finding perpendicular Vector to the border for later uses 
+        Vector2 perpVec;
+        if (line.first.y-line.second.y != 0 ) {                                             //check in case slope is 0
+            perpVec = {1, -(line.first.x-line.second.x)/(line.first.y-line.second.y)};      //the perpendicular vector of the line
+        }
+        else perpVec = {0, 1};
+        
+        //making sure perpendicular vector is pointing correct way
+        double dist1 = sqrt(pow(line.first.x+perpVec.x-400 , 2) + pow(line.first.y+perpVec.y-400, 2));
+        double dist2 = sqrt(pow(line.first.x-perpVec.x-400 , 2) + pow(line.first.y-perpVec.y-400, 2));
+        if (dist2 < dist1) {                //making sure perpendicular vector points inwards towards (400, 400) by comparing distances
+            perpVec.x*=-1;                  //of some point on the border's line translated towards perpVec's direction with some point
+            perpVec.y*=-1;                  //translated in negative direction. The point with the closer distance gives correct direction
+        }
+
+        //getting unit vector of perpVec
+        float mag = sqrt(pow(perpVec.x, 2) + pow(perpVec.y, 2));
+        Vector2 unitPerp = {(1/mag)*perpVec.x, (1/mag)*perpVec.y};
+
+        //translating item following its current path so it is just touching the border
+        Vector2 slope;
+        if (line.first.x-line.second.x < 0.001 && line.first.x-line.second.x > -0.001) {                            //checking incase slope is undefined
+            slope = {0, 1};
+        }   
+        else {
+            slope = {1, (line.first.y-line.second.y)/(line.first.x-line.second.x)};                                 //finding slope of our border line
+        }
+        Vector2 start = {line.first.x + unitPerp.x*25, line.first.y + unitPerp.y*25};                               //some point on this line will be where the center of our item is as the item is colliding with the border
+                                                                                                                    //line is parallel to border but translated 25 units in the perpendicular vector direction
+        //use quadratic formula to find the time taken from initial point to when it is just about to collide
+        //values for A, B, and C were derived using the intersection of a parabola vector equation to represent 
+        //path of item and the above line
+        if (i == 0 && slope.x != 0) {                       //formula doesn't work on vertical lines                  
+            double A = 1.f/2;
+            double B = vel.y-(slope.y*vel.x)/slope.x;
+            double C = double(pos.y)-double(start.y)-(double(slope.y)/double(slope.x))*(double(pos.x)-double(start.x));
+            float t1 = (-B + sqrt(B*B-4*A*C))/(2*A);
+            float t2 = (-B - sqrt(B*B-4*A*C))/(2*A);
+            t = t2 < 0 ? t1: t2;
+            if (t < 0.001) t = 0;
+            //FOR DEBUGGING
+            // std::cout << std::fixed;
+            // std::cout << std::setprecision(8);
+            // std::cout << "\n\nvelocity: " << vel.x << " " << vel.y << std::endl;
+            // std::cout << "start " << start.x << " " << start.y << ", slope " << slope.x << " " << slope.y << std::endl;
+            // std::cout << "pos: " << pos.x << " " << pos.y << std::endl;
+            // // std::cout << "A: " << A << " B: " << B << " C: " << C << std::endl;
+            // std::cout << "t: " << t << std::endl;
+            // std::cout << "camera rotation: " << cameraRotation << std::endl;
+        }
+        else if (i == 0) {
+            t = (start.x-pos.x)/vel.x;
+        }
+        
+        //use t to find new position and correct bounce off velocity
+        Vector2 newPos = {pos.x + t*vel.x, pos.y+t*vel.y+t*t/2.f};
+        vel = {vel.x, vel.y + t};
+
+        //changing velocity so its relative to the border
+        Vector2 p = closestPointLineCircle(line.first, line.second, newPos);
+        Vector2 tranVel = {-1*rotationVel*(PI/180)*(p.y-400), rotationVel*(PI/180)*(p.x-400)};
+        vel.x-=tranVel.x;
+        vel.y-=tranVel.y;
+
+        //changing direction of velocity using vector reflection formula relative to the moving border
+        float dotProd = vel.x*unitPerp.x + vel.y*unitPerp.y;
+        vel.x = vel.x-2*dotProd*unitPerp.x;
+        vel.y = vel.y-2*dotProd*unitPerp.y;
+        if (sqrt(vel.x*vel.x + vel.y*vel.y) != 0) {                                                     //if magnitude of velocity is 0 then there is no loss
+            float loss = abs(dotProd/(sqrt(vel.x*vel.x + vel.y*vel.y)))*.1;
+            vel.x*=(1-(loss)); vel.y*=(1-(loss*1.5));                                                   //the greater the change in velocity direction, the more energy it loses
+        }
+
+        //changing velocity back to background frame
+        vel.x+=tranVel.x;
+        vel.y+=tranVel.y;
+
+
+        if (collisions.size() == 1 || i == 1) {
+                //moving item amount it was supposed to move but couldn't due to collision
+                pos = {newPos.x + vel.x*(1-t), newPos.y + vel.y*(1-t) + (1-t)*(1-t)/2};
+                vel.y+=(1-t);
+
+                //finding angular velocity based on the magnitude of the component of velocity parallel to the border
+                float den = sqrt(pow(vel.x, 2) + pow(vel.y, 2));            
+                float theta = PI/2-acos((vel.x*unitPerp.x + vel.y*unitPerp.y)/den);                         //finding angle between velocity and border
+                float cross = unitPerp.x*vel.y-unitPerp.y*vel.x;                                            //use the cross product of velocity and unitPerp to determine direction of rotation, clockwise or counterclockwise
+                float angvel = (180/PI)*cos(theta)*sqrt(pow(vel.x, 2) + pow(vel.y, 2))/25;                  //angular velocity in degrees
+                if (cross < 0) rotation.y = -1*angvel;                                                      //velocity points to the right of perp vec so clockwise rotation
+                else if (cross > 0) rotation.y = angvel;                                                    //velocity points left of perp vec so counterclockwise rotation
+                else rotation.y = 0;
+        }
     }
-    //getting unit vector of perpVec
-    float mag = sqrt(pow(perpVec.x, 2) + pow(perpVec.y, 2));
-    Vector2 unitPerp = {(1/mag)*perpVec.x, (1/mag)*perpVec.y};
-
-    //translating item using negative of velocity vector so it is just touching the border
-    float m = (line.first.y-line.second.y)/(line.first.x-line.second.x);                                        //finding slope of our border line
-    float t = (line.first.y-pos.y+m*pos.x-m*line.first.x)/(vel.y-m*vel.x);                                      //parameter of item's movement vector line when it intersects with the border line
-    Vector2 intersection = {pos.x+vel.x*t, pos.y+vel.y*t};                                                      //intersection point of item's path and border line
-    float velDotLine = vel.x*1 + vel.y*m, velMag = sqrt(vel.x*vel.x + vel.y*vel.y), lineMag = sqrt(1 + m*m);    //values needed to find angle between item's path and border line
-    float theta = acos(velDotLine/(velMag*lineMag));                                                            //angle between item's path and border line
-    float hypotenuse = 25.1/sin(theta);                                                                         //finding distance from intersection point to new point using angle
-                                                                                                                //the 25.1 sets the closest distance the item will be to the border, translating it on its current path of travel
-                                                                                                                //this basically backtracks the item to the point where it is almost touching the border
-                                                                                                                //the trajectory, border, and perpendicular vector of magnitude 25.1 form a right triangle
-                                                                                                                //one corner of the triangle is the intersection point, another corner is the closest point on the border
-                                                                                                                //to our point of interest. We will use the hypotenuse and angle between trajectory and border to find where
-                                                                                                                //this point is
-    float newVelMag = hypotenuse/sqrt(vel.x*vel.x + vel.y*vel.y);                                               //magnitude of translation from itersection point
-    Vector2 newVel = {-newVelMag*vel.x, -newVelMag*vel.y};                                                      //reversing the direction of velocity as we are going backwards
-    Vector2 newPos = {intersection.x+newVel.x, intersection.y+newVel.y};                                        //new position
-
-    //finding magnitude of overreach for item for later, magnitude of newPos - oldPos vector
-    Vector2 overVec = {newPos.x-pos.x, newPos.y-pos.y};
-    float overMag = sqrt(pow(overVec.x, 2) + pow(overVec.y, 2));
-
-    //changing direction of velocity using vector reflection formula
-    float dotProd = vel.x*unitPerp.x + vel.y*unitPerp.y;
-    vel.x = vel.x-2*dotProd*unitPerp.x;
-    vel.y = vel.y-2*dotProd*unitPerp.y;
-
-    //moving item amount it was supposed to move but couldn't due to collision
-
-
-
-
-    
-
-    
-
-
-
-    // pos.second+=vel.second; rotation.second = vel.first*2; pos.first+=vel.first; rotation.first += rotation.second;
-    // if (vel.first < 0) {
-    //     vel.first+=0.02;
-    //     if (vel.first > 0) {
-    //         vel.first = 0;
-    //     }
-    // }
-    // else if (vel.first > 0) {
-    //     vel.first-=0.02;
-    //     if (vel.first < 0) {
-    //         vel.first = 0;
-    //     }
-    // }
-    // else {
-    //     vel.first = 0;
-    // }
-    // if (pos.first >= 775) {
-    //     pos.first = 775;
-    //     if (vel.first > 0) {
-    //         vel.first*=-1;
-    //     }
-    // }
-    // else if (pos.first <= 25) {
-    //     pos.first = 25;
-    //     if (vel.first < 0) {
-    //         vel.first*=-1;
-    //     }
-    // }
-    // if (pos.second >= 775) {
-    //     pos.second = 775;
-    //     vel.second*=-0.90;
-    // }
-    // vel.second++;
 }
 //gives a eerie animation when powerups are collected
 void PowerupItem::spaz() {
@@ -176,10 +247,11 @@ void PowerupItem::spaz() {
         time--;
     }
     Vector2 position = getAdjustedCoordinates({spazpos.x, spazpos.y}, cameraRotation);
-    DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x, Fade(WHITE, fade));
+    DrawTexturePro(texture, (Rectangle){0, 0, 50, 50}, (Rectangle){position.x, position.y, 50, 50}, (Vector2){25, 25}, rotation.x-cameraRotation, Fade(WHITE, fade));
 }
 
-double PowerupItem::cameraRotation = 0;
+float PowerupItem::cameraRotation = 0;
+float PowerupItem::rotationVel = 0;
 
         //--------------------------------------------------------------------------
         // Child structs
@@ -299,6 +371,8 @@ Powerup::Powerup() {
 }
 
 void Powerup::drawPowerup() {
+
+    
     
     //drawing border and powerup placeholders
     DrawRectangleRoundedLines(powerBoard, 0.2, 100, 5, (Color){80, 60, 60, 255});
@@ -382,14 +456,22 @@ void Powerup::drawPowerup() {
             }
         }
         else {
-            it->curr->moveItem();
-            it->curr->DrawItem(true);
-            it->curr->time--;
-            if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.x, it->curr->pos.y}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                it->curr->removed = true;
+            if (it->curr->wait) {                                   //fade in of item
+                if (it->curr->fade == 0) PlaySound(LoadSound("resources/audio/PowerupAppear.wav"));
+                it->curr->DrawItem(true);
+                it->curr->fade+=0.02;
+                if (it->curr->fade >= 1) it->curr->wait = false;
+            }
+            else {
+                it->curr->moveItem();
+                it->curr->DrawItem(true);
+                it->curr->time--;
+                if (CheckCollisionPointCircle(GetMousePosition(), (Vector2){it->curr->pos.x, it->curr->pos.y}, 30) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    it->curr->removed = true;
+                }
             }
         }
-        if (it != nullptr && it->curr->time <= 0 && !it->curr->removed) {
+        if (it != nullptr && it->curr->time <= 0 && !it->curr->removed) {       //fading out if not collected after certain time
             it->curr->fade-=0.01;
             if (it->curr->fade <= 0) {
                  item* temp = it; it = it->next;
@@ -398,18 +480,16 @@ void Powerup::drawPowerup() {
                  removed = true;
             }
         }
-        if (!removed) it = it->next; //if nothing has been removed, move on to next node
-        else removed = false; //otherwise iterator stays on current one as this will be the next node
+        if (!removed) it = it->next;        //if nothing has been removed, move on to next node
+        else removed = false;               //otherwise iterator stays on current one as this will be the next node
     }
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
     int rand1;
-    spawnedPower.push_back(new Nuke(800, nuke));
-    return;
-    if (include5Rand) rand1 = /*GetRandomValue(1, 100)*/64;
-    else rand1 = GetRandomValue(1, 13);
+    if (include5Rand) rand1 = /*GetRandomValue(1, 100)*/96;
+    else rand1 = GetRandomValue(1, 95);
 
     //multiplier powerup
     if (rand1 <= 25) {
@@ -467,3 +547,5 @@ std::vector<std::pair<double, int>> Powerup::checkFastSpeed() {
     fastSpeed.clear();
     return temp;
 }; 
+
+std::vector<std::pair<Vector2, Vector2>> Powerup::circles = std::vector<std::pair<Vector2, Vector2>>();

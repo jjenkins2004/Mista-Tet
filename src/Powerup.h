@@ -42,14 +42,16 @@ struct PowerupItem {
     std::string id;                                         //ID of powerupitem
     Texture2D texture;                                      //texture of the powerup
     int time;                                               //frames left before despawn
-    double fade = 1;                                        //opacity of item 
+    double fade = 0;                                        //opacity of item 
     bool positive;                                          //used to determine if the item should be immediately used or stored 
 
     //positioning of powerupitem
     Vector2 pos;                                            //x and y pos
     Vector2 vel;                                            //x and y vel
     Vector2 rotation;                                       //angular position and angular velocity for rolling
-    static double cameraRotation;                           //current rotation of the screen
+    static float cameraRotation;                            //current rotation of the screen
+    static float rotationVel;                               //current angular velocity of camera, + is clockwise
+    bool wait = true;                                       //fade in item
 
     //spaz function variables
     bool spazzed = false;                                   //to determine if it is the first time calling spaz()
@@ -143,8 +145,10 @@ class Powerup {
         //constructor
         Powerup();
 
+        static std::vector<std::pair<Vector2, Vector2>> circles;
+
         //updating and setting
-        void updateRotation(float r) {rotation = r;}
+        void updateRotation(float r, float w, bool s) {rotation = r;}
         void updateLevel(int l) {level = l;}
         void setScore(Score* s) {src = s;}
 

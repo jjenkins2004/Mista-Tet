@@ -137,8 +137,8 @@ class Grid {
         bool subtract = false;                                          //for when we rotate the screen back to its original state
         std::vector<std::tuple<int, int, bool>>::iterator rotationIt;   //iterator for which rotation powerup we are currently on
         std::vector<std::tuple<int, int, bool>> null;                   //acts as a nullptr for rotationIt iterator
-        double angVel = 0.05;                                           //current angular velocity of the screen rotation, max is 1.5
-        double angAcc = 0.01;                                           //accelerates the angular velocity until it reaches 1.5
+        double angVel = 0;                                              //current angular velocity of the screen rotation, max is 1.5
+        double angAcc = 0.075;                                          //accelerates the angular velocity until it reaches 1.5
         bool shake = false;                                             //bool to determine whether we should shake the screen at each 90 degree rotation
         float maxOffsetRotation = 15;                                   //max offset of x and y for screen shake
 
