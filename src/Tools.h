@@ -6,6 +6,7 @@
 #include <math.h>
 #include <iostream>
 
+//same as Vector2 type but uses more precise types
 typedef struct v2 {
     long double x;
     long double y;

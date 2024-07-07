@@ -488,7 +488,7 @@ void Powerup::drawPowerup() {
 void Powerup::spawnPowerup(bool include5Rand) {
     bool positive = false;
     int rand1;
-    if (include5Rand) rand1 = /*GetRandomValue(1, 100)*/96;
+    if (include5Rand) rand1 = GetRandomValue(1, 100);
     else rand1 = GetRandomValue(1, 95);
 
     //multiplier powerup
