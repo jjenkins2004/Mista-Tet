@@ -82,8 +82,8 @@ int main() {
             downcounter = 0;
 
             //temp
-            powerUp->spawnPowerup(true);
             grid->randomRotate();
+            powerUp->spawnPowerup(true);
             start = false; continue;
 
             //bringing up our start menu

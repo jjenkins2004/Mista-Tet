@@ -13,7 +13,7 @@ Tet::Tet(Score* s): src(s) {
 void Tet::drawTet() {
     
     //tet and what he is saying
-    DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, 0,  WHITE);
+    DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, rotation,  WHITE);
 
     //tetbobbing
     tetBob();
@@ -102,7 +102,7 @@ void Tet::drawTet() {
             stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 10;
+            int num = 0;
             if (tetStage >= 3) num = 5; //later stages of the game make tet powers happen more often
             if (GetRandomValue(1, 10) <= num) { //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
@@ -116,6 +116,29 @@ void Tet::drawTet() {
             }
         }
     }
+}
+
+void Tet::look(Vector2 coor) {
+    if (coor.x < 0) {                                                   //reset rotation back to zero and make tet look forward
+        rotation = 0;
+        if (tetStage == 1 || tetStage == 2) source.x = tdim*facePhase;
+        else if (tetStage == 3) t = LoadTexture("resources/tet/mistaTet3Forward.png");
+        else if (tetStage == 4) t = LoadTexture("resources/tet/mistaTet4Forward.png");
+        return;
+    }
+    if (abs(dest.x-coor.x) < 0.001) {                                   //just in case somehow line is vertical, but this should never occur
+        return;
+    }
+    Vector2 slope = {-1, -1*(dest.y-coor.y)/(dest.x-coor.x)};           //find the vector from center of tet to coor
+    float den = sqrt(pow(slope.x, 2) + pow(slope.y, 2));                //denominator for the angle formula using two vectors
+    float theta = 180*acos((slope.x*-1)/den)/PI;                        //determine the angle between (-1, 0) which is gaze direction with 0 rotation with the slope vector
+    rotation = slope.y < 0 ? theta: theta*-1;                           //determine if we should rotate clockwise or counterclockwise
+
+    //changing texture to side profile
+    if ((tetStage == 1 || tetStage == 2) && source.x < tdim*2) source.x+=tdim*2;
+    else if (tetStage == 3) t = LoadTexture("resources/tet/mistaTet3Left.png");
+    else if (tetStage == 4) t = LoadTexture("resources/tet/mistaTet4Left.png");
+
 }
 
 int Tet::tetMonologue() {

@@ -486,6 +486,8 @@ void Powerup::drawPowerup() {
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
+    spawnedPower.push_back(new Laser(1000, lasers));
+    return;
     bool positive = false;
     int rand1;
     if (include5Rand) rand1 = GetRandomValue(1, 100);

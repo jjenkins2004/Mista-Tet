@@ -5,9 +5,11 @@
 
 #include "Score.h"
 
-/*****
- * handles all actions related to tet; animations, dialogue, changes, etc...
-*****/
+
+//--------------------------------------------------------------------------
+// handles all actions related to tet; animations, dialogue, changes, etc...
+//--------------------------------------------------------------------------
+
 
 class Tet {
     public:
@@ -24,6 +26,8 @@ class Tet {
         int tetMonologue();
         //check if a tet power is activated
         std::string checkTetPower();
+        //tet will turn to the side and look at the given corrdinates, if x coordinate is negative, will reset face back to facing forward
+        void look(Vector2 coor);
 
 
     private:
@@ -92,13 +96,16 @@ class Tet {
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock};        //stage 2 powers, when score is greater than 50,000
 
     //for tet's face
-    void tetBob(); int bobCounter = 0; double yvel = -0.25; bool bobWait = false;                       //for the constant up and down motion of the tet head
-    void tetTalk(bool wait); int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;   //for tet's mouth moving when talking
-    bool spaceWait = false;                                                                             //make sure tet's mouth is closed when there is a period.
-    Rectangle source = (Rectangle) {0, 0, tdim, tdim};                                                  //source rectangle for mista tet structure
-    Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                                        //destination rectabgle for mista tet texture
-    Texture2D t = LoadTexture("resources/tet/mistaTet1.png");                                           //mista tet texture
-    int tetStage = 1;                                                                                   //current stage out of 4, each stage has a different texture
+    void tetBob();                                                                      //for the constant up and down motion of the tet head
+    int bobCounter = 0; double yvel = -0.25; bool bobWait = false;                    
+    void tetTalk(bool wait);                                                            //for tet's mouth moving when talking
+    int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;
+    bool spaceWait = false;                                                             //make sure tet's mouth is closed when there is a period.
+    Rectangle source = (Rectangle) {0, 0, tdim, tdim};                                  //source rectangle for mista tet structure
+    Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                        //destination rectabgle for mista tet texture
+    Texture2D t = LoadTexture("resources/tet/mistaTet1.png");                           //mista tet texture
+    float rotation = 0;                                                                 //current rotation of Tet's face
+    int tetStage = 1;                                                                   //current stage out of 4, each stage has a different texture
 
     //resources for tet talking
     std::vector<std::string> tetSounds =                                                                //current pool of sounds we can use when tet is talking

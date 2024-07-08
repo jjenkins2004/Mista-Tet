@@ -423,7 +423,7 @@ void Grid::placeBlock() {
 }
 
 void Grid::generateBlock() {
-    block = Block(next.front(), grid);
+    block = Block(/*next.front()*/1, grid);
     const std::pair<int, int>* pos = block.getPos();
     for (int i = 0; i < 4; i++) if (grid[pos[i].second][pos[i].first] != 0) gameover = true;
     next.pop_front();
@@ -462,13 +462,16 @@ int Grid::removeRow(std::vector<int>& rows) {
             cells.push_back(&grid[r][i]);
         }
     }
+    tet->look({xpos+5*gridsize, ypos+rows[0]*gridsize-15});
     std::vector<int*>::iterator it = cells.begin();
     int counter = 0;
     while(!WindowShouldClose()) {
-
+        updateAll();
         //this is removing each square and delaying it a little bit
          if (counter == 1 && !first && it != cells.end()) {
             PlaySound(LoadSound("resources/audio/rowcompletion.wav"));
+            int indx = it-cells.begin();
+            tet->look({xpos+gridsize*5, ypos+rows[indx/10]*gridsize-gridsize/2});
             **it = 0;
             it++;
             counter = 0;
@@ -480,6 +483,7 @@ int Grid::removeRow(std::vector<int>& rows) {
         if (it == cells.end()) {
             counter = 0;
             while (!WindowShouldClose()) {
+                updateAll();
                 if (counter == 10) return 0;
                 else counter++;
                 BeginDrawing();
@@ -524,6 +528,7 @@ int Grid::fixRows(std::vector<int> rows) {
     int counter = 0;
 
     while(!WindowShouldClose()) {
+        updateAll();
         //if our distance is 0 then either we are done or we need to move on to the next row in removedRows
         if (counter == 10) {
             if (distance == 0) {
@@ -546,7 +551,11 @@ int Grid::fixRows(std::vector<int> rows) {
                     else if (rows.size() == 3) scr->addScore(600);
                     else scr->addScore(1000);
                     while (!WindowShouldClose()) {
-                        if (counter == 15) return 0;
+                        updateAll();
+                        if (counter == 15) {
+                            tet->look({-1, 0});
+                            return 0;
+                        }
                         else counter++;
                         BeginDrawing();
                             drawAll(false, true);
@@ -605,12 +614,8 @@ int Grid::lasers() {
     int wait = 0;
 
     //camera for screen shake
-    Camera2D camera = { 0 };
-    camera.target = (Vector2){400, 400};
-    camera.offset = (Vector2){400, 400};
-    camera.rotation = 0;
-    camera.zoom = 1;
-    float maxAngle = 2;
+    Camera2D camera;
+    float maxAngle = 1.5;
     float maxOffset = 15;
 
     //choosing three random columns
@@ -624,9 +629,10 @@ int Grid::lasers() {
     }
     
     PlaySound(s);
-
+    tet->look({xpos+5*gridsize, ypos+15*gridsize});
     while(!WindowShouldClose()) {
-
+        updateAll();
+        camera = cameraMain;
             if (wait < 90) {
                 wait++;
                 BeginDrawing();
@@ -637,7 +643,7 @@ int Grid::lasers() {
 
             camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-            camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.rotation = cameraMain.rotation + maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             fade+=0.008;
             if (fade >= 1.2) {
                 int counter = 0;
@@ -652,6 +658,8 @@ int Grid::lasers() {
                 //the more blocks you break, the higher score and greater multiplier buff
                 this->scr->addMultiplier(1+counter*0.025);
                 this->scr->addScore(counter*30);
+                
+                tet->look({-1, 0});
                 return 0;
             }
     
@@ -689,24 +697,25 @@ int Grid::bomb() {
     int explosionStage = 0;
 
     //camera for screen shake
-    Camera2D camera = { 0 };
-    camera.target = (Vector2){400, 400};
-    camera.offset = (Vector2){400, 400};
-    camera.rotation = 0;
-    camera.zoom = 1;
-    float maxAngle = 2;
+    Camera2D camera;
+    float maxAngle = 1.5;
     float maxOffset = 15;
 
     PlaySound(tick);
     while(!WindowShouldClose()) {
+        updateAll();
+        camera = cameraMain;
         if (counter1 <= 150) {
             if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) pos.x+=5;
             if (IsKeyDown(KEY_LEFT) && pos.x - 5 > 200) pos.x-=5;
             if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) pos.y+=5;
             if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) pos.y-=5;
+            if (counter1 >= 20) tet->look({pos.x, pos.y});
             BeginDrawing();
-                this->drawAll(true, true);
-                DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, WHITE);
+                BeginMode2D(camera);
+                    this->drawAll(true, false);
+                    DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, WHITE);
+                EndMode2D();
             EndDrawing();
             counter1++;
             continue;
@@ -714,8 +723,10 @@ int Grid::bomb() {
         if (fade >= -0.2) {
             fade-=0.015;
             BeginDrawing();
-                this->drawAll(true, true);
-                DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, Fade(WHITE, fade));
+                BeginMode2D(camera);
+                    this->drawAll(true, false);
+                    DrawTexturePro(target, {0, 0, 1200, 1200}, pos, {50, 50}, 0, Fade(WHITE, fade));
+                EndMode2D();
             EndDrawing();
             continue;
         }
@@ -723,7 +734,7 @@ int Grid::bomb() {
             if (counter2 > 20) {
                 camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
                 camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
-                camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+                camera.rotation = cameraMain.rotation + maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             }
             if (counter2 == 20) {
                 PlaySound(s);
@@ -752,7 +763,7 @@ int Grid::bomb() {
             }
             if (counter2 > 100) {
                 if (maxOffset > 1) maxOffset-=0.3;
-                if (maxAngle > 1) maxAngle-=0.05;
+                if (maxAngle > 0.5) maxAngle-=0.05;
             }
             BeginDrawing();
                 BeginMode2D(camera);
@@ -763,6 +774,7 @@ int Grid::bomb() {
             counter2++;
             continue;
         }
+        tet->look({-1, 0});
         return 0;
 
     }
@@ -779,10 +791,13 @@ int Grid::nuke() {
     double fade1 = 1;
     double fade2 = 0;
 
-     //camera for screen shake
+    //camera for screen shake
     Camera2D camera;
     float maxAngle = 2;
     float maxOffset = 25;
+
+    //for tet look
+    float y = ypos+20*gridsize;
 
     while (!WindowShouldClose()) {
         updateAll();
@@ -796,8 +811,13 @@ int Grid::nuke() {
             continue;
         }
         if (counter2 < 400) {
+            if (counter2 == 0) tet->look({xpos+5*gridsize, y});
             if (counter2 == 60) PlaySound(explosionSound);
-            if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) source.x += 150;
+            if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) {
+                y-=30;
+                tet->look({xpos+5*gridsize, y});
+                source.x += 150;
+            }
             if (counter2 > 200) fade1-=0.005;
             if (counter2 >= 60) {
                 camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
@@ -827,6 +847,7 @@ int Grid::nuke() {
                 grid[i][j] = 0;
             }
         }
+        tet->look({-1, 0});
         scr->addScore(gridCounter*10);
         return 0;
     }
