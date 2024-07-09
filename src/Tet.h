@@ -64,7 +64,7 @@ class Tet {
                                             "I thought you should\nknow that I have an IQ of\n378. I think the test\nunderestimated my true\nintelligence.",
                                             "They say Rome wasn't\nbuilt in a day.\nI could do it.",
                                             "The ladies all want\nme, as you can clearly\ntell.",
-                                            "Albert Einstein said\nthis to me, \"You're\nintellect is endless in\ndepth and breadth\""};
+                                            "Albert Einstein said\nthis to me, \"You're\nintellect is endless in\ndepth and breadth\"."};
 
     //struct that holds the dialogue that tet says when he does this and what he specifically does
     struct tetPower {
@@ -119,6 +119,7 @@ class Tet {
                             "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", 
                             "resources/audio/tetTalk7.wav"};
     int talk = 2;                                                                                       //wait counter for tet talking sound
+    void drawTetText(std::string& s);                                                                   //function that puts tet's dialogue on correct position
 
     Score* src;                                                     //score object pointer
     Font tetFont = LoadFont("resources/allFont.ttf");               //font used for text

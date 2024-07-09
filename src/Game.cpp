@@ -82,7 +82,7 @@ int main() {
             downcounter = 0;
 
             //temp
-            grid->randomRotate();
+            //grid->randomRotate();
             powerUp->spawnPowerup(true);
             start = false; continue;
 

@@ -26,7 +26,7 @@ void Tet::drawTet() {
         }
         time++;
         SetTextLineSpacing(20);
-        DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+        drawTetText(tetText);
     }
     else if (time == timebetweenText) { //checks if we should make tet say something
         if (txtCounter == txtCounterWait) {
@@ -93,7 +93,7 @@ void Tet::drawTet() {
         }
         else ++txtCounter;
         SetTextLineSpacing(20);
-        DrawTextPro(tetFont, tetText.c_str(), (Vector2){550, 100}, (Vector2){0, 0}, 0, 20, 0, WHITE);
+        drawTetText(tetText);
         tetTalk(spaceWait);
     }
     else {
@@ -103,11 +103,11 @@ void Tet::drawTet() {
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
             int num = 0;
-            if (tetStage >= 3) num = 5; //later stages of the game make tet powers happen more often
-            if (GetRandomValue(1, 10) <= num) { //determines whether the next dialogue from tet should be a tet power
+            if (tetStage >= 3) num = 5;                             //later stages of the game make tet powers happen more often
+            if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (tetStage <=2) txtIndex = GetRandomValue(4, 5); //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 7); //choosing power from our late stage bag
+                if (tetStage <=2) txtIndex = GetRandomValue(4, 5);  //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 7);               //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -290,4 +290,22 @@ std::string Tet::checkTetPower() {
     std::string temp = currPower;
     currPower = "none";
     return temp;
+}
+
+void Tet::drawTetText(std::string& s) {
+    int start = 0;
+    std::vector<std::string> lines;
+    for (int i = 0; i < s.length(); i++){
+        if (s[i] == '\n') {
+            lines.push_back(s.substr(start, i-start));
+            start = i+1;
+        }
+    }
+    lines.push_back(s.substr(start, s.size()));
+    Vector2 center = {650, float(160-(lines.size()/2.f)*20+10)};
+    for (string i: lines) {
+        Vector2 textMeasure = MeasureTextEx(tetFont, i.c_str(), 20, 0);
+        DrawTextPro(tetFont, i.c_str(), center, {textMeasure.x/2, textMeasure.y/2}, 0, 20, 0, WHITE);
+        center.y+=20;
+    }
 }
