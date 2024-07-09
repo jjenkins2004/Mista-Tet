@@ -13,33 +13,37 @@
 
 class Tet {
     public:
+
         Tet(Score* s);
 
         //set level
-        void updateLevel(int l) {
-            level = l;
-        }
+        void updateLevel(int l) { level = l;}
 
         //draw mista tet
         void drawTet();
+
         //tet monologue
         int tetMonologue();
+
         //check if a tet power is activated
         std::string checkTetPower();
+
         //tet will turn to the side and look at the given corrdinates, if x coordinate is negative, will reset face back to facing forward
         void look(Vector2 coor);
 
+        //increase the tet stage
+        void increaseStage();
 
     private:
 
     //during the game for when tet is talking
-    std::string tetText;
-    int txtCounter = 0;
+    std::string tetText;                                    //current text that is being displayed
+    int txtCounter = 0;                                     
     int txtCounterWait = 3;
-    int txtTracker = 0;
-    int txtIndex; //which index are we using right now
-    std::vector<int> vals; //which dialougues tet can say (to make sure two dont repeat back to back)
-    int timebetweenText = GetRandomValue(1*60, 3*60);
+    int txtTracker = 0;                                 
+    int txtIndex;                                           //which index are we using right now
+    std::vector<int> vals;                                  //which dialougues tet can say (to make sure two dont repeat back to back)
+    int timebetweenText = GetRandomValue(1*60, 3*60);       //how long before each time tet talks
     int time = 0; int waitTime; bool wait;
     bool stop;
 

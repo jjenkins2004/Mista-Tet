@@ -293,19 +293,22 @@ std::string Tet::checkTetPower() {
 }
 
 void Tet::drawTetText(std::string& s) {
+
+    //adds each line in s, seperated by new line characters into seperate strings and puts them in a vector
     int start = 0;
     std::vector<std::string> lines;
     for (int i = 0; i < s.length(); i++){
-        if (s[i] == '\n') {
-            lines.push_back(s.substr(start, i-start));
-            start = i+1;
+        if (s[i] == '\n') {                                                                                 //i index represents new line character
+            lines.push_back(s.substr(start, i-start));                                                      //add section of string starting at start index to right before new line character
+            start = i+1;                                                                                    //new start index is character after new line character
         }
     }
-    lines.push_back(s.substr(start, s.size()));
-    Vector2 center = {650, float(160-(lines.size()/2.f)*20+10)};
+    lines.push_back(s.substr(start));                                                                       //push back the remaining text
+    Vector2 center = {650, float(160-(lines.size()/2.f)*20+10)};                                            //figure out where first line should start based on number of lines
+                                                                                                            //center of entire text will be at (650, 160)
     for (string i: lines) {
         Vector2 textMeasure = MeasureTextEx(tetFont, i.c_str(), 20, 0);
-        DrawTextPro(tetFont, i.c_str(), center, {textMeasure.x/2, textMeasure.y/2}, 0, 20, 0, WHITE);
-        center.y+=20;
+        DrawTextPro(tetFont, i.c_str(), center, {textMeasure.x/2, textMeasure.y/2}, 0, 20, 0, WHITE);       //drawing each individual line
+        center.y+=20;                                                                                       //next line will be 20 pixels below current line
     }
 }
