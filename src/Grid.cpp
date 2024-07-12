@@ -282,6 +282,7 @@ void Grid::updateAll() {
     pow->updateRotation(cameraMain.rotation, angVel, subtract);
     scr->updateLevel(level);
     pow->updateLevel(level);
+    tet->checkStage();
     PowerupItem::cameraRotation = cameraMain.rotation;
     PowerupItem::rotationVel = subtract ? -angVel: angVel;
 }

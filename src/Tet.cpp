@@ -284,6 +284,42 @@ void Tet::tetBob() {
             yvel+=maxBobSpeed/50;
         }
     }
+    if (tetStage >= 3) {
+        if (yvel > 0) {
+            if (dest.y < 329) {             //look 5
+                source.x = tdim*4;
+            }
+            else if (dest.y < 334) {        //look 4
+                source.x = tdim*3;
+            }
+            else if (dest.y < 345) {        //look 3
+                source.x = tdim*2;
+            }
+            else if (dest.y < 350) {        //look 2
+                source.x = tdim;
+            }
+            else {                          //look 1
+                source.x = 0;
+            }
+        }
+        else {
+            if (dest.y >= 350) {            //look 1
+                source.x = 0;
+            }
+            else if (dest.y >= 345) {       //look 2
+                source.x = tdim;
+            }
+            else if (dest.y >= 334) {       //look 3
+                source.x = tdim*2;
+            }
+            else if (dest.y >= 329) {       //look 4
+                source.x = tdim*3;
+            }
+            else {                          //look 5
+                source.x = tdim*4;
+            }
+        }
+    }   
 }
 
 std::string Tet::checkTetPower() {
@@ -310,5 +346,24 @@ void Tet::drawTetText(std::string& s) {
         Vector2 textMeasure = MeasureTextEx(tetFont, i.c_str(), 20, 0);
         DrawTextPro(tetFont, i.c_str(), center, {textMeasure.x/2, textMeasure.y/2}, 0, 20, 0, WHITE);       //drawing each individual line
         center.y+=20;                                                                                       //next line will be 20 pixels below current line
+    }
+}
+
+void Tet::checkStage() {
+    if (src->getScore() >= 25000 && tetStage < 2) {
+        tetStage = 2;
+        t = LoadTexture("resources/tet/mistaTet2.png");
+    }
+    else if (src->getScore() >= 50000 && tetStage < 3) {
+        tetStage = 3;
+    }
+    else if (src->getScore() >= 75000 && tetStage < 4) {
+        tetStage = 4;
+    }
+    else if (src->getScore() >= 90000) {
+        //cutscene and tet goes crazy with his powers
+    }
+    else if (src->getScore() >= 100000) {
+        //you win
     }
 }

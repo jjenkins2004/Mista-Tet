@@ -31,8 +31,8 @@ class Tet {
         //tet will turn to the side and look at the given corrdinates, if x coordinate is negative, will reset face back to facing forward
         void look(Vector2 coor);
 
-        //increase the tet stage
-        void increaseStage();
+        //check if we should increase the tet stage
+        void checkStage();
 
     private:
 
@@ -101,7 +101,8 @@ class Tet {
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head
-    int bobCounter = 0; double yvel = -0.25; bool bobWait = false;                    
+    int bobCounter = 0; double yvel = -0.25; bool bobWait = false;           
+    int count = 0;         
     void tetTalk(bool wait);                                                            //for tet's mouth moving when talking
     int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;
     bool spaceWait = false;                                                             //make sure tet's mouth is closed when there is a period.
