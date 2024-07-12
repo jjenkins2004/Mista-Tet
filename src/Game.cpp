@@ -83,7 +83,7 @@ int main() {
 
             //temp
             //grid->randomRotate();
-            score->addScore(49500);
+            score->addScore(74500);
             powerUp->spawnPowerup(true);
             start = false; continue;
 
@@ -172,6 +172,7 @@ int main() {
         else if (power == "blind2") grid->blind(GetRandomValue(8, 12));
         else if (power == "zblock") grid->changeNext(5);
         else if (power == "sblock") grid->changeNext(7);
+        else if (power == "turn") grid->randomRotate();
 
         //ask powerup class if there are any fast speedchange
         //need a seperate function because we don't want to store this powerup for later use and the powerup affects

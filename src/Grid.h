@@ -69,7 +69,7 @@ class Grid {
         int lasers();                                       //shoots three lasers from sky, adds score and multiplier based on how many blocks were destroyed (player power)
         int bomb();                                         //blows up specified area by player, adds score based on blocks destroyed (player power)
         int nuke();                                         //blows up whole board (player power)
-        void changeNext(int i);                             //changes the next three blocks (player power)
+        void changeNext(int i);                             //changes the next three blocks (player power & tet power)
 
         //--------------------------------------------------------------------------
         // Internal Block Class that handles block manipulation functions

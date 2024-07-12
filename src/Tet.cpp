@@ -11,10 +11,12 @@ Tet::Tet(Score* s): src(s) {
 }
 
 void Tet::drawTet() {
+    std::cout << "start of drawTet" << std::endl;
     
     //tet and what he is saying
     DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, rotation,  WHITE);
 
+    std::cout << "before tetBob" << std::endl;
     //tetbobbing
     tetBob();
 
@@ -102,12 +104,12 @@ void Tet::drawTet() {
             stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 0;
-            if (tetStage >= 3) num = 5;                             //later stages of the game make tet powers happen more often
+            int num = 4;
+            if (tetStage >= 3) num = 7;                             //later stages of the game make tet powers happen more often
             if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (tetStage <=2) txtIndex = GetRandomValue(4, 5);  //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 7);               //choosing power from our late stage bag
+                if (tetStage <=2) txtIndex = GetRandomValue(0, 5);  //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 6);               //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -116,6 +118,7 @@ void Tet::drawTet() {
             }
         }
     }
+    std::cout << "end of drawtet" << std::endl;
 }
 
 void Tet::look(Vector2 coor) {
@@ -250,8 +253,10 @@ void Tet::tetTalk(bool wait) {
 }
 
 void Tet::tetBob() {
-    double maxBobSpeed = 0.25;
-    if (bobWait) {
+
+    //for tet bobbing up and down constantly
+    double maxBobSpeed = 0.25;                      //defining the maximum speed which tet will accelerate to when bobbing up and down
+    if (bobWait) {                                  //waiting at the top and bottom of the bob
             if (bobCounter == 50) {
                 bobCounter = 0;
                 bobWait = false;
@@ -262,14 +267,14 @@ void Tet::tetBob() {
     }
     else {
         dest.y += yvel;
-        if (dest.y <= 335 && yvel < 0) {
+        if (dest.y <= 335 && yvel < 0) {            //decelerating when passing this point
             yvel+=maxBobSpeed/50;
             if (yvel > -maxBobSpeed/100) {
                 yvel = maxBobSpeed/50;
                 bobWait = true;
             }
         }
-        else if (dest.y >= 343.75 && yvel > 0) {
+        else if (dest.y >= 343.75 && yvel > 0) {    //decelerating when passing this point
             yvel-=maxBobSpeed/50;
             if (yvel < maxBobSpeed/100) {
                 dest.y = 350;
@@ -284,6 +289,8 @@ void Tet::tetBob() {
             yvel+=maxBobSpeed/50;
         }
     }
+
+    //for tete glowing eye animation
     if (tetStage >= 3) {
         if (yvel > 0) {
             if (dest.y < 329) {             //look 5
@@ -329,7 +336,6 @@ std::string Tet::checkTetPower() {
 }
 
 void Tet::drawTetText(std::string& s) {
-
     //adds each line in s, seperated by new line characters into seperate strings and puts them in a vector
     int start = 0;
     std::vector<std::string> lines;
@@ -356,9 +362,13 @@ void Tet::checkStage() {
     }
     else if (src->getScore() >= 50000 && tetStage < 3) {
         tetStage = 3;
+        if (rotation == 0) t = LoadTexture("resources/tet/mistaTet3Forward.png");
+        else t = LoadTexture("resources/tet/mistaTet3Left.png");
     }
     else if (src->getScore() >= 75000 && tetStage < 4) {
         tetStage = 4;
+        if (rotation == 0) t = LoadTexture("resources/tet/mistaTet4Forward.png");
+        else t = LoadTexture("resources/tet/mistaTet4Left.png");
     }
     else if (src->getScore() >= 90000) {
         //cutscene and tet goes crazy with his powers

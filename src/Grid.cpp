@@ -877,7 +877,7 @@ void Grid::blind(int num) {
 }
 
 void Grid::randomRotate() {
-    rotations.push_back(std::make_tuple(GetRandomValue(500, 500), GetRandomValue(50*60, 50*60), true));
+    rotations.push_back(std::make_tuple(GetRandomValue(1, 3), GetRandomValue(20*60, 40*60), true));
 }
 
 
