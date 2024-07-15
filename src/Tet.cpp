@@ -11,12 +11,10 @@ Tet::Tet(Score* s): src(s) {
 }
 
 void Tet::drawTet() {
-    std::cout << "start of drawTet" << std::endl;
     
     //tet and what he is saying
     DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, rotation,  WHITE);
 
-    std::cout << "before tetBob" << std::endl;
     //tetbobbing
     tetBob();
 
@@ -118,7 +116,6 @@ void Tet::drawTet() {
             }
         }
     }
-    std::cout << "end of drawtet" << std::endl;
 }
 
 void Tet::look(Vector2 coor) {
@@ -253,7 +250,6 @@ void Tet::tetTalk(bool wait) {
 }
 
 void Tet::tetBob() {
-
     //for tet bobbing up and down constantly
     double maxBobSpeed = 0.25;                      //defining the maximum speed which tet will accelerate to when bobbing up and down
     if (bobWait) {                                  //waiting at the top and bottom of the bob
@@ -370,10 +366,189 @@ void Tet::checkStage() {
         if (rotation == 0) t = LoadTexture("resources/tet/mistaTet4Forward.png");
         else t = LoadTexture("resources/tet/mistaTet4Left.png");
     }
-    else if (src->getScore() >= 90000) {
+
+    //handled in game.cpp
+
+    //else if (src->getScore() >= 90000) {
         //cutscene and tet goes crazy with his powers
-    }
-    else if (src->getScore() >= 100000) {
+    //}
+    //else if (src->getScore() >= 100000) {
         //you win
+    //}
+}
+
+int Tet::tetCutscene() {
+    //defining variables
+    Texture2D tetFace = LoadTexture("resources/tet/mistaTet4Forward.png");
+    Rectangle tetSource = (Rectangle) {0, 0, tdim, tdim};
+    float scale = 0.01;
+    Rectangle tetDest = (Rectangle) {400, 350, tdim*scale, tdim*scale};
+    Vector2 tetOrigin = (Vector2){scale*tdim/2, scale*tdim/2};
+    float tBoxWidth = 700, tBoxHeight = 125; Color textBoxColor = (Color) {45, 45, 45, 255};
+    Rectangle textBox = (Rectangle) {400-tBoxWidth/2, 700-tBoxHeight/2, tBoxWidth, tBoxHeight};
+    Color textColor = (Color){30, 0, 0, 255}; SetTextLineSpacing(25);
+    int txtcounter = 0, txtWait = 2, begCount = 0, bobCount = 0, soundCount = 0;
+    bool wait = false, checkEnd = false, start = true, end = false, waitBob = false;
+    float fade = 0, tetVel = -0.01;
+
+    //opening monologue file
+    ifstream mono("resources/tet/tetCutscene.txt");
+    string txt;
+    char ch;
+
+    //loop for Tet's monologue
+    while(!WindowShouldClose()) {
+
+        //tet texture enlarges and waits some time before speaking
+        if (start) {
+            scale*=1.03;
+            if (scale >= 6) {                               //tet is of size so wait some time before starting to speak
+                bobCounter = 0;
+                scale = 6;
+                start = false;
+            }
+            //rescaling drawing values to match current scale
+            tetDest = (Rectangle) {400, 350, tdim*scale, tdim*scale};
+            tetOrigin = (Vector2){scale*tdim/2, scale*tdim/2};
+        }
+        else if (begCount < 120) begCount++;                //waiting some time in after appearing before speaking
+        else if (!wait) {
+            if (txtcounter == txtWait) {
+
+                if (txtWait == 15) txtWait = 2;
+                mono.get(ch);
+
+                //checking characters
+                if (ch == '&') {                            //& character marks the end of the text and end of cutscene
+                    checkEnd = true;
+                    wait = true;
+                } 
+                else txt+=ch;
+                if (ch == '.' || ch == '?' || ch == '!') {  //pausing for end of sentences
+                    txtWait = 15;
+                    soundCount = 0;                         //make sure sound doesn't play when there is punctuation
+                }
+                //stopping everytime there are two next lines in a row
+                if (txt.length() > 2 && *(txt.end()-1) == '\n' && *(txt.end()-2) == '\n') wait = true;
+
+                txtcounter = 0;
+
+                //playing tet talking sounds
+                if (ch != ' ' && txtWait != 15) {           //sound doesn't play when there is a space or if there is punctuation
+                    if (soundCount == 2) {                  //play sound, wait two letters, play another sound
+                        //grabbing sound from our pool
+                        std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
+                        PlaySound(LoadSound(it->c_str()));
+                        tetSounds.erase(it);
+                        if (tetSounds.size() == 3) {        //resetting the pool if it gets too small
+                            tetSounds = tetSoundsOriginal;
+                        }
+                        soundCount = 0;
+                    }
+                    else soundCount++;
+                }          
+            }
+            else ++txtcounter;
+            
+        }
+        else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+            if (!checkEnd) {
+                txt = "";
+                txtcounter = 0;
+                wait = false;
+            }
+            else end = true;
+        }
+        if (IsKeyPressed(KEY_S)) end = true;
+
+        //for tet bobbing up and down constantly
+        double maxBobSpeed = 0.5;                       //defining the maximum speed which tet will accelerate to when bobbing up and down
+        if (waitBob) {                                  //waiting at the top and bottom of the bob
+                if (bobCount == 50) {
+                    bobCount = 0;
+                    waitBob = false;
+                }
+                else {
+                    bobCount++;
+                }
+        }
+        else if (scale == 6) {
+            tetDest.y += tetVel;
+            if (tetDest.y <= 300  && tetVel < 0) {              //decelerating when passing this point
+                tetVel+=maxBobSpeed/50;
+                if (tetVel > -maxBobSpeed/100) {
+                    tetVel = maxBobSpeed/50;
+                    waitBob = true;
+                }
+            }
+            else if (tetDest.y >= 337 && tetVel > 0) {          //decelerating when passing this point
+                tetVel-=maxBobSpeed/50;
+                if (tetVel < maxBobSpeed/100) {
+                    tetDest.y = 350;
+                    tetVel = -maxBobSpeed/50;
+                    waitBob = true;
+                }
+            }
+            else if (tetVel < 0 && tetVel >-maxBobSpeed) {
+                tetVel-=maxBobSpeed/50;
+            }
+            else if (tetVel > 0 && tetVel < maxBobSpeed) {
+                tetVel+=maxBobSpeed/50;
+            }
+        }
+
+        //for tet glowing eye animation
+        if (tetStage >= 3) {
+            if (tetVel > 0) {
+                if (tetDest.y < 286.8) {             //look 5
+                    tetSource.x = tdim*4;
+                }
+                else if (tetDest.y < 304.1) {        //look 4
+                    tetSource.x = tdim*3;
+                }
+                else if (tetDest.y < 333.6) {        //look 3
+                    tetSource.x = tdim*2;
+                }
+                else if (tetDest.y < 350) {        //look 2
+                    tetSource.x = tdim;
+                }
+                else {                          //look 1
+                    tetSource.x = 0;
+                }
+            }
+            else {
+                if (tetDest.y >= 350 ) {            //look 1
+                    tetSource.x = 0;
+                }
+                else if (tetDest.y >= 333.6) {       //look 2
+                    tetSource.x = tdim;
+                }
+                else if (tetDest.y >= 304.1) {       //look 3
+                    tetSource.x = tdim*2;
+                }
+                else if (tetDest.y >= 286.769) {       //look 4
+                    tetSource.x = tdim*3;
+                }
+                else {                          //look 5
+                    tetSource.x = tdim*4;
+                }
+            }
+        }   
+
+
+        BeginDrawing();
+            ClearBackground(BLACK);
+            DrawTexturePro(t, tetSource, tetDest, tetOrigin, 0, WHITE);
+            DrawRectangleRounded(textBox, 0.2, 500, textBoxColor);
+            DrawRectangleRoundedLines(textBox, 0.2, 500, 5, (Color){30, 30, 30, 255});
+            DrawTextPro(tetFont, txt.c_str(), (Vector2){textBox.x+15, textBox.y+10}, (Vector2){0,0}, 0, 30, 0, textColor);
+            DrawTextEx(tetFont, "S to skip, CLICK to proceed", (Vector2){800-MeasureTextEx(tetFont, "S to skip, CLICK to proceed", 15, 0).x-5, 800-18}, 15, 0, WHITE);
+            DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
+        EndDrawing();
+        if (end) {
+            fade+=0.01;
+            if (fade >= 1.5) return 0;
+        }
     }
+    return -1;
 }

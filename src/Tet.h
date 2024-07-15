@@ -25,6 +25,9 @@ class Tet {
         //tet monologue
         int tetMonologue();
 
+        //cutscene when you reach 90k score
+        int tetCutscene();
+
         //check if a tet power is activated
         std::string checkTetPower();
 

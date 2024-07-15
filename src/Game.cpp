@@ -43,6 +43,7 @@ int main() {
     Font titleFont = LoadFont("resources/titleFont.ttf");   //title font
     std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
     int level = 0;                                          //the current level, determines how fast the blocks fall
+    bool scenePlayed = false;                               //has tet cutscene already played?
 
 
     //--------------------------------------------------------------------------
@@ -81,11 +82,11 @@ int main() {
             horizontalcounter = 0;
             downcounter = 0;
 
-            //temp
-            //grid->randomRotate();
-            score->addScore(74500);
-            powerUp->spawnPowerup(true);
-            start = false; continue;
+            // //temp
+            // //grid->randomRotate();
+            // score->addScore(89980);
+            // powerUp->spawnPowerup(true);
+            // start = false; continue;
 
             //bringing up our start menu
             if (menu() == -1) break;
@@ -123,6 +124,12 @@ int main() {
 
         //updating functions
         grid->updateAll();
+
+        //checking if we should go to tet cutscene
+        if (!scenePlayed && score->getScore() >= 90000) {
+            if (tet->tetCutscene() == -1) break;
+            scenePlayed = true;
+        }
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
         //using level as x that approaches 120
