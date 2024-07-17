@@ -131,6 +131,7 @@ int main() {
         if (!scenePlayed && score->getScore() >= 90000) {
             if (tet->tetCutscene() == -1) break;
             scenePlayed = true;
+            MusicPlayer().play("resources/music/finalBattleMusic.wav");
         }
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function

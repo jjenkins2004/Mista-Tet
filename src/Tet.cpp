@@ -502,8 +502,13 @@ int Tet::tetCutscene() {
     string txt;
     char ch;
 
+    //playing music
+    MusicPlayer().play("resources/music/TetTheme.wav");
+
     //loop for Tet's monologue
     while(!WindowShouldClose()) {
+
+        MusicPlayer().updateMusic();                        //updating music stream
 
         //tet texture enlarges and waits some time before speaking
         if (start) {
@@ -538,7 +543,7 @@ int Tet::tetCutscene() {
                     txtWait = 15;
                     soundCount = 0;                         //make sure sound doesn't play when there is punctuation
                 }
-                
+
                 txtcounter = 0;
 
                 //playing tet talking sounds
@@ -654,6 +659,7 @@ int Tet::tetCutscene() {
             DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
         EndDrawing();
         if (end) {
+            if (fade == 0) MusicPlayer().fade(140);
             fade+=0.01;
             if (fade >= 1.5) {
                 UnloadTexture(tetFace);
