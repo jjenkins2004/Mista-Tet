@@ -4,6 +4,7 @@
 #define tdim 70
 
 #include "Score.h"
+#include "Tools.h"
 
 
 //--------------------------------------------------------------------------
@@ -94,8 +95,6 @@ class Tet {
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};                                 //replaces next three blocks with s blocks
 
     bool tetpowertoggle = false;                                                                                //to determine if next dialogue should be a tetPower
-
-    Sound debuff = LoadSound("resources/audio/tetDeBuff.wav");                                                  //play this when player is debuffed by tet
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                     //current chosen power

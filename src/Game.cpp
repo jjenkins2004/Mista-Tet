@@ -4,6 +4,7 @@
 
 #include "raylib.h"
 #include "Grid.h"
+#include "Tools.h"
 #include <cmath>
 
 #define screenWidth 800
@@ -111,6 +112,7 @@ int main() {
                 }
             }
             if (quit) break;                                                //check if game should quit
+            MusicPlayer().play("resources/music/tetStage1Music.wav");       //playing stage 1 music
 
         }
 
@@ -256,8 +258,7 @@ int main() {
 
         //space bar to drop block
         else if (IsKeyPressed(KEY_SPACE)) {
-            Sound drop = LoadSound("resources/audio/blockdropping.wav");
-            PlaySound(drop);
+            sound().play("resources/audio/blockdropping.wav");
             score->addScore(grid->drop()*2);
             checkRows = true;
         }
@@ -277,6 +278,7 @@ int main() {
                 start = true;
                 continue;
             }
+            MusicPlayer().resume();
         }
 
 
@@ -366,8 +368,12 @@ int menu() {
     bool fade = false;                                                          //bool to fade into Tet Monologue when play button is pressed
     double fadeTracker = 0;                                                     //for fade of screen
 
+    MusicPlayer().play("resources/music/tetTheme.wav");                         //playing tet theme song
+
 
     while (!WindowShouldClose()) {
+
+        MusicPlayer().updateMusic();            //updating the music player
 
         BeginDrawing();
             ClearBackground(BLACK);
@@ -417,7 +423,7 @@ int menu() {
 
 
 int pause() {
-    Texture2D tetHead = LoadTexture("resources/mistaTet4Forward.png");                      //tet's head in pause menu
+    Texture2D tetHead = LoadTexture("resources/tet/mistaTet4Forward.png");                  //tet's head in pause menu
     Font allFont = LoadFont("resources/allFont.ttf");                                       //loading font
     Rectangle src = (Rectangle){0, 0, 70, 70}, dest = (Rectangle) {400, 275, 70*6, 70*6};   //source and dest rectangle of tet head texture
     int bobCounter = 0, bobSpeed = 10, yvel = -1, startWait = 60, counter = 0, add = 1;     //variables for bobbing of the tet head
@@ -425,7 +431,11 @@ int pause() {
     double fade = 0;                                                                        //for fading
     bool wait, quit = false;                                                                //wait for head bobbing and quit for returning to menu
 
+    MusicPlayer().pause();                                                                  //loading pause menu music
+
     while (!WindowShouldClose()) {
+        
+        MusicPlayer().updatePauseMusic();               //updating music stream
 
         //for bobbing of giant Tet Head
         if (counter == 15) {
@@ -472,9 +482,10 @@ int pause() {
             if (quit) {
                 DrawRectangle(0, 0, 800, 800, Fade(WHITE, fade));
                 fade+=0.01;
-                if (fade >= 1) return 0;
             }
         EndDrawing();
+
+        if (fade >= 1) return 0;
 
         ++counter;
         ++bobCounter;
@@ -485,7 +496,7 @@ int pause() {
 
 int usePower(PowerupItem* p, Score* scr, Grid* grid) {
     if (p->id == "multiplier") {                                    //multiplier powerup
-        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
+        sound().play("resources/audio/usepowerup.wav");
         Multiplier* m = dynamic_cast<Multiplier*>(p);
         scr->addMultiplier(m->multiplier);
         delete m;
@@ -503,13 +514,13 @@ int usePower(PowerupItem* p, Score* scr, Grid* grid) {
         return grid->nuke();
     }
     else if (p->id == "threeblock") {                               //change next three blocks power
-        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
+        sound().play("resources/audio/usepowerup.wav");
         ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
         grid->changeNext(t->blockID);
         delete t;
     }   
     else if (p->id == "plusmultiplier") {                           //permanent multiplier power
-        PlaySound(LoadSound("resources/audio/usepowerup.wav"));
+        sound().play("resources/audio/usepowerup.wav");
         PlusMultiplier* m = dynamic_cast<PlusMultiplier*>(p);
         scr->addPermanentMultiplier(m->multiplier);
     }

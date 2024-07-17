@@ -24,6 +24,56 @@ struct RandomBlock {
         std::vector<int> blocks;
 };
 
+//handles playing music
+struct MusicPlayer {
+    public:
+        //continously plays this file on repeat
+        static void play(std::string file);
+        //used when pause button is hit
+        static void pause();
+        //resuming after leaving pause menu
+        static void resume();
+        //fades out current playing song in this number of frames
+        static void fade(int frames);
+        //updating funciton
+        static void updateMusic();
+        //updating for pause menu music
+        static void updatePauseMusic();
+    private:
+        static float vol;               //volume of the music
+        static float decrease;          //how much we decrease the volume each frame
+        static bool playing;            //are we currently playing a song
+        static Music pauseSong;         //seperate variable for pause menu music
+        static Music song;              //current music playing
+};
+
+//handles sound playing and unloading
+//plays the sound using the play() function and adds it to our soundlist. Every so often, goes through sound list and unloads sounds done playing
+struct sound {
+    public:
+        //play sound
+        static void play(std::string file);
+        //updating function
+        static void updateSound();
+    private:
+        struct item {
+            Sound curr;                                             //current item
+            item* next;                                             //next item
+            item* prev;                                             //previous item
+        };
+
+        //list
+        struct soundlist {
+            void push_back(Sound i);                                //adds new sound to the back of the list
+            void remove(item* i);                                   //deletes the given item
+            item* head = nullptr;                                   //head of the list
+            item* tail = nullptr;                                   //tail of the list
+        };
+
+        static int resetCounter;                                    //counter for when we go through list and unload sounds
+        static soundlist sounds;                                    //list of played sounds
+};
+
 //to get accurate coordinates relative to the screen when there is a camera rotation
 Vector2 getAdjustedCoordinates(Vector2 coor, double rotation);
 

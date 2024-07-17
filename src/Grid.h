@@ -144,8 +144,6 @@ class Grid {
 
         //resources
         Texture2D fog = LoadTexture("resources/tet/fog.png");                   //for blind power
-        Sound rotateSound = LoadSound("resources/audio/ScreenTurn.wav");        //for screen rotation power
-        Sound rotationRumble = LoadSound("resources/audio/RotationRumble.wav"); //for screen rotation power
 
         //--------------------------------------------------------------------------
         // General Grid class variables

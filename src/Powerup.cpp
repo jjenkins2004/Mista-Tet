@@ -207,8 +207,7 @@ void PowerupItem::moveItem() {
 void PowerupItem::spaz() {
     //checks if it is our first time calling spaz
     if (!spazzed) {
-        Sound powerupSFX = LoadSound("resources/audio/powerupCollection.wav");
-        PlaySound(powerupSFX);
+        sound().play("resources/audio/powerupCollection.wav");
         spazzed = true;
         time = 45;
         vel.x = 1;
@@ -312,7 +311,7 @@ void Mystery::collect() {
         mystery->removed = true;
         mystery->fade = 0;
         mystery->pos = pos;
-        PlaySound(LoadSound("resources/audio/MysteryReveal.wav"));
+        sound().play("resources/audio/MysteryReveal.wav");
     }
 
     //reduces opacity of the mystery powerup texture and increases opacity of new powerup texture
@@ -457,7 +456,7 @@ void Powerup::drawPowerup() {
         }
         else {
             if (it->curr->wait) {                                   //fade in of item
-                if (it->curr->fade == 0) PlaySound(LoadSound("resources/audio/PowerupAppear.wav"));
+                if (it->curr->fade == 0) sound().play("resources/audio/PowerupAppear.wav");
                 it->curr->DrawItem(true);
                 it->curr->fade+=0.02;
                 if (it->curr->fade >= 1) it->curr->wait = false;

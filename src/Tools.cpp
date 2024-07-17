@@ -1,5 +1,9 @@
 #include "Tools.h"
 
+//--------------------------------------------------------------------------
+// random block bag
+//--------------------------------------------------------------------------
+
 int RandomBlock::getBlock() {
     if (blocks.empty()) resetBag();
     int rand = GetRandomValue(0, blocks.size()-1);
@@ -12,6 +16,10 @@ int RandomBlock::getBlock() {
 void RandomBlock::resetBag() {
     for (int i = 1; i < 8; i++) blocks.push_back(i);
 }
+
+//--------------------------------------------------------------------------
+// Powerup Item collision and math
+//--------------------------------------------------------------------------
 
 Vector2 getAdjustedCoordinates(Vector2 coor, double rotation) {
     double x = coor.x-400; double y = coor.y-400;       //finding vectors of the coordinates with (400, 400) as the center
@@ -95,3 +103,116 @@ Vector2 closestPointLineCircle(Vector2 point1, Vector2 point2, Vector2 center) {
     return {float(c.x + t*perpVec.x), float(c.y+t*perpVec.y)};
 
 }
+
+//--------------------------------------------------------------------------
+// MusicPlayer
+//--------------------------------------------------------------------------
+
+void MusicPlayer::play(std::string file) {
+    UnloadMusicStream(song);
+    song = LoadMusicStream(file.c_str());
+    PlayMusicStream(song);
+    playing = true;
+}
+
+void MusicPlayer::pause() {
+    pauseSong = LoadMusicStream("resources/music/TetTheme.wav");
+    PlayMusicStream(pauseSong);
+}
+
+void MusicPlayer::resume() {
+    StopMusicStream(pauseSong);
+    UnloadMusicStream(pauseSong);
+}
+
+void MusicPlayer::fade(int frames) {
+    decrease = 1.f/frames;
+}
+
+void MusicPlayer::updateMusic() {
+    if (playing) {
+        //checking if we need to repeat the current song
+        if (!IsMusicStreamPlaying(song)) {
+             PlayMusicStream(song);
+        }
+        else UpdateMusicStream(song);
+
+        //applying fade
+        vol -= decrease;
+        SetMusicVolume(song, vol);
+        //unloading music when volume hits 0 from the fade
+        if (vol <= 0) {
+            StopMusicStream(song);
+            vol = 1;
+            decrease = 0;
+            playing = false;
+        }
+    }
+}
+
+void MusicPlayer::updatePauseMusic() {
+    if (!IsMusicStreamPlaying(pauseSong)) {
+        PlayMusicStream(pauseSong);
+    }
+    else UpdateMusicStream(pauseSong);
+}
+
+Music MusicPlayer::song;
+Music MusicPlayer::pauseSong;
+float MusicPlayer::vol = 1;
+float MusicPlayer::decrease = 0;
+bool MusicPlayer::playing = false;
+
+//--------------------------------------------------------------------------
+// sound and soundlist
+//--------------------------------------------------------------------------
+
+void sound::soundlist::push_back(Sound i) {
+    if (tail != nullptr) {
+        tail->next = new item();
+        tail->next->next = nullptr; tail->next->curr = i; tail->next->prev = tail;
+        tail = tail->next;
+    }
+    else {
+        head = new item();
+        tail = head;
+        head->curr = i; head->next = nullptr; head->prev = nullptr;
+    }
+}
+
+void sound::soundlist::remove(item* i) {
+    if (i == head) head = i->next;
+    if (i == tail) tail = i->prev;
+    if (i->prev != nullptr) i->prev->next = i->next;
+    if (i->next != nullptr) i->next->prev = i->prev;
+    UnloadSound(i->curr);
+    delete i;
+}
+
+void sound::play(std::string file) {
+    sounds.push_back(LoadSound(file.c_str()));
+    PlaySound(sounds.tail->curr);
+}
+
+void sound::updateSound() {
+    if (resetCounter == 60*20) {
+        //unload not currently playing sounds
+        item* it = sounds.head;
+        while(it != nullptr) {
+            if (!IsSoundPlaying(it->curr)) {
+                item* temp = it;
+                it = it->next;
+                sounds.remove(temp);
+            }
+            else {
+                it = it->next;
+            }
+        }
+        resetCounter = 0;
+    }
+    else ++resetCounter;
+
+}
+
+int sound::resetCounter = 0;
+sound::soundlist sound::sounds = sound::soundlist();

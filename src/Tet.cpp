@@ -36,7 +36,6 @@ void Tet::drawTet() {
                     if (tetStage <=2) {
                         tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
-                            if (txtIndex != 3) PlaySound(debuff);
                             tetpowertoggle = false;
                             stop = true;
                             usePower(tetPowers1[txtIndex]);
@@ -45,7 +44,6 @@ void Tet::drawTet() {
                     else {
                         tetText += tetPowers2[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers2[txtIndex].dialogue.length()-1) {
-                            if (txtIndex != 5) PlaySound(debuff);
                             tetpowertoggle = false;
                             stop = true;
                             usePower(tetPowers2[txtIndex]);
@@ -68,7 +66,7 @@ void Tet::drawTet() {
                 else {
                     if (talk == 2) {
                         std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
-                        PlaySound(LoadSound(it->c_str()));
+                        sound().play(*it);
                         tetSounds.erase(it);
                         if (tetSounds.size() == 3) {
                             tetSounds = tetSoundsOriginal;
@@ -165,6 +163,9 @@ int Tet::tetMonologue() {
 
     //loop for Tet's monologue
     while(!WindowShouldClose()) {
+
+        MusicPlayer().updateMusic();                                                    //updating music stream
+
         tetSource = (Rectangle) {facePhase*tdim, 0, tdim, tdim};
         if (!wait && facePhase == 0 && faceCounter == faceCounterChange) {
             facePhase = 1;
@@ -199,9 +200,15 @@ int Tet::tetMonologue() {
                 faceCounter = 0;
                 wait = false;
             }
-            else end = true;
+            else {
+                end = true;
+                if (end != true) MusicPlayer().fade(120);
+            }
         }
-        if (IsKeyPressed(KEY_S)) end = true;
+        if (IsKeyPressed(KEY_S)) {
+            if (end != true) MusicPlayer().fade(120);
+            end = true;
+        }
 
 
         BeginDrawing();
@@ -354,15 +361,18 @@ void Tet::drawTetText(std::string& s) {
 void Tet::checkStage() {
     if (src->getScore() >= 25000 && tetStage < 2) {
         tetStage = 2;
+        UnloadTexture(t);
         t = LoadTexture("resources/tet/mistaTet2.png");
     }
     else if (src->getScore() >= 50000 && tetStage < 3) {
         tetStage = 3;
+        UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/mistaTet3Forward.png");
         else t = LoadTexture("resources/tet/mistaTet3Left.png");
     }
     else if (src->getScore() >= 75000 && tetStage < 4) {
         tetStage = 4;
+        UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/mistaTet4Forward.png");
         else t = LoadTexture("resources/tet/mistaTet4Left.png");
     }
@@ -438,7 +448,7 @@ int Tet::tetCutscene() {
                     if (soundCount == 2) {                  //play sound, wait two letters, play another sound
                         //grabbing sound from our pool
                         std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
-                        PlaySound(LoadSound(it->c_str()));
+                        sound().play(*it);
                         tetSounds.erase(it);
                         if (tetSounds.size() == 3) {        //resetting the pool if it gets too small
                             tetSounds = tetSoundsOriginal;
@@ -547,7 +557,10 @@ int Tet::tetCutscene() {
         EndDrawing();
         if (end) {
             fade+=0.01;
-            if (fade >= 1.5) return 0;
+            if (fade >= 1.5) {
+                UnloadTexture(tetFace);
+                return 0;
+            }
         }
     }
     return -1;

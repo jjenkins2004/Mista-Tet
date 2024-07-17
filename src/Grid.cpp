@@ -285,6 +285,8 @@ void Grid::updateAll() {
     tet->checkStage();
     PowerupItem::cameraRotation = cameraMain.rotation;
     PowerupItem::rotationVel = subtract ? -angVel: angVel;
+    MusicPlayer().updateMusic();
+    sound().updateSound();
 }
 
 void Grid::updateCamera() {
@@ -324,7 +326,7 @@ void Grid::updateCamera() {
         numRotations++;
     }
     else if (shake) {
-        if (maxOffsetRotation == 15) PlaySound(rotationRumble);
+        if (maxOffsetRotation == 15) sound().play("resources/audio/RotationRumble.wav");
         cameraMain.offset.x = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
         cameraMain.offset.y = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
         maxOffsetRotation-=0.1875;
@@ -346,7 +348,7 @@ void Grid::updateCamera() {
         }
     }
     else {
-        if (cameraMain.rotation == 0 || cameraMain.rotation == 90 || cameraMain.rotation == 180 || cameraMain.rotation == 270) PlaySound(rotateSound);
+        if (cameraMain.rotation == 0 || cameraMain.rotation == 90 || cameraMain.rotation == 180 || cameraMain.rotation == 270) sound().play("resources/audio/ScreenTurn.wav");
         if (subtract) {
             cameraMain.rotation-=angVel;
             if (cameraMain.rotation < 0) cameraMain.rotation+=360;
@@ -470,7 +472,7 @@ int Grid::removeRow(std::vector<int>& rows) {
         updateAll();
         //this is removing each square and delaying it a little bit
          if (counter == 1 && !first && it != cells.end()) {
-            PlaySound(LoadSound("resources/audio/rowcompletion.wav"));
+            sound().play("resources/audio/rowcompletion.wav");
             int indx = it-cells.begin();
             tet->look({xpos+gridsize*5, ypos+rows[indx/10]*gridsize-gridsize/2});
             **it = 0;
@@ -582,7 +584,7 @@ int Grid::fixRows(std::vector<int> rows) {
 
             //moving the grid
             for (int i = row; i >= 0; i--) for (int j = 0; j < 10; j++) grid[i+1][j] = grid[i][j];
-            PlaySound(LoadSound("resources/audio/blockdropping.wav"));
+            sound().play("resources/audio/blockdropping.wav");
             distance--; row++; counter = 0;
         }
         else {
@@ -610,7 +612,6 @@ int Grid::lasers() {
     Rectangle laserBodySource = {0, 0, 50, 70};
     Vector2 laserBodyOrigin = {25, 35};
     Texture2D laser = LoadTexture("resources/powerup/Laser.png");
-    Sound s = LoadSound("resources/audio/laserAudio.wav");
     float fade = 0;
     int wait = 0;
 
@@ -629,7 +630,7 @@ int Grid::lasers() {
         nums.erase(it);
     }
     
-    PlaySound(s);
+    sound().play("resources/audio/laserAudio.wav");
     tet->look({xpos+5*gridsize, ypos+15*gridsize});
     while(!WindowShouldClose()) {
         updateAll();
@@ -686,8 +687,6 @@ int Grid::lasers() {
 }
 
 int Grid::bomb() {
-    Sound tick = LoadSound("resources/audio/Ticking.wav");
-    Sound s = LoadSound("resources/audio/explosion.wav");
     Texture2D target = LoadTexture("resources/powerup/target.png");
     Texture2D explosion = LoadTexture("resources/powerup/Explosion.png");
     int counter1 = 0;
@@ -702,7 +701,7 @@ int Grid::bomb() {
     float maxAngle = 1.5;
     float maxOffset = 15;
 
-    PlaySound(tick);
+    sound().play("resources/audio/Ticking.wav");
     while(!WindowShouldClose()) {
         updateAll();
         camera = cameraMain;
@@ -738,7 +737,7 @@ int Grid::bomb() {
                 camera.rotation = cameraMain.rotation + maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             }
             if (counter2 == 20) {
-                PlaySound(s);
+                sound().play("resources/audio/explosion.wav");
             }
             if (counter2 % 20 == 0 && counter2 != 0) {
                 if (counter2 == 80) {
@@ -776,6 +775,8 @@ int Grid::bomb() {
             continue;
         }
         tet->look({-1, 0});
+        UnloadTexture(target);
+        UnloadTexture(explosion);
         return 0;
 
     }
@@ -784,8 +785,6 @@ int Grid::bomb() {
 
 int Grid::nuke() {
     Texture2D explosion = LoadTexture("resources/powerup/NuclearExplosion.png");
-    Sound alarm = LoadSound("resources/audio/alarm.wav");
-    Sound explosionSound = LoadSound("resources/audio/nukeSound.wav");
     int counter1 = 0;
     int counter2 = 0;
     Rectangle source = {0, 0, 150, 120};
@@ -805,7 +804,7 @@ int Grid::nuke() {
         camera = cameraMain;
         if (counter1 < 180) {
             counter1++;
-            if (counter1 == 30) PlaySound(alarm);
+            if (counter1 == 30) sound().play("resources/audio/alarm.wav");
             BeginDrawing();
                 this->drawAll(true, true);
             EndDrawing();
@@ -813,7 +812,7 @@ int Grid::nuke() {
         }
         if (counter2 < 400) {
             if (counter2 == 0) tet->look({xpos+5*gridsize, y});
-            if (counter2 == 60) PlaySound(explosionSound);
+            if (counter2 == 60) sound().play("resources/audio/nukeSound.wav");
             if (counter2 % 20 == 0 && counter2 != 0 && counter2 < 180) {
                 y-=30;
                 tet->look({xpos+5*gridsize, y});
@@ -850,6 +849,7 @@ int Grid::nuke() {
         }
         tet->look({-1, 0});
         scr->addScore(gridCounter*10);
+        UnloadTexture(explosion);
         return 0;
     }
     return -1;
@@ -966,20 +966,20 @@ Grid::Block::Block(int id, int grid[21][10]): id(id), rotation(0) {
 
 bool Grid::Block::moveDown(const int grid[21][10]) {
     if (checkVerticalCollision(grid)) return false;
-    PlaySound(LoadSound("resources/audio/blockmove.wav"));
+    sound().play("resources/audio/blockmove.wav");
     for (int i = 0; i < 4; i++) pos[i].second++;
     return true;
 }
 
 void Grid::Block::moveRight(const int grid[21][10]) {
     if (checkHorizontalCollision(1, grid)) return;
-    PlaySound(LoadSound("resources/audio/blockmove.wav"));
+    sound().play("resources/audio/blockmove.wav");
     for (int i = 0; i < 4; i++) pos[i].first++;
 }
 
 void Grid::Block::moveLeft(const int grid[21][10]) {
     if (checkHorizontalCollision(0, grid)) return;
-    PlaySound(LoadSound("resources/audio/blockmove.wav"));
+    sound().play("resources/audio/blockmove.wav");
     for (int i = 0; i < 4; i++) pos[i].first--;
 }
 
@@ -1008,7 +1008,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second+=2;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1021,7 +1021,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1034,7 +1034,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first-=2;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1048,7 +1048,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first+=2;
             pos[3].second-=2;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
@@ -1063,7 +1063,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1075,7 +1075,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1087,7 +1087,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1099,7 +1099,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
@@ -1113,7 +1113,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1125,7 +1125,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1137,7 +1137,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1149,7 +1149,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
@@ -1163,7 +1163,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1175,7 +1175,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1187,7 +1187,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1199,7 +1199,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
@@ -1214,7 +1214,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1227,7 +1227,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1240,7 +1240,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1253,7 +1253,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
@@ -1267,7 +1267,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1279,7 +1279,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first--;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1291,7 +1291,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second--;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation++;
                 return;
             }
@@ -1303,7 +1303,7 @@ void Grid::Block::rotate(const int grid[21][10]) {
             pos[3].first++;
             pos[3].second++;
             if (checkRotationalCollision(pos, grid)) {
-                PlaySound(LoadSound("resources/audio/blockmove.wav"));
+                sound().play("resources/audio/blockmove.wav");
                 rotation = 0;
                 return;
             }
