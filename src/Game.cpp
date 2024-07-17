@@ -85,7 +85,7 @@ int main() {
 
             // //temp
             // //grid->randomRotate();
-            // score->addScore(89980);
+            score->addScore(89500);
             // powerUp->spawnPowerup(true);
             // start = false; continue;
 

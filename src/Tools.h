@@ -33,8 +33,8 @@ struct MusicPlayer {
         static void pause();
         //resuming after leaving pause menu
         static void resume();
-        //fades out current playing song in this number of frames
-        static void fade(int frames);
+        //fades out current song and plays new song immediately after
+        static void fade(int frames, std::string file = "");
         //updating funciton
         static void updateMusic();
         //updating for pause menu music
@@ -43,6 +43,7 @@ struct MusicPlayer {
         static float vol;               //volume of the music
         static float decrease;          //how much we decrease the volume each frame
         static bool playing;            //are we currently playing a song
+        static std::string nextSong;    //the next song that will be played after fading
         static Music pauseSong;         //seperate variable for pause menu music
         static Music song;              //current music playing
 };

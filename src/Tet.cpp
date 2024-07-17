@@ -142,19 +142,15 @@ void Tet::look(Vector2 coor) {
 int Tet::tetMonologue() {
     //defining variables
     Rectangle tetSource = (Rectangle) {0, 0, tdim, tdim};
-    Rectangle tetDest = (Rectangle) {400, 300, 6*tdim, 6*tdim};
-    Vector2 tetOrigin = (Vector2){6*tdim/2, 6*tdim/2};
+    float scale = 6;
+    Rectangle tetDest = (Rectangle) {400, 350, tdim*scale, tdim*scale};
+    Vector2 tetOrigin = (Vector2){scale*tdim/2, scale*tdim/2};
     float tBoxWidth = 700, tBoxHeight = 125; Color textBoxColor = (Color) {45, 45, 45, 255};
     Rectangle textBox = (Rectangle) {400-tBoxWidth/2, 700-tBoxHeight/2, tBoxWidth, tBoxHeight};
     Color textColor = (Color){30, 0, 0, 255}; SetTextLineSpacing(25);
-    int txtcounter = 0;
-    bool wait = false;
-    bool checkEnd = false;
-    bool end = false;
-    float facePhase = 0;
-    int faceCounter = 0; 
-    int faceCounterChange = GetRandomValue(3, 7);
-    double fade = 0;
+    int txtcounter = 0, txtWait = 2, bobCount = 0, soundCount = 0, talkCount = 0, talkCountMax = GetRandomValue(8, 12);
+    bool wait = false, checkEnd = false, start = true, end = false, waitBob = false;
+    float fade = 0, tetVel = -0.01;
 
     //opening monologue file
     ifstream mono("resources/tet/tetMonologue.txt");
@@ -163,55 +159,152 @@ int Tet::tetMonologue() {
 
     //loop for Tet's monologue
     while(!WindowShouldClose()) {
-
-        MusicPlayer().updateMusic();                                                    //updating music stream
-
-        tetSource = (Rectangle) {facePhase*tdim, 0, tdim, tdim};
-        if (!wait && facePhase == 0 && faceCounter == faceCounterChange) {
-            facePhase = 1;
-            faceCounterChange = GetRandomValue(8, 12);
-            faceCounter = 0;
-        }
-        if (!wait && facePhase == 1 && faceCounter == faceCounterChange) {
-            facePhase = 0;
-            faceCounterChange = GetRandomValue(3, 7);
-            faceCounter = 0;
-        }
         if (!wait) {
-            if (txtcounter == 2) {
+            if (txtcounter == txtWait) {
+                if (txtWait == 15) txtWait = 2;
                 mono.get(ch);
 
-                //& character marks the end of the text
-                if (ch == '&') {
+                //checking characters
+                if (ch == '&') {                            //& character marks the end of the text and end of cutscene
                     checkEnd = true;
                     wait = true;
                 } 
+                else if (ch == '$') {                       //$ marks the end of this section
+                    wait = true;
+                    mono.get(ch);                           //removing the next line character
+                }
                 else txt+=ch;
-                //stopping everytime there are two next lines in a row
-                if (txt.length() > 2 && *(txt.end()-1) == '\n' && *(txt.end()-2) == '\n') wait = true;
+
+                if (ch == '.' || ch == '?' || ch == '!') {  //pausing for end of sentences
+                    txtWait = 15;
+                    soundCount = 0;                         //make sure sound doesn't play when there is punctuation
+                }
+
                 txtcounter = 0;
+
+                //playing tet talking sounds
+                if (!wait && ch != ' ' && txtWait != 15) {  //sound doesn't play when there is a space or if there is punctuation, or if we need to wait
+                    if (soundCount == 2) {                  //play sound, wait two letters, play another sound
+                        //grabbing sound from our pool
+                        std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
+                        sound().play(*it);
+                        tetSounds.erase(it);
+                        if (tetSounds.size() == 3) {        //resetting the pool if it gets too small
+                            tetSounds = tetSoundsOriginal;
+                        }
+                        soundCount = 0;
+                    }
+                    else soundCount++;
+                }          
             }
+            else ++txtcounter;
+
+            //mouth movements
+                if (talkCount == talkCountMax) {
+                    if (tetSource.x == 0) {
+                        tetSource.x+=tdim;
+                        talkCountMax = GetRandomValue(8, 12);
+                    }
+                    else {
+                        tetSource.x-=tdim;
+                        talkCountMax = GetRandomValue(3, 7);
+                    }
+                    talkCount = 0;
+                }
+                else talkCount++;
+                //closing mouth at punctuation or when we are waiting
+                if (txtWait == 15 || wait) {
+                    tetSource.x = 0;
+                }
             
         }
         else if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
             if (!checkEnd) {
                 txt = "";
                 txtcounter = 0;
-                faceCounter = 0;
                 wait = false;
             }
-            else {
-                end = true;
-                if (end != true) MusicPlayer().fade(120);
+            else end = true;
+        }
+        if (IsKeyPressed(KEY_S)) end = true;
+
+        //for tet bobbing up and down constantly
+        double maxBobSpeed = 0.5;                       //defining the maximum speed which tet will accelerate to when bobbing up and down
+        if (waitBob) {                                  //waiting at the top and bottom of the bob
+                if (bobCount == 50) {
+                    bobCount = 0;
+                    waitBob = false;
+                }
+                else {
+                    bobCount++;
+                }
+        }
+        else if (scale == 6) {
+            tetDest.y += tetVel;
+            if (tetDest.y <= 300  && tetVel < 0) {              //decelerating when passing this point
+                tetVel+=maxBobSpeed/50;
+                if (tetVel > -maxBobSpeed/100) {
+                    tetVel = maxBobSpeed/50;
+                    waitBob = true;
+                }
+            }
+            else if (tetDest.y >= 337 && tetVel > 0) {          //decelerating when passing this point
+                tetVel-=maxBobSpeed/50;
+                if (tetVel < maxBobSpeed/100) {
+                    tetDest.y = 350;
+                    tetVel = -maxBobSpeed/50;
+                    waitBob = true;
+                }
+            }
+            else if (tetVel < 0 && tetVel >-maxBobSpeed) {
+                tetVel-=maxBobSpeed/50;
+            }
+            else if (tetVel > 0 && tetVel < maxBobSpeed) {
+                tetVel+=maxBobSpeed/50;
             }
         }
-        if (IsKeyPressed(KEY_S)) {
-            if (end != true) MusicPlayer().fade(120);
-            end = true;
-        }
+
+        //for tet glowing eye animation
+        if (tetStage >= 3) {
+            if (tetVel > 0) {
+                if (tetDest.y < 286.8) {            //look 5
+                    tetSource.x = tdim*4;
+                }
+                else if (tetDest.y < 304.1) {       //look 4
+                    tetSource.x = tdim*3;
+                }
+                else if (tetDest.y < 333.6) {       //look 3
+                    tetSource.x = tdim*2;
+                }
+                else if (tetDest.y < 350) {         //look 2
+                    tetSource.x = tdim;
+                }
+                else {                              //look 1
+                    tetSource.x = 0;
+                }
+            }
+            else {
+                if (tetDest.y >= 350 ) {            //look 1
+                    tetSource.x = 0;
+                }
+                else if (tetDest.y >= 333.6) {      //look 2
+                    tetSource.x = tdim;
+                }
+                else if (tetDest.y >= 304.1) {      //look 3
+                    tetSource.x = tdim*2;
+                }
+                else if (tetDest.y >= 286.769) {    //look 4
+                    tetSource.x = tdim*3;
+                }
+                else {                              //look 5
+                    tetSource.x = tdim*4;
+                }
+            }
+        }   
 
 
         BeginDrawing();
+            MusicPlayer().updateMusic();
             ClearBackground(BLACK);
             DrawTexturePro(t, tetSource, tetDest, tetOrigin, 0, WHITE);
             DrawRectangleRounded(textBox, 0.2, 500, textBoxColor);
@@ -220,11 +313,11 @@ int Tet::tetMonologue() {
             DrawTextEx(tetFont, "S to skip, CLICK to proceed", (Vector2){800-MeasureTextEx(tetFont, "S to skip, CLICK to proceed", 15, 0).x-5, 800-18}, 15, 0, WHITE);
             DrawRectangle(0, 0, 800, 800, Fade(BLACK, fade));
         EndDrawing();
-        ++txtcounter;
-        ++faceCounter;
         if (end) {
             fade+=0.01;
-            if (fade >= 1.5) return 0;
+            if (fade >= 1.5) {
+                return 0;
+            }
         }
     }
     return -1;
@@ -363,18 +456,21 @@ void Tet::checkStage() {
         tetStage = 2;
         UnloadTexture(t);
         t = LoadTexture("resources/tet/mistaTet2.png");
+        MusicPlayer().fade(300, "resources/music/tetStage2Music.wav");
     }
     else if (src->getScore() >= 50000 && tetStage < 3) {
         tetStage = 3;
         UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/mistaTet3Forward.png");
         else t = LoadTexture("resources/tet/mistaTet3Left.png");
+        MusicPlayer().fade(300, "resources/music/tetStage3Music.wav");
     }
     else if (src->getScore() >= 75000 && tetStage < 4) {
         tetStage = 4;
         UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/mistaTet4Forward.png");
         else t = LoadTexture("resources/tet/mistaTet4Left.png");
+        MusicPlayer().fade(300, "resources/music/tetStage4Music.wav");
     }
 
     //handled in game.cpp
@@ -433,14 +529,16 @@ int Tet::tetCutscene() {
                     checkEnd = true;
                     wait = true;
                 } 
+                else if (ch == '$') {                       //$ marks the end of this section
+                    wait = true;
+                    mono.get(ch);                           //removing the next line character
+                }
                 else txt+=ch;
                 if (ch == '.' || ch == '?' || ch == '!') {  //pausing for end of sentences
                     txtWait = 15;
                     soundCount = 0;                         //make sure sound doesn't play when there is punctuation
                 }
-                //stopping everytime there are two next lines in a row
-                if (txt.length() > 2 && *(txt.end()-1) == '\n' && *(txt.end()-2) == '\n') wait = true;
-
+                
                 txtcounter = 0;
 
                 //playing tet talking sounds

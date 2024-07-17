@@ -125,8 +125,9 @@ void MusicPlayer::resume() {
     UnloadMusicStream(pauseSong);
 }
 
-void MusicPlayer::fade(int frames) {
+void MusicPlayer::fade(int frames, std::string file) {
     decrease = 1.f/frames;
+    nextSong = file;
 }
 
 void MusicPlayer::updateMusic() {
@@ -145,7 +146,11 @@ void MusicPlayer::updateMusic() {
             StopMusicStream(song);
             vol = 1;
             decrease = 0;
-            playing = false;
+            if (nextSong != "") {
+                play(nextSong);
+                nextSong = "";
+            }
+            else playing = false;
         }
     }
 }
@@ -159,6 +164,7 @@ void MusicPlayer::updatePauseMusic() {
 
 Music MusicPlayer::song;
 Music MusicPlayer::pauseSong;
+std::string MusicPlayer::nextSong = "";
 float MusicPlayer::vol = 1;
 float MusicPlayer::decrease = 0;
 bool MusicPlayer::playing = false;
