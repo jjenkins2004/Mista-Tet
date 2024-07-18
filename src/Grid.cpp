@@ -280,6 +280,7 @@ void Grid::updateAll() {
     updateCamera();
     scr->updateMultiplier();
     pow->updateRotation(cameraMain.rotation, angVel, subtract);
+    tet->updateCamRotate(cameraMain.rotation);
     scr->updateLevel(level);
     pow->updateLevel(level);
     tet->checkStage();
@@ -357,6 +358,14 @@ void Grid::updateCamera() {
         if (angVel < 1) angVel+=angAcc;
         else angVel = 1;
     }
+}
+
+void Grid::resetRotation() {
+    cameraMain.rotation = 0;
+    subtract = false;
+    shake = false;
+    angVel = 0;
+    rotations.clear();
 }
 
 void Grid::updatelevel() {
@@ -877,7 +886,11 @@ void Grid::blind(int num) {
 }
 
 void Grid::randomRotate() {
-    rotations.push_back(std::make_tuple(GetRandomValue(1, 3), GetRandomValue(20*60, 40*60), true));
+    rotations.push_back(std::make_tuple(GetRandomValue(3, 3), GetRandomValue(20*60, 40*60), true));
+}
+
+void Grid::extremeRandomRotate() {
+    rotations.push_back(std::make_tuple(GetRandomValue(1, 1), GetRandomValue(20*60, 40*60), true));
 }
 
 

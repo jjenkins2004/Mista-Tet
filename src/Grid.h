@@ -34,6 +34,7 @@ class Grid {
         void drawGrid(bool block);                              //draws the grid and bool tells grid if block should also be drawn
         void updateAll();                                       //convinient function that calls all updating functions
         void updateCamera();                                    //called everyframe to update the camera
+        void resetRotation();                                   //remove all rotation powers and reset rotation
         void updatelevel();                                     //updating function for level and level related powers
         int getLevel() { return level; }                        //get current level  
         bool checkGameOver() { return gameover; }               //check if player lost
@@ -64,6 +65,7 @@ class Grid {
         //--------------------------------------------------------------------------
         
         void randomRotate();                                //get a random tet rotate power, randomizes active length and number of 90 degree rotations
+        void extremeRandomRotate();                         //extreme version of random rotate, called at the beginning of final stage
         void increaseLevel(int x);                          //increase level by x 30 seconds (tet power)
         void blind(int num);                                //blind random rows on board, parameter is number of rows (tet power)
         int lasers();                                       //shoots three lasers from sky, adds score and multiplier based on how many blocks were destroyed (player power)

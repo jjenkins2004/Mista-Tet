@@ -19,6 +19,9 @@ class Tet {
 
         //set level
         void updateLevel(int l) { level = l;}
+        
+        //set camera rotation
+        void updateCamRotate(float r) {camRotation = r;}
 
         //draw mista tet
         void drawTet();
@@ -48,8 +51,9 @@ class Tet {
     int txtIndex;                                           //which index are we using right now
     std::vector<int> vals;                                  //which dialougues tet can say (to make sure two dont repeat back to back)
     int timebetweenText = GetRandomValue(1*60, 3*60);       //how long before each time tet talks
-    int time = 0; int waitTime; bool wait;
+    int time = 0; int waitTime; bool wait = false;
     bool stop;
+    bool finalStage = false, hugeFlip = false;
 
 
     //possible tet text that has no effect
@@ -93,13 +97,22 @@ class Tet {
     tetPower flip = {"FLIP THE SCREEN!", "turn"};                                                               //turns the screen 90, 180, or 270 degrees
     tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};                                 //replaces next three blocks with z blocks
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};                                 //replaces next three blocks with s blocks
+    tetPower babies1 = {"PUNCH the baby, you\nevil degenerate!", "babies1"};
+    tetPower babies2 = {"PUNCH the babies, you\nevil degenerate!", "babies2"};
+    tetPower babies3 = {"PUNCH the babies, you\nevil degenerate!", "babies3"};
+    tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
 
     bool tetpowertoggle = false;                                                                                //to determine if next dialogue should be a tetPower
 
+    //for the babie head powerup
+    std::tuple<int, int, int, Texture2D> babies = std::make_tuple(0, 0, 0, LoadTexture(""));    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
+    std::vector<Vector2> positions;                                                             //positions of our baby heads
+
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
-    std::string currPower = "null";                                                                                                     //current chosen power
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock};                  //stage 1 powers, starts at beginning
-    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock};        //stage 2 powers, when score is greater than 50,000
+    std::string currPower = "null";                                                                                                                 //current chosen power
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1};                     //stage 1 powers, starts at beginning
+    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2};           //stage 2 powers, when score is greater than 50,000
+    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3};
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head
@@ -127,7 +140,9 @@ class Tet {
                             "resources/audio/tetTalk7.wav"};
     int talk = 2;                                                                                       //wait counter for tet talking sound
     void drawTetText(std::string& s);                                                                   //function that puts tet's dialogue on correct position
+    void tetFinalStage();                                                                               //brings tet into final stage, called after cutscene
 
+    float camRotation = 0;                                          //current camera rotation
     Score* src;                                                     //score object pointer
     Font tetFont = LoadFont("resources/allFont.ttf");               //font used for text
     int level;                                                      //current level

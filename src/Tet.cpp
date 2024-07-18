@@ -28,12 +28,20 @@ void Tet::drawTet() {
         SetTextLineSpacing(20);
         drawTetText(tetText);
     }
-    else if (time == timebetweenText) { //checks if we should make tet say something
+    else if (time >= timebetweenText) { //checks if we should make tet say something
         if (txtCounter == txtCounterWait) {
             spaceWait = false;
             if (!stop) {
                 if (tetpowertoggle) {
-                    if (tetStage <=2) {
+                    if (finalStage) {
+                        tetText+= finalPowers[txtIndex].dialogue.substr(txtTracker, 1);
+                        if (txtTracker == finalPowers[txtIndex].dialogue.length()-1) {
+                            tetpowertoggle = false;
+                            stop = true;
+                            usePower(finalPowers[txtIndex]);
+                        }
+                    }
+                    else if (tetStage <=2) {
                         tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
                             tetpowertoggle = false;
@@ -95,22 +103,66 @@ void Tet::drawTet() {
         tetTalk(spaceWait);
     }
     else {
-        time++;
+        ++time;
+        //std::cout << "time: " << time << std::endl;
         if (time == timebetweenText) {
             stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 4;
+            int num = 10;
             if (tetStage >= 3) num = 7;                             //later stages of the game make tet powers happen more often
+            if (finalStage) num = 10;
             if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (tetStage <=2) txtIndex = GetRandomValue(0, 5);  //choosing power from our early stage bag
+                if (finalStage) {
+                    if (hugeFlip) {
+                        //initial final stage flurry of powers
+                        txtIndex = 0;
+                        hugeFlip = false;
+                    }
+                    else {
+                        //normal final stage tet powers
+                        txtIndex = GetRandomValue(2, 2);
+                    }
+                }
+                else if (tetStage <=2) txtIndex = /*GetRandomValue(0, 5)*/6;  //choosing power from our early stage bag
                 else txtIndex = GetRandomValue(0, 6);               //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
                 txtIndex = *it;
                 vals.erase(it);
+            }
+        }
+    }
+
+    //for babies
+    if (get<0>(babies) != 0) {
+        if (positions.empty()) {                                                                                    //getting random coordinates for the heads initially
+            for (int i = 0; i < get<0>(babies); i++) {
+                positions.push_back(Vector2{float(GetRandomValue(20, 780)), float(GetRandomValue(20, 780))});
+            }
+        }
+        for (std::vector<Vector2>::iterator it = positions.begin(); it != positions.end(); it++) {                  //drawing each baby head and checking if player clicked it
+            DrawTexturePro(get<3>(babies), {0, 0, 50, 50}, {it->x, it->y, 100, 100}, {50, 50}, 0, WHITE);
+            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                std::cout << getAdjustedCoordinates(GetMousePosition(), camRotation).x << " " << getAdjustedCoordinates(GetMousePosition(), camRotation).y << std::endl;
+                std::cout << it->x << " " << it->y << std::endl;
+            }
+            if (CheckCollisionPointCircle(getAdjustedCoordinates(GetMousePosition(), camRotation), *it, 15) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {       //checking if player hit the baby
+                positions.erase(it);
+            }
+        }
+        if (positions.empty()) {                                                                                    //player has clicked all the heads, reward them
+            src->addScore(300);
+            UnloadTexture(get<3>(babies));
+            babies = make_tuple(0, 0, 0, LoadTexture(""));                                                                           //shows to not draw babies
+        }
+        else {
+            if (--get<2>(babies) == 0) {
+                src->addScore(get<1>(babies)*-1);
+                UnloadTexture(get<3>(babies));
+                babies = make_tuple(0, 0, 0, LoadTexture(""));
             }
         }
     }
@@ -327,6 +379,9 @@ void Tet::usePower(tetPower p) {
     if (p.power == "less") src->addMultiplier(0.7);
     else if (p.power == "half") src->addMultiplier(0.5);
     else if (p.power == "negative") src->addMultiplier(-1);
+    else if (p.power == "babies1") babies = std::make_tuple(1, 200, 180, LoadTexture("resources/tet/babyHead.png"));
+    else if (p.power == "babies2") babies = std::make_tuple(2, 300, 180, LoadTexture("resources/tet/babyHead.png"));
+    else if (p.power == "babies3") babies = std::make_tuple(3, 400, 180, LoadTexture("resources/tet/babyHeadFinal.png"));
     else currPower = p.power;
 }
 
@@ -662,10 +717,22 @@ int Tet::tetCutscene() {
             if (fade == 0) MusicPlayer().fade(140);
             fade+=0.01;
             if (fade >= 1.5) {
-                UnloadTexture(tetFace);
+                tetFinalStage();                //bring tet into final stage
                 return 0;
             }
         }
     }
     return -1;
+}
+
+void Tet::tetFinalStage() {
+    tetText = "";
+    txtTracker = 0;
+    time = 0;
+    wait = false;
+    txtCounter = 0;
+    talk = 0;
+    finalStage = true;
+    hugeFlip = true;
+    timebetweenText = 120;
 }

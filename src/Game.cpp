@@ -84,10 +84,10 @@ int main() {
             downcounter = 0;
 
             // //temp
-            // //grid->randomRotate();
-            score->addScore(89500);
+            //grid->randomRotate();
+            //score->addScore(89990);
             // powerUp->spawnPowerup(true);
-            // start = false; continue;
+            start = false; continue;
 
             //bringing up our start menu
             if (menu() == -1) break;
@@ -183,6 +183,10 @@ int main() {
         else if (power == "zblock") grid->changeNext(5);
         else if (power == "sblock") grid->changeNext(7);
         else if (power == "turn") grid->randomRotate();
+        else if (power == "flurry") {
+            grid->extremeRandomRotate();
+            score->addMultiplier(-1);
+        }
 
         //ask powerup class if there are any fast speedchange
         //need a seperate function because we don't want to store this powerup for later use and the powerup affects
