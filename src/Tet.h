@@ -3,8 +3,8 @@
 
 #define tdim 70
 
-#include "Score.h"
-#include "Tools.h"
+#include "score.h"
+#include "tools.h"
 
 
 //--------------------------------------------------------------------------
@@ -107,8 +107,8 @@ class Tet {
     //for the babie head powerup
     std::tuple<int, int, int> babies = std::make_tuple(0, 0, 0);                    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
     std::vector<Vector2> positions;                                                 //positions of our baby heads
-    Texture2D babyHead = LoadTexture("resources/tet/babyHead.png");                 //normal baby head
-    Texture2D redBabyHead = LoadTexture("resources/tet/babyHeadFinal.png");         //final stage baby head
+    Texture2D babyHead = LoadTexture("resources/tet/baby_head.png");                //normal baby head
+    Texture2D redBabyHead = LoadTexture("resources/tet/baby_head_final.png");       //final stage baby head
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                 //current chosen power
@@ -125,28 +125,28 @@ class Tet {
     bool spaceWait = false;                                                             //make sure tet's mouth is closed when there is a period.
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};                                  //source rectangle for mista tet structure
     Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                        //destination rectabgle for mista tet texture
-    Texture2D t = LoadTexture("resources/tet/mistaTet1.png");                           //mista tet texture
+    Texture2D t = LoadTexture("resources/tet/tet_1.png");                               //mista tet texture
     float rotation = 0;                                                                 //current rotation of Tet's face
     int tetStage = 1;                                                                   //current stage out of 4, each stage has a different texture
 
     //resources for tet talking
     std::vector<std::string> tetSounds =                                                                //current pool of sounds we can use when tet is talking
-                            {"resources/audio/tetTalk1.wav", "resources/audio/tetTalk2.wav", 
-                            "resources/audio/tetTalk3.wav", "resources/audio/tetTalk4.wav", 
-                            "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", 
-                            "resources/audio/tetTalk7.wav"};
+                            {"resources/audio/tet_talk_1.mp3", "resources/audio/tet_talk_2.mp3", 
+                            "resources/audio/tet_talk_3.mp3", "resources/audio/tet_talk_4.mp3", 
+                            "resources/audio/tet_talk_5.mp3", "resources/audio/tet_talk_6.mp3", 
+                            "resources/audio/tet_talk_7.mp3"};
     std::vector<std::string> tetSoundsOriginal =                                                        //original pool of sounds for refrence when we want to reset the pool
-                            {"resources/audio/tetTalk1.wav", "resources/audio/tetTalk2.wav", 
-                            "resources/audio/tetTalk3.wav", "resources/audio/tetTalk4.wav", 
-                            "resources/audio/tetTalk5.wav", "resources/audio/tetTalk6.wav", 
-                            "resources/audio/tetTalk7.wav"};
+                            {"resources/audio/tet_talk_1.mp3", "resources/audio/tet_talk_2.mp3", 
+                            "resources/audio/tet_talk_3.mp3", "resources/audio/tet_talk_4.mp3", 
+                            "resources/audio/tet_talk_5.mp3", "resources/audio/tet_talk_6.mp3", 
+                            "resources/audio/tet_talk_7.mp3"};
     int talk = 2;                                                                                       //wait counter for tet talking sound
     void drawTetText(std::string& s);                                                                   //function that puts tet's dialogue on correct position
     void tetFinalStage();                                                                               //brings tet into final stage, called after cutscene
 
     float camRotation = 0;                                          //current camera rotation
     Score* src;                                                     //score object pointer
-    Font tetFont = LoadFont("resources/allFont.ttf");               //font used for text
+    Font tetFont = LoadFont("resources/all_font.ttf");              //font used for text
     int level;                                                      //current level
 
 };

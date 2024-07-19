@@ -1,4 +1,4 @@
-#include "Tet.h"
+#include "tet.h"
 #include <iostream>
 #include <fstream>
 
@@ -172,8 +172,8 @@ void Tet::look(Vector2 coor) {
     if (coor.x < 0) {                                                   //reset rotation back to zero and make tet look forward
         rotation = 0;
         if (tetStage == 1 || tetStage == 2) source.x = tdim*facePhase;
-        else if (tetStage == 3) t = LoadTexture("resources/tet/mistaTet3Forward.png");
-        else if (tetStage == 4) t = LoadTexture("resources/tet/mistaTet4Forward.png");
+        else if (tetStage == 3) t = LoadTexture("resources/tet/tet_3_forward.png");
+        else if (tetStage == 4) t = LoadTexture("resources/tet/tet_4_forward.png");
         return;
     }
     if (abs(dest.x-coor.x) < 0.001) {                                   //just in case somehow line is vertical, but this should never occur
@@ -186,8 +186,8 @@ void Tet::look(Vector2 coor) {
 
     //changing texture to side profile
     if ((tetStage == 1 || tetStage == 2) && source.x < tdim*2) source.x+=tdim*2;
-    else if (tetStage == 3) t = LoadTexture("resources/tet/mistaTet3Left.png");
-    else if (tetStage == 4) t = LoadTexture("resources/tet/mistaTet4Left.png");
+    else if (tetStage == 3) t = LoadTexture("resources/tet/tet_3_left.png");
+    else if (tetStage == 4) t = LoadTexture("resources/tet/tet_4_left.png");
 
 }
 
@@ -519,22 +519,22 @@ void Tet::checkStage() {
     if (src->getScore() >= 25000 && tetStage < 2) {
         tetStage = 2;
         UnloadTexture(t);
-        t = LoadTexture("resources/tet/mistaTet2.png");
-        MusicPlayer().fade(300, "resources/music/tetStage2Music.wav");
+        t = LoadTexture("resources/tet/tet_2.png");
+        MusicPlayer().fade(300, "resources/music/tet_stage_2.mp3");
     }
     else if (src->getScore() >= 50000 && tetStage < 3) {
         tetStage = 3;
         UnloadTexture(t);
-        if (rotation == 0) t = LoadTexture("resources/tet/mistaTet3Forward.png");
-        else t = LoadTexture("resources/tet/mistaTet3Left.png");
-        MusicPlayer().fade(300, "resources/music/tetStage3Music.wav");
+        if (rotation == 0) t = LoadTexture("resources/tet/tet_3_forward.png");
+        else t = LoadTexture("resources/tet/tet_3_left.png");
+        MusicPlayer().fade(300, "resources/music/tet_stage_3.mp3");
     }
     else if (src->getScore() >= 75000 && tetStage < 4) {
         tetStage = 4;
         UnloadTexture(t);
-        if (rotation == 0) t = LoadTexture("resources/tet/mistaTet4Forward.png");
-        else t = LoadTexture("resources/tet/mistaTet4Left.png");
-        MusicPlayer().fade(300, "resources/music/tetStage4Music.wav");
+        if (rotation == 0) t = LoadTexture("resources/tet/tet_4_forward.png");
+        else t = LoadTexture("resources/tet/tet_4_left.png");
+        MusicPlayer().fade(300, "resources/music/tet_stage_4.mp3");
     }
 
     //handled in game.cpp
@@ -549,7 +549,7 @@ void Tet::checkStage() {
 
 int Tet::tetCutscene() {
     //defining variables
-    Texture2D tetFace = LoadTexture("resources/tet/mistaTet4Forward.png");
+    Texture2D tetFace = LoadTexture("resources/tet/tet_4_forward.png");
     Rectangle tetSource = (Rectangle) {0, 0, tdim, tdim};
     float scale = 0.01;
     Rectangle tetDest = (Rectangle) {400, 350, tdim*scale, tdim*scale};
@@ -567,7 +567,7 @@ int Tet::tetCutscene() {
     char ch;
 
     //playing music
-    MusicPlayer().play("resources/music/TetTheme.wav");
+    MusicPlayer().play("resources/music/tet_theme.mp3");
 
     //loop for Tet's monologue
     while(!WindowShouldClose()) {

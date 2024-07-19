@@ -1,4 +1,4 @@
-#include "Score.h"
+#include "score.h"
 #include "string"
 
 Score::Score(): score(0) {}

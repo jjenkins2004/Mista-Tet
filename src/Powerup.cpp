@@ -1,4 +1,4 @@
-#include "Powerup.h"
+#include "powerup.h"
 #include <iomanip>
 
 /*********************************************************************************************
@@ -207,7 +207,7 @@ void PowerupItem::moveItem() {
 void PowerupItem::spaz() {
     //checks if it is our first time calling spaz
     if (!spazzed) {
-        sound().play("resources/audio/powerupCollection.wav");
+        sound().play("resources/audio/powerup_collection.mp3");
         spazzed = true;
         time = 45;
         vel.x = 1;
@@ -285,33 +285,33 @@ void Mystery::collect() {
         int rand = GetRandomValue(1, 21);
 
         //setting our mystery powerupitem
-        if (rand == 1) mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/x2Multiplier.png"));
-        if (rand == 2) mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/x1,5Multiplier.png"));
-        if (rand == 3) mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/x1,2Multiplier.png"));
-        if (rand == 4) mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/x0,7Multiplier.png"));
-        if (rand == 5) mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/-Multiplier.png"));
-        if (rand == 6) mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/Iblock.png"), 1);
-        if (rand == 7) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Jblock.png"), 2);
-        if (rand == 8) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Lblock.png"), 3);
-        if (rand == 9) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Oblock.png"), 4);
-        if (rand == 10) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/Tblock.png"), 6);
-        if (rand == 11) mystery = new Laser(1000, LoadTexture("resources/powerup/Lasers.png"));
-        if (rand == 12) mystery = new Bomb(1000, LoadTexture("resources/powerup/Bomb.png"));
-        if (rand == 13) mystery = new Nuke(800, LoadTexture("resources/powerup/Nuke.png"));
-        if (rand == 14) mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/+0,1Multiplier.png"));
-        if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/+0,2Multiplier.png"));
-        if (rand == 16) mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5Random.png"));
-        if (rand == 17) mystery = new SpeedChange(0, 800, LoadTexture("resources/powerup/Pause.png"));
-        if (rand == 18) mystery = new SpeedChange(1, 800, LoadTexture("resources/powerup/Fast1.png"));
-        if (rand == 19) mystery = new SpeedChange(2, 800, LoadTexture("resources/powerup/Fast2.png"));
-        if (rand == 20) mystery = new SpeedChange(-1, 800, LoadTexture("resources/powerup/Slow1.png"));
-        if (rand == 21) mystery = new SpeedChange(-2, 800, LoadTexture("resources/powerup/Slow2.png"));
+        if (rand == 1) mystery = new Multiplier(2, 800, LoadTexture("resources/powerup/2_multiplier.png"));
+        if (rand == 2) mystery = new Multiplier(1.5, 800, LoadTexture("resources/powerup/1_5_multiplier.png"));
+        if (rand == 3) mystery = new Multiplier(1.2, 800, LoadTexture("resources/powerup/1_2_multiplier.png"));
+        if (rand == 4) mystery = new Multiplier(0.7, 800, LoadTexture("resources/powerup/0_7_multiplier.png"));
+        if (rand == 5) mystery = new Multiplier(-1, 800, LoadTexture("resources/powerup/negative_multiplier.png"));
+        if (rand == 6) mystery = new ThreeBlock(1000, LoadTexture("resources/powerup/I_block.png"), 1);
+        if (rand == 7) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/J_block.png"), 2);
+        if (rand == 8) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/L_block.png"), 3);
+        if (rand == 9) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/O_block.png"), 4);
+        if (rand == 10) mystery = new ThreeBlock(1200, LoadTexture("resources/powerup/T_block.png"), 6);
+        if (rand == 11) mystery = new Laser(1000, LoadTexture("resources/powerup/lasers.png"));
+        if (rand == 12) mystery = new Bomb(1000, LoadTexture("resources/powerup/bomb.png"));
+        if (rand == 13) mystery = new Nuke(800, LoadTexture("resources/powerup/nuke.png"));
+        if (rand == 14) mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/0_1_multiplier.png"));
+        if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/0_5_multiplier.png"));
+        if (rand == 16) mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5_random.png"));
+        if (rand == 17) mystery = new SpeedChange(0, 800, LoadTexture("resources/powerup/pause.png"));
+        if (rand == 18) mystery = new SpeedChange(1, 800, LoadTexture("resources/powerup/fast_1.png"));
+        if (rand == 19) mystery = new SpeedChange(2, 800, LoadTexture("resources/powerup/fast_2.png"));
+        if (rand == 20) mystery = new SpeedChange(-1, 800, LoadTexture("resources/powerup/slow_1.png"));
+        if (rand == 21) mystery = new SpeedChange(-2, 800, LoadTexture("resources/powerup/slow_2.png"));
 
         fade = 1;
         mystery->removed = true;
         mystery->fade = 0;
         mystery->pos = pos;
-        sound().play("resources/audio/MysteryReveal.wav");
+        sound().play("resources/audio/mystery_reveal.mp3");
     }
 
     //reduces opacity of the mystery powerup texture and increases opacity of new powerup texture
@@ -456,7 +456,7 @@ void Powerup::drawPowerup() {
         }
         else {
             if (it->curr->wait) {                                   //fade in of item
-                if (it->curr->fade == 0) sound().play("resources/audio/PowerupAppear.wav");
+                if (it->curr->fade == 0) sound().play("resources/audio/powerup_appear.mp3");
                 it->curr->DrawItem(true);
                 it->curr->fade+=0.02;
                 if (it->curr->fade >= 1) it->curr->wait = false;

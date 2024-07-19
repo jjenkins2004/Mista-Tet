@@ -7,14 +7,14 @@
 //--------------------------------------------------------------------------
 
 #include "raylib.h"
-#include "Tools.h"
+#include "tools.h"
 #include <vector>
 #include <ctime>
 #include <queue>
 #include <iostream>
-#include "Score.h"
-#include "Tet.h"
-#include "Powerup.h"
+#include "score.h"
+#include "tet.h"
+#include "powerup.h"
 
 
 
@@ -145,7 +145,7 @@ class Grid {
         float maxOffsetRotation = 15;                                   //max offset of x and y for screen shake
 
         //resources
-        Texture2D fog = LoadTexture("resources/tet/fog.png");                   //for blind power
+        Texture2D fog = LoadTexture("resources/tet/fog.png");           //for blind power
 
         //--------------------------------------------------------------------------
         // General Grid class variables
@@ -180,7 +180,7 @@ class Grid {
         Camera2D cameraMain = { 0 };                    //camera will mainly used for tet rotation power
 
         //font for the game
-        Font allFont = LoadFont("resources/allFont.ttf");
+        Font allFont = LoadFont("resources/all_font.ttf");
         
         //our grid of placed blocks
         int grid[21][10];

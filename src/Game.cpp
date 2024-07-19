@@ -3,8 +3,8 @@
 //--------------------------------------------------------------------------
 
 #include "raylib.h"
-#include "Grid.h"
-#include "Tools.h"
+#include "grid.h"
+#include "tools.h"
 #include <cmath>
 
 #define screenWidth 800
@@ -41,7 +41,7 @@ int main() {
     int spawnpower = -1;         //how often we should spawn powerup
 
     //other
-    Font titleFont = LoadFont("resources/titleFont.ttf");   //title font
+    Font titleFont = LoadFont("resources/title_font.ttf");  //title font
     std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
     int level = 0;                                          //the current level, determines how fast the blocks fall
     bool scenePlayed = false;                               //has tet cutscene already played?
@@ -112,7 +112,7 @@ int main() {
                 }
             }
             if (quit) break;                                                //check if game should quit
-            MusicPlayer().play("resources/music/tetStage1Music.wav");       //playing stage 1 music
+            MusicPlayer().play("resources/music/tet_stage_1.mp3");          //playing stage 1 music
 
         }
 
@@ -131,7 +131,7 @@ int main() {
         if (!scenePlayed && score->getScore() >= 90000) {
             if (tet->tetCutscene() == -1) break;
             scenePlayed = true;
-            MusicPlayer().play("resources/music/finalBattleMusic.wav");
+            MusicPlayer().play("resources/music/final_battle_music.mp3");
         }
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
@@ -263,7 +263,7 @@ int main() {
 
         //space bar to drop block
         else if (IsKeyPressed(KEY_SPACE)) {
-            sound().play("resources/audio/blockdropping.wav");
+            sound().play("resources/audio/block_dropping.mp3");
             score->addScore(grid->drop()*2);
             checkRows = true;
         }
@@ -362,7 +362,7 @@ int main() {
 //----------------------------------------------------------------------------------
 
 int menu() {
-    Font titleFont = LoadFont("resources/titleFont.ttf");                       //loading font
+    Font titleFont = LoadFont("resources/title_font.ttf");                      //loading font
     Rectangle playbutton {275, 400, 240, 100};                                  //start menu play button
     const std::vector<Color> colors = {SKYBLUE, DARKBLUE, ORANGE, 
                                         YELLOW, LIME, PURPLE, RED};             //colors for background cubes
@@ -373,7 +373,7 @@ int menu() {
     bool fade = false;                                                          //bool to fade into Tet Monologue when play button is pressed
     double fadeTracker = 0;                                                     //for fade of screen
 
-    MusicPlayer().play("resources/music/tetTheme.wav");                         //playing tet theme song
+    MusicPlayer().play("resources/music/tet_theme.mp3");                        //playing tet theme song
 
 
     while (!WindowShouldClose()) {
@@ -428,8 +428,8 @@ int menu() {
 
 
 int pause() {
-    Texture2D tetHead = LoadTexture("resources/tet/mistaTet4Forward.png");                  //tet's head in pause menu
-    Font allFont = LoadFont("resources/allFont.ttf");                                       //loading font
+    Texture2D tetHead = LoadTexture("resources/tet/tet_4_forward.png");                     //tet's head in pause menu
+    Font allFont = LoadFont("resources/all_font.ttf");                                      //loading font
     Rectangle src = (Rectangle){0, 0, 70, 70}, dest = (Rectangle) {400, 275, 70*6, 70*6};   //source and dest rectangle of tet head texture
     int bobCounter = 0, bobSpeed = 10, yvel = -1, startWait = 60, counter = 0, add = 1;     //variables for bobbing of the tet head
                                                                                             //much better implementation using velocity was done in the tet class but I'm too lazy to change this
@@ -501,7 +501,7 @@ int pause() {
 
 int usePower(PowerupItem* p, Score* scr, Grid* grid) {
     if (p->id == "multiplier") {                                    //multiplier powerup
-        sound().play("resources/audio/usepowerup.wav");
+        sound().play("resources/audio/use_powerup.mp3");
         Multiplier* m = dynamic_cast<Multiplier*>(p);
         scr->addMultiplier(m->multiplier);
         delete m;
@@ -519,13 +519,13 @@ int usePower(PowerupItem* p, Score* scr, Grid* grid) {
         return grid->nuke();
     }
     else if (p->id == "threeblock") {                               //change next three blocks power
-        sound().play("resources/audio/usepowerup.wav");
+        sound().play("resources/audio/use_powerup.mp3");
         ThreeBlock* t = dynamic_cast<ThreeBlock*>(p);
         grid->changeNext(t->blockID);
         delete t;
     }   
     else if (p->id == "plusmultiplier") {                           //permanent multiplier power
-        sound().play("resources/audio/usepowerup.wav");
+        sound().play("resources/audio/use_powerup.mp3");
         PlusMultiplier* m = dynamic_cast<PlusMultiplier*>(p);
         scr->addPermanentMultiplier(m->multiplier);
     }

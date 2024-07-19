@@ -1,4 +1,4 @@
-#include "Tools.h"
+#include "tools.h"
 
 //--------------------------------------------------------------------------
 // random block bag
@@ -38,10 +38,10 @@ bool checkCollisionLineCircle(Vector2 point1, Vector2 point2, Vector2 center, fl
     v2 c = {center.x, center.y};
 
     //finding unit perpendicular vector
-    if (p1.y-p2.y < 0.01 && p1.y-p2.y > -0.01) {            //check in case slope is 0
+    if (p1.y-p2.y < 0.01 && p1.y-p2.y > -0.01) {                    //check in case slope is 0
         perpVec = {0, 1};
     }
-    else perpVec = {1, -(p1.x-p2.x)/(p1.y-p2.y)};           //the perpendicular vector of the line
+    else perpVec = {1, -(p1.x-p2.x)/(p1.y-p2.y)};                   //the perpendicular vector of the line
     
     float scale = 1/sqrt(pow(perpVec.x, 2) + pow(perpVec.y, 2));    //coverting perpVector into unit vector
     perpVec.x*=scale;
@@ -116,7 +116,7 @@ void MusicPlayer::play(std::string file) {
 }
 
 void MusicPlayer::pause() {
-    pauseSong = LoadMusicStream("resources/music/TetTheme.wav");
+    pauseSong = LoadMusicStream("resources/music/tet_theme.wav");
     PlayMusicStream(pauseSong);
 }
 

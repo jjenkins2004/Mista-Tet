@@ -6,11 +6,11 @@
 #define POWERUP_H
 
 #include "raylib.h"
-#include "Score.h"
+#include "score.h"
 #include <vector>
 #include <string>
 #include <iostream>
-#include "Tools.h"
+#include "tools.h"
 
 #define RECWIDTH 240
 #define RECHEIGHT 70
@@ -163,31 +163,31 @@ class Powerup {
     private:
 
         //font
-        Font allFont = LoadFont("resources/allFont.ttf");
+        Font allFont = LoadFont("resources/all_font.ttf");
 
         //textures
-        Texture2D x2 = LoadTexture("resources/powerup/x2Multiplier.png");
-        Texture2D x1_5 = LoadTexture("resources/powerup/x1,5Multiplier.png");
-        Texture2D x1_2 = LoadTexture("resources/powerup/x1,2Multiplier.png");
-        Texture2D x0_7 = LoadTexture("resources/powerup/x0,7Multiplier.png");
-        Texture2D xNegative = LoadTexture("resources/powerup/-Multiplier.png");
-        Texture2D lasers = LoadTexture("resources/powerup/Lasers.png");
-        Texture2D bomb = LoadTexture("resources/powerup/Bomb.png");
-        Texture2D nuke = LoadTexture("resources/powerup/Nuke.png");
-        Texture2D Jblock = LoadTexture("resources/powerup/Jblock.png");
-        Texture2D Lblock = LoadTexture("resources/powerup/Lblock.png");
-        Texture2D Oblock = LoadTexture("resources/powerup/Oblock.png");
-        Texture2D Tblock = LoadTexture("resources/powerup/Tblock.png");
-        Texture2D Iblock = LoadTexture("resources/powerup/Iblock.png");
-        Texture2D plus0_2 = LoadTexture("resources/powerup/+0,2Multiplier.png");
-        Texture2D plus0_1 = LoadTexture("resources/powerup/+0,1Multiplier.png");
-        Texture2D mystery = LoadTexture("resources/powerup/Mystery.png");
-        Texture2D fiveRandom = LoadTexture("resources/powerup/5Random.png");
-        Texture2D slow1 = LoadTexture("resources/powerup/Slow1.png");
-        Texture2D slow2 = LoadTexture("resources/powerup/Slow2.png");
-        Texture2D fast1 = LoadTexture("resources/powerup/Fast1.png");
-        Texture2D fast2 = LoadTexture("resources/powerup/Fast2.png");
-        Texture2D pause = LoadTexture("resources/powerup/Pause.png");
+        Texture2D x2 = LoadTexture("resources/powerup/2_multiplier.png");
+        Texture2D x1_5 = LoadTexture("resources/powerup/1_5_multiplier.png");
+        Texture2D x1_2 = LoadTexture("resources/powerup/1_2_multiplier.png");
+        Texture2D x0_7 = LoadTexture("resources/powerup/0_7_multiplier.png");
+        Texture2D xNegative = LoadTexture("resources/powerup/negative_multiplier.png");
+        Texture2D lasers = LoadTexture("resources/powerup/lasers.png");
+        Texture2D bomb = LoadTexture("resources/powerup/bomb.png");
+        Texture2D nuke = LoadTexture("resources/powerup/nuke.png");
+        Texture2D Jblock = LoadTexture("resources/powerup/J_block.png");
+        Texture2D Lblock = LoadTexture("resources/powerup/L_block.png");
+        Texture2D Oblock = LoadTexture("resources/powerup/O_block.png");
+        Texture2D Tblock = LoadTexture("resources/powerup/T_block.png");
+        Texture2D Iblock = LoadTexture("resources/powerup/I_block.png");
+        Texture2D plus0_2 = LoadTexture("resources/powerup/0_2_multiplier.png");
+        Texture2D plus0_1 = LoadTexture("resources/powerup/0_1_multiplier.png");
+        Texture2D mystery = LoadTexture("resources/powerup/mystery.png");
+        Texture2D fiveRandom = LoadTexture("resources/powerup/5_random.png");
+        Texture2D slow1 = LoadTexture("resources/powerup/slow_1.png");
+        Texture2D slow2 = LoadTexture("resources/powerup/slow_2.png");
+        Texture2D fast1 = LoadTexture("resources/powerup/fast_1.png");
+        Texture2D fast2 = LoadTexture("resources/powerup/fast_2.png");
+        Texture2D pause = LoadTexture("resources/powerup/pause.png");
 
         //locations for powerboard
         Rectangle powerBoard = (Rectangle) {350-RECWIDTH/2, 705, RECWIDTH, RECHEIGHT};  //board of stored powerups location

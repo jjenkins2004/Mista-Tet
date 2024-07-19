@@ -68,7 +68,7 @@ class Score {
         std::string convertDecimal(float x);
 
         //font we are using for text
-        Font allFont = LoadFont("resources/allFont.ttf");
+        Font allFont = LoadFont("resources/all_font.ttf");
 
         //the current multipliers that are being applied
         std::deque<std::pair<double, int>> currmultipliers;
