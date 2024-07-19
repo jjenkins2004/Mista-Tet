@@ -105,8 +105,10 @@ class Tet {
     bool tetpowertoggle = false;                                                                                //to determine if next dialogue should be a tetPower
 
     //for the babie head powerup
-    std::tuple<int, int, int, Texture2D> babies = std::make_tuple(0, 0, 0, LoadTexture(""));    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
-    std::vector<Vector2> positions;                                                             //positions of our baby heads
+    std::tuple<int, int, int> babies = std::make_tuple(0, 0, 0);                    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
+    std::vector<Vector2> positions;                                                 //positions of our baby heads
+    Texture2D babyHead = LoadTexture("resources/tet/babyHead.png");                 //normal baby head
+    Texture2D redBabyHead = LoadTexture("resources/tet/babyHeadFinal.png");         //final stage baby head
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                 //current chosen power

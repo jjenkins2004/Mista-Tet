@@ -138,31 +138,31 @@ void Tet::drawTet() {
 
     //for babies
     if (get<0>(babies) != 0) {
+        Texture2D* babyT;
+        if (finalStage) babyT = &redBabyHead;
+        else babyT = &babyHead;
         if (positions.empty()) {                                                                                    //getting random coordinates for the heads initially
             for (int i = 0; i < get<0>(babies); i++) {
                 positions.push_back(Vector2{float(GetRandomValue(20, 780)), float(GetRandomValue(20, 780))});
             }
         }
         for (std::vector<Vector2>::iterator it = positions.begin(); it != positions.end(); it++) {                  //drawing each baby head and checking if player clicked it
-            DrawTexturePro(get<3>(babies), {0, 0, 50, 50}, {it->x, it->y, 100, 100}, {50, 50}, 0, WHITE);
-            if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
-                std::cout << getAdjustedCoordinates(GetMousePosition(), camRotation).x << " " << getAdjustedCoordinates(GetMousePosition(), camRotation).y << std::endl;
-                std::cout << it->x << " " << it->y << std::endl;
-            }
-            if (CheckCollisionPointCircle(getAdjustedCoordinates(GetMousePosition(), camRotation), *it, 15) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {       //checking if player hit the baby
+            DrawTexturePro(*babyT, {0, 0, 50, 50}, {it->x, it->y, 150, 150}, {75, 75}, 0, WHITE);
+            if (CheckCollisionPointCircle(getAdjustedCoordinates(GetMousePosition(), camRotation), *it, 75) && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {       //checking if player hit the baby
+                if(finalStage) sound().play("resources/audio/babySoundFinal.mp3");
+                else sound().play("resources/audio/babySound.mp3");
                 positions.erase(it);
+                it--;
             }
         }
         if (positions.empty()) {                                                                                    //player has clicked all the heads, reward them
             src->addScore(300);
-            UnloadTexture(get<3>(babies));
-            babies = make_tuple(0, 0, 0, LoadTexture(""));                                                                           //shows to not draw babies
+            babies = make_tuple(0, 0, 0);                                                                           //shows to not draw babies
         }
         else {
             if (--get<2>(babies) == 0) {
                 src->addScore(get<1>(babies)*-1);
-                UnloadTexture(get<3>(babies));
-                babies = make_tuple(0, 0, 0, LoadTexture(""));
+                babies = make_tuple(0, 0, 0);
             }
         }
     }
@@ -379,9 +379,18 @@ void Tet::usePower(tetPower p) {
     if (p.power == "less") src->addMultiplier(0.7);
     else if (p.power == "half") src->addMultiplier(0.5);
     else if (p.power == "negative") src->addMultiplier(-1);
-    else if (p.power == "babies1") babies = std::make_tuple(1, 200, 180, LoadTexture("resources/tet/babyHead.png"));
-    else if (p.power == "babies2") babies = std::make_tuple(2, 300, 180, LoadTexture("resources/tet/babyHead.png"));
-    else if (p.power == "babies3") babies = std::make_tuple(3, 400, 180, LoadTexture("resources/tet/babyHeadFinal.png"));
+    else if (p.power == "babies1") {
+        babies = std::make_tuple(1, 200, 200);
+        sound().play("resources/audio/babyLaugh.mp3");
+    }
+    else if (p.power == "babies2"){
+        babies = std::make_tuple(2, 300, 230);
+        sound().play("resources/audio/babyLaugh.mp3");
+    }
+    else if (p.power == "babies3") {
+        babies = std::make_tuple(3, 400, 260);
+        sound().play("resources/audio/babyLaughFinal.mp3");
+    }
     else currPower = p.power;
 }
 
