@@ -309,12 +309,13 @@ void Grid::updateCamera() {
         subtract = true;
     }
     if (!subtract && int(cameraMain.rotation)%90 > 88 && int(cameraMain.rotation+angVel)%90 < 2 ) {
-         if (cameraMain.rotation < 90) cameraMain.rotation = 90;
-         else if (cameraMain.rotation < 180) cameraMain.rotation = 180;
-         else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
-         else cameraMain.rotation = 0;
-         shake = true;
-         angVel = 0;
+        if (cameraMain.rotation < 90) cameraMain.rotation = 90;
+        else if (cameraMain.rotation < 180) cameraMain.rotation = 180;
+        else if (cameraMain.rotation < 270) cameraMain.rotation = 270;
+        else cameraMain.rotation = 0;
+        shake = true;
+        angVel = 0;
+        maxOffsetRotation = 15;
         numRotations++;
     }
     else if (subtract && int(cameraMain.rotation)%90 < 2 && cameraMain.rotation != 0 && cameraMain.rotation != 90 && cameraMain.rotation != 180 && cameraMain.rotation != 270 && int(cameraMain.rotation+90-angVel)%90 > 88) {
@@ -332,7 +333,6 @@ void Grid::updateCamera() {
         cameraMain.offset.y = 400 + maxOffsetRotation*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
         maxOffsetRotation-=0.1875;
         if (maxOffsetRotation <= 0) {
-            maxOffsetRotation = 15;
             shake = false;
             cameraMain.offset.x = 400;
             cameraMain.offset.y = 400;
@@ -354,18 +354,27 @@ void Grid::updateCamera() {
             cameraMain.rotation-=angVel;
             if (cameraMain.rotation < 0) cameraMain.rotation+=360;
         }
-        else cameraMain.rotation+= angVel;
+        else {
+            cameraMain.rotation+= angVel;
+        }
+        cameraMain.offset.x = 400 + 3*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        cameraMain.offset.y = 400 + 3*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
         if (angVel < 1) angVel+=angAcc;
         else angVel = 1;
     }
 }
 
-void Grid::resetRotation() {
+void Grid::finalStage() {
     cameraMain.rotation = 0;
     subtract = false;
     shake = false;
     angVel = 0;
+    numRotations = 0;
     rotations.clear();
+    rotationIt = null.end();
+    cameraMain.offset.x = 400;
+    cameraMain.offset.y = 400;
+    tet->tetFinalStage();
 }
 
 void Grid::updatelevel() {

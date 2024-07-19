@@ -41,6 +41,9 @@ class Tet {
         //check if we should increase the tet stage
         void checkStage();
 
+        //bring tet into final stage
+        void tetFinalStage();                                                                              
+
     private:
 
     //during the game for when tet is talking
@@ -142,7 +145,6 @@ class Tet {
                             "resources/audio/tet_talk_7.mp3"};
     int talk = 2;                                                                                       //wait counter for tet talking sound
     void drawTetText(std::string& s);                                                                   //function that puts tet's dialogue on correct position
-    void tetFinalStage();                                                                               //brings tet into final stage, called after cutscene
 
     float camRotation = 0;                                          //current camera rotation
     Score* src;                                                     //score object pointer

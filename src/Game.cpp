@@ -83,9 +83,9 @@ int main() {
             horizontalcounter = 0;
             downcounter = 0;
 
-            // //temp
-            //grid->randomRotate();
-            //score->addScore(89990);
+            //temp
+            grid->randomRotate();
+            score->addScore(89990);
             // powerUp->spawnPowerup(true);
             start = false; continue;
 
@@ -131,6 +131,7 @@ int main() {
         if (!scenePlayed && score->getScore() >= 90000) {
             if (tet->tetCutscene() == -1) break;
             scenePlayed = true;
+            grid->finalStage();
             MusicPlayer().play("resources/music/final_battle_music.mp3");
         }
 
