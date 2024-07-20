@@ -34,7 +34,7 @@ class Grid {
         void drawGrid(bool block);                              //draws the grid and bool tells grid if block should also be drawn
         void updateAll();                                       //convinient function that calls all updating functions
         void updateCamera();                                    //called everyframe to update the camera
-        void finalStage();                                      //function called when bringing tet into final stage
+        int finalStage();                                       //function called when bringing tet into final stage
         void updatelevel();                                     //updating function for level and level related powers
         int getLevel() { return level; }                        //get current level  
         bool checkGameOver() { return gameover; }               //check if player lost

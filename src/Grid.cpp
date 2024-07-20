@@ -325,6 +325,7 @@ void Grid::updateCamera() {
         else cameraMain.rotation = 0;
         shake = true;
         angVel = 0;
+        maxOffsetRotation = 15;
         numRotations++;
     }
     else if (shake) {
@@ -364,7 +365,8 @@ void Grid::updateCamera() {
     }
 }
 
-void Grid::finalStage() {
+int Grid::finalStage() {
+    //resetting rotation and rotation powerups
     cameraMain.rotation = 0;
     subtract = false;
     shake = false;
@@ -372,9 +374,153 @@ void Grid::finalStage() {
     numRotations = 0;
     rotations.clear();
     rotationIt = null.end();
+
+    //resetting camera
     cameraMain.offset.x = 400;
     cameraMain.offset.y = 400;
+
+    //resetting grid
+    for (int i = 0; i < 21; i++) {
+        for (int j = 0; j < 10; j++) {
+            grid[i][j] = 0;
+        }
+    }
+
+    //resetting block
+    block = Block(block.getId(), grid);
+
+    //calling final stage for tet class
     tet->tetFinalStage();
+
+    //variables
+    int counter = 0;
+    bool wait = true;
+
+    //camera
+    Camera2D camera;
+    float maxAngle = 0.25;
+    float maxOffset = 2;
+
+    //initialize 2d camera
+    camera.target = (Vector2){400, 400};
+    camera.offset = (Vector2){400, 400};
+    camera.rotation = 0;
+    camera.zoom = 1;
+
+    //giant gross block comes out
+    while(!WindowShouldClose()) {
+        updateAll();
+
+        if (!wait) {            //making the block start from center and grow
+            if (counter == 0) {
+                grid[17][4] = GetRandomValue(1, 7);
+                grid[17][5] = GetRandomValue(1, 7);
+                grid[16][4] = GetRandomValue(1, 7);
+                grid[16][5] = GetRandomValue(1, 7);
+            }
+            else if (counter == 30) {
+                MusicPlayer().play("resources/music/final_battle_music.mp3");
+                for (int i = 3; i < 7; i++) {
+                    grid[18][i] = GetRandomValue(1, 7);
+                    grid[15][i] = GetRandomValue(1, 7);
+                }
+                grid[17][3] = GetRandomValue(1, 7);
+                grid[17][6] = GetRandomValue(1, 7);
+                grid[16][3] = GetRandomValue(1, 7);
+                grid[16][6] = GetRandomValue(1, 7);
+            }
+            else if (counter == 60) {
+                grid[14][3] = GetRandomValue(1, 7);
+                grid[14][5] = GetRandomValue(1, 7);
+                grid[14][6] = GetRandomValue(1, 7);
+                grid[18][2] = GetRandomValue(1, 7);
+                grid[16][2] = GetRandomValue(1, 7);
+                grid[19][4] = GetRandomValue(1, 7);
+                grid[19][6] = GetRandomValue(1, 7);
+                grid[18][7] = GetRandomValue(1, 7);
+                grid[16][7] = GetRandomValue(1, 7);
+            }
+            else if (counter == 120) {
+                grid[20][4] = GetRandomValue(1, 7);
+                grid[20][6] = GetRandomValue(1, 7);
+                grid[19][2] = GetRandomValue(1, 7);
+                grid[19][7] = GetRandomValue(1, 7);
+                grid[16][1] = GetRandomValue(1, 7);
+                grid[16][8] = GetRandomValue(1, 7);
+                grid[14][2] = GetRandomValue(1, 7);
+                grid[14][7] = GetRandomValue(1, 7);
+                grid[13][3] = GetRandomValue(1, 7);
+                grid[13][6] = GetRandomValue(1, 7);
+            }
+            else if (counter == 170) {
+                grid[20][3] = GetRandomValue(1, 7);
+                grid[19][1] = GetRandomValue(1, 7);
+                grid[19][8] = GetRandomValue(1, 7);
+                grid[17][1] = GetRandomValue(1, 7);
+                grid[17][8] = GetRandomValue(1, 7);
+                grid[14][1] = GetRandomValue(1, 7);
+                grid[14][8] = GetRandomValue(1, 7);
+                grid[12][6] = GetRandomValue(1, 7);
+            }
+            else if (counter == 220) {
+                grid[20][1] = GetRandomValue(1, 7);
+                grid[20][8] = GetRandomValue(1, 7);
+                grid[17][0] = GetRandomValue(1, 7);
+                grid[17][9] = GetRandomValue(1, 7);
+                grid[13][1] = GetRandomValue(1, 7);
+                grid[12][3] = GetRandomValue(1, 7);
+                grid[12][7] = GetRandomValue(1, 7);
+            }
+            else if (counter == 270) {
+                grid[20][0] = GetRandomValue(1, 7);
+                grid[20][9] = GetRandomValue(1, 7);
+                grid[18][0] = GetRandomValue(1, 7);
+                grid[13][0] = GetRandomValue(1, 7);
+                grid[12][1] = GetRandomValue(1, 7);
+                grid[12][8] = GetRandomValue(1, 7);
+                grid[11][3] = GetRandomValue(1, 7);
+            }
+            else if (counter == 320) {
+                grid[14][9] = GetRandomValue(1, 7);
+                grid[12][9] = GetRandomValue(1, 7);
+                grid[11][1] = GetRandomValue(1, 7);
+                grid[11][4] = GetRandomValue(1, 7);
+                grid[11][8] = GetRandomValue(1, 7);
+                grid[10][3] = GetRandomValue(1, 7);
+            }
+
+            else if (counter == 360) return 0;
+            counter++;
+            //camera shake, build it up then dies out
+            if (counter <= 200) {
+                if (maxOffset >= 20) maxOffset = 12;
+                else maxOffset+=0.05;
+                if (maxAngle >= 2) maxAngle = 1.5;
+                else maxAngle += 0.007;
+            }
+            else {
+                if (maxOffset <= 3) maxOffset = 3;
+                else maxOffset-=0.1;
+                if (maxAngle <= 0.1) maxAngle-= 0.002;
+            }
+            camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+            camera.rotation = maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+        }
+        else {                  //waiting a little in the beginning
+            counter++;
+            if (counter == 150) {
+                wait = false;
+                counter = 0;
+            }
+        }
+        BeginDrawing();
+            BeginMode2D(camera);
+                drawAll(false, false);
+            EndMode2D();
+        EndDrawing();
+    }
+    return -1;
 }
 
 void Grid::updatelevel() {

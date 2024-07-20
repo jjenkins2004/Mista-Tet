@@ -71,3 +71,7 @@ std::string Score::convertDecimal(float i) {
 void Score::addPermanentMultiplier(double m) {
     baseMultiplier+= m;
 }
+
+void Score::halfMultiplier() {
+    baseMultiplier/=2;
+}

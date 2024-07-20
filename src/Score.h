@@ -57,6 +57,8 @@ class Score {
         void updateMultiplier();
         //permanent multiplier
         void addPermanentMultiplier(double m);
+        //half base multiplier
+        void halfMultiplier();
         //getting score
         float getScore() {
             return score;

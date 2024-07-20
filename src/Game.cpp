@@ -131,8 +131,7 @@ int main() {
         if (!scenePlayed && score->getScore() >= 90000) {
             if (tet->tetCutscene() == -1) break;
             scenePlayed = true;
-            grid->finalStage();
-            MusicPlayer().play("resources/music/final_battle_music.mp3");
+            if (grid->finalStage() == -1) break;
         }
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
@@ -187,6 +186,7 @@ int main() {
         else if (power == "flurry") {
             grid->extremeRandomRotate();
             score->addMultiplier(-1);
+            score->halfMultiplier();
         }
 
         //ask powerup class if there are any fast speedchange
