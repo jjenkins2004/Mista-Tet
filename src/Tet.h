@@ -30,6 +30,8 @@ class Tet {
         void drawTet();
 
         //logic for choosing, displaying, delaying, and taking appropriate actions related to the tet dialogue.
+        //as the tet speaks, the dialogue text appears on the screen letter by letter, like a typewriter,
+        //mimicking the way people talk.
         void updateDialogue();
 
         //baby power
@@ -63,15 +65,18 @@ class Tet {
 
     //during the game for when tet is talking
     std::string tetText;                                    //current text that is being displayed
-    int txtCounter = 0;                                     
-    int txtCounterWait = 3;
-    int txtTracker = 0;                                 
-    int txtIndex;                                           //which index are we using right now
+    int txtCounter = 0;                                     //frame counter for when we should add another character to the display
+    int txtCounterWait = 3;                                 //how many frames we should wait before adding another character
+    int txtTracker = 0;                                     //what index in the entire text we are at right now 
+    int txtIndex;                                           //which index (dialogue) are we using right now in a specific vector of possible dialogues
     std::vector<int> vals;                                  //which dialougues tet can say (to make sure two dont repeat back to back)
+    int waitTime;                                           //how long we should keep the dialogue displayed after every letter has come out
+    bool wait = false;                                      //determines if we should wait while displaying the current text
+    bool stop;                                              //dialogue resets and wait 
     int timebetweenText = GetRandomValue(1*60, 3*60);       //how long before each time tet talks
-    int time = 0; int waitTime; bool wait = false;
-    bool stop;
-    bool finalStage = false, finalStart = false;
+    int time = 0;                                           //counter for time between dialogues
+    bool finalStage = false, finalStart = false;            //determines if we should give the initial final stage dialogue and powers
+    bool tetpowertoggle = false;                            //to determine if next dialogue should be a tetPower
 
 
     //possible tet text that has no effect
@@ -121,8 +126,6 @@ class Tet {
     tetPower fly = {"GOODBYE!!!!", "fly"};                                                                      //flies towards grid and destroys blocks in way, blocks that are destroyed decrease points
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
 
-    bool tetpowertoggle = false;                                                                                //to determine if next dialogue should be a tetPower
-
     //for the babie head powerup
     std::tuple<int, int, int> babies = std::make_tuple(0, 0, 0);                    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
     std::vector<Vector2> positions;                                                 //positions of our baby heads
@@ -130,13 +133,13 @@ class Tet {
     Texture2D redBabyHead = LoadTexture("resources/tet/baby_head_final.png");       //final stage baby head
 
     //for tet flying power
-    Rectangle oldDest;
-    bool flying = false;
-    Vector2 tetVel = {0, 0};
-    int flytime = 0;
-    float tetFade = 1;
-    float tetFade2 = 0;
-    Texture2D t2 = LoadTexture("resources/tet/tet_4_left.png");
+    Rectangle oldDest;                                                      //save Tet's old destination so he can go back to it after powerup is over
+    bool flying = false;                                                    //while true, the fly power will be activated
+    Vector2 tetVel = {0, 0};                                                //velocity of tet when he is flying
+    int flytime = 0;                                                        //frame counter to know when to do certain actions during this power
+    float tetFade = 1;                                                      //variable to keep track of tet texture fade
+    float tetFade2 = 0;                                                     //variable to keep track of tet texture fade
+    Texture2D t2 = LoadTexture("resources/tet/tet_4_left.png");             //another texture, so as tet is fading out, he can simultaneously appear at another place
 
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
@@ -147,11 +150,14 @@ class Tet {
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head
-    int bobCounter = 0; double yvel = -0.25; bool bobWait = false;           
-    int count = 0;         
-    void tetTalk(bool wait);                                                            //for tet's mouth moving when talking
-    int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;
+    int bobCounter = 0;                                                                 //for waiting some time at the top and bottom of bob motions                       
+    double yvel = -0.25;                                                                //current y velocity of tet as he is bobbing
+    bool bobWait = false;                                                               //to determine if we should wait at the top and bottom of bob motions                    
+
+    void tetTalk(bool wait);                                                            //for tet's mouth moving when talking                              
+    int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;            //tetCounter and tetCounter max determine when we should switch between open and closed mouths, facePhase: 0 for mouth closed, 1 for mouth open
     bool spaceWait = false;                                                             //make sure tet's mouth is closed when there is a period.
+
     float scale = 3.5;                                                                  //how much larger we draw tet compared to original texture
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};                                  //source rectangle for mista tet structure
     Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                        //destination rectangle for mista tet texture

@@ -19,6 +19,7 @@ void Tet::drawTet() {
     updateDialogue();
 
     //tet power drawing
+    //these functions will do nothing if powerup is not active but will update if it is active
     babyPower();
     flyPower();
 
@@ -27,6 +28,7 @@ void Tet::drawTet() {
 }
 
 void Tet::updateDialogue() {
+    //wait time after entire dialogue comes out
     if (wait) {
         if (time == waitTime) {
             time = 0;
@@ -37,11 +39,15 @@ void Tet::updateDialogue() {
         SetTextLineSpacing(20);
         drawTetText(tetText);
     }
-    else if (time >= timebetweenText) { //checks if we should make tet say something
+    //checks if tet should generate and display a new dialogue
+    else if (time >= timebetweenText) {
+        //adds a singular character to what is displayed and waits for a couple frames before adding another character 
         if (txtCounter == txtCounterWait) {
             spaceWait = false;
             if (!stop) {
-                if (tetpowertoggle) {
+                //from which bag and which index should we add another character or use power
+                if (tetpowertoggle) {                           //tet power dialogues
+                    //score is >90,000, final stage powers
                     if (finalStage) {
                         tetText+= finalPowers[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == finalPowers[txtIndex].dialogue.length()-1) {
@@ -51,6 +57,7 @@ void Tet::updateDialogue() {
                             if (finalStart) finalStart = false;
                         }
                     }
+                    //score is below 50,000, stages 1 and 2
                     else if (tetStage <=2) {
                         tetText+= tetPowers1[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers1[txtIndex].dialogue.length()-1) {
@@ -59,6 +66,7 @@ void Tet::updateDialogue() {
                             usePower(tetPowers1[txtIndex]);
                         }
                     }
+                    //score is between 50,000 and 90,000, stages 3 and 4
                     else {
                         tetText += tetPowers2[txtIndex].dialogue.substr(txtTracker, 1);
                         if (txtTracker == tetPowers2[txtIndex].dialogue.length()-1) {
@@ -68,12 +76,16 @@ void Tet::updateDialogue() {
                         }
                     }
                 }
+                //dialogue is not a tet power so choose from noEffectText
                 else {
                     tetText+= noEffectText[txtIndex].substr(txtTracker, 1);
                     if (txtTracker == noEffectText[txtIndex].length()-1) stop = true;
                 }
+
+                //determine if the last letter we just added was a punctuation mark to add an extra delay
                 string lastletter = tetText.substr(tetText.length()-1, 1);
                 if (lastletter == "." || lastletter == "?" || lastletter == "!") {
+                    //make sure tet mouth during punctuation letters
                     if (tetStage <= 2) {
                         spaceWait = true;
                         if (facePhase == 1) source.x-=tdim;
@@ -81,24 +93,30 @@ void Tet::updateDialogue() {
                     }
                     txtCounterWait = 15;
                 }
+                //last letter was not a punctuation so we can see if we should make a tet talking sound
                 else {
+                    //play a special sound for the inital final stage dialogue
                     if (!finalStart) {
+                        //every third letter that comes out which is not a punctuation, play a random tet sound
                         if (talk == 2) {
+                            //choosing the random sound
                             std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
                             sound().play(*it);
+
+                            //erasing sound from bag so we don't repeat same ones in a row
                             tetSounds.erase(it);
-                            if (tetSounds.size() == 3) {
+                            if (tetSounds.size() == 3) {                //restoring bag if size is low
                                 tetSounds = tetSoundsOriginal;
                             }
                             talk = 0;
                         }
                         else talk++;
                     }
-
-                    txtCounterWait = 3;
+                    txtCounterWait = 3;                                 //wait this many frames before adding a new letter
                 }
-                txtTracker++;
+                txtTracker++;                                           //letter as been added so moving on to next letter
             }
+            //dialogue is finished so we should wait some time with full dialogue displaeyd
             else {
                 talk = 2;
                 time = 0;
@@ -112,10 +130,11 @@ void Tet::updateDialogue() {
         else ++txtCounter;
         SetTextLineSpacing(20);
         drawTetText(tetText);
-        tetTalk(spaceWait);
+        tetTalk(spaceWait);                 //spaceWait just tells tetTalk if we are currently at a punctuation mark and tet mouth should not open at this time
     }
     else {
         ++time;
+        //determining whether this should be a tet power and generating a new dialogue
         if (time == timebetweenText) {
             stop = false;
             //choosing which text we should put on screen
@@ -132,12 +151,11 @@ void Tet::updateDialogue() {
                         txtIndex = 0;
                     }
                     else {
-                        //normal final stage tet powers
-                        txtIndex = GetRandomValue(3, 3);
+                        txtIndex = GetRandomValue(3, 3);                    //final stage powers
                     }
                 }
-                else if (tetStage <=2) txtIndex = GetRandomValue(0, 6);  //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 7);               //choosing power from our late stage bag
+                else if (tetStage <=2) txtIndex = GetRandomValue(0, 6);     //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 7);                       //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -181,13 +199,18 @@ void Tet::babyPower() {
 }
 
 void Tet::flyPower() {
+
+    //this entire power is time based and flytime is just used to keep track of the time and when to do a certain action
+
     if (!flying) return;
 
     if (flytime == 0) oldDest = dest;
+    //fade tet out
     else if (flytime > 30 && flytime <= 90) {
         if (tetFade > 0) tetFade-=0.1;
         else tetFade = 0;
     }
+    //fade tet in and teleport tet to the bottom right of the grid
     else if (flytime > 90 && flytime <= 130) {
         if (flytime == 91) {
             scale = 2;
@@ -197,6 +220,7 @@ void Tet::flyPower() {
         if (tetFade < 1) tetFade+=0.1;
         else tetFade = 1;
     }
+    //first fly path
     else if (flytime > 130 && flytime <= 136) {
         if (flytime == 131) {
             sound().play("resources/audio/tet_fly_boom.mp3");
@@ -206,6 +230,8 @@ void Tet::flyPower() {
         else if (flytime == 132 || flytime == 133) {
             tetVel.x-=10;
             tetVel.y+=10;
+
+            //determining which grids were destroyed and subtracting score
             std::vector<Vector2> grids;
             int scoreCount = 0;
             if (flytime == 132) grids = {{17, 7}, {17, 8}, {17, 9}, {18, 7}, {18, 8}, {18, 9}};
@@ -237,6 +263,7 @@ void Tet::flyPower() {
         dest.x+=tetVel.x;
         dest.y+=tetVel.y;
     }
+    //fade out first path tet and simultaneously fade in tet for second path
     else if (flytime > 136 && flytime <= 170) {
         if (tetFade > 0) tetFade-=0.03;
         else tetFade = 0;
@@ -249,6 +276,7 @@ void Tet::flyPower() {
         }
         DrawTexturePro(t2, source, {575, 575, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
     }
+    //second path
     else if (flytime > 170 && flytime <= 176) {
         if (flytime == 171) {
             sound().play("resources/audio/tet_fly_boom.mp3");
@@ -290,6 +318,7 @@ void Tet::flyPower() {
         dest.x+=tetVel.x;
         dest.y+=tetVel.y;
     }
+    //fade out 2nd path tet and fade in new tet for 3rd path
     else if (flytime > 176 && flytime <= 210) {
         if (tetFade > 0) tetFade-=0.03;
         else tetFade = 0;
@@ -302,6 +331,7 @@ void Tet::flyPower() {
         }
         DrawTexturePro(t2, source, {575, 500, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
     }
+    //3rd path tet
     else if (flytime > 210 && flytime <= 216) {
         if (flytime == 211) {
             sound().play("resources/audio/tet_fly_boom.mp3");
@@ -349,6 +379,7 @@ void Tet::flyPower() {
             tetFade = 0;
         }
     }
+    //bring tet to original position
     else if (flytime > 260) {
         if (flytime == 261) {
             dest = oldDest;
@@ -597,11 +628,13 @@ void Tet::usePower(tetPower p) {
 void Tet::tetTalk(bool wait) {
     if (tetStage <= 2 && !wait) {
         if (tetCounter == tetCounterMax) {
+            //opening tet mouth
             if (facePhase == 0) {
                 source.x+=tdim;
                 facePhase = 1;
                 tetCounterMax = GetRandomValue(8, 12);
             }
+            //closing tet mouth
             else {
                 source.x-=tdim;
                 facePhase = 0;

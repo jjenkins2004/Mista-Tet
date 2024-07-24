@@ -1,6 +1,20 @@
 #include "score.h"
 #include "string"
 
+void Text::move() {
+        xpos+=xVelocity;
+        ypos+=yVelocity;
+        if (counter == 2) {
+            yVelocity+=1;
+            counter = 0;
+        }
+        else counter++;
+        alpha-=0.025;
+    }
+
+
+
+
 Score::Score(): score(0) {}
 
 void Score::drawScore() {
