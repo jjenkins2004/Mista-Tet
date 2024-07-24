@@ -48,9 +48,10 @@ class Score {
         //draws scoreboard and score
         void drawScore();
 
-        //add some numeber to the score
+        //add some number to the score
         void addScore(int score);
-
+        //add score but ignore negative
+        void addScoreIgnoreNeg(int score);
         //adding multiplier
         void addMultiplier(double i);
         //updating the multipliers

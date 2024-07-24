@@ -38,7 +38,7 @@ int main() {
     int downcounter = 0;                                    //cooldown for moving block down
     int powerupcounter = 0;                                 //keeps track of when to spawn new powerup
     bool start = true;                                      //bool to bring us to the start menu
-    int spawnpower = -1;         //how often we should spawn powerup
+    int spawnpower = -1;                                    //how often we should spawn powerup
 
     //other
     Font titleFont = LoadFont("resources/title_font.ttf");  //title font
@@ -82,10 +82,11 @@ int main() {
             levelcounter = 0;
             horizontalcounter = 0;
             downcounter = 0;
+            scenePlayed = false;
 
             //temp
-            grid->randomRotate();
-            score->addScore(89990);
+            // grid->randomRotate();
+            score->addScore(89900);
             // powerUp->spawnPowerup(true);
             start = false; continue;
 
@@ -312,6 +313,7 @@ int main() {
             start = true; bool quit = true;
             int endcounter = 0; double fade = 0;
             while (!WindowShouldClose()) {
+                grid->updateAll();
                 ++endcounter;
                 fade +=0.01;
                 if (endcounter == 450) {

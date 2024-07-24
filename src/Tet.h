@@ -23,8 +23,20 @@ class Tet {
         //set camera rotation
         void updateCamRotate(float r) {camRotation = r;}
 
+        //set grid
+        void setGrid(int (*g)[10]) {grid = g;}
+
         //draw mista tet
         void drawTet();
+
+        //logic for choosing, displaying, delaying, and taking appropriate actions related to the tet dialogue.
+        void updateDialogue();
+
+        //baby power
+        void babyPower();
+
+        //fly power
+        void flyPower();
 
         //tet monologue
         int tetMonologue();
@@ -42,7 +54,10 @@ class Tet {
         void checkStage();
 
         //bring tet into final stage
-        void tetFinalStage();                                                                              
+        void tetFinalStage();    
+
+        //grid class will check this variable and if true will give the screen a small shake
+        bool flyShake = false;                                                                          
 
     private:
 
@@ -56,7 +71,7 @@ class Tet {
     int timebetweenText = GetRandomValue(1*60, 3*60);       //how long before each time tet talks
     int time = 0; int waitTime; bool wait = false;
     bool stop;
-    bool finalStage = false, hugeFlip = false;
+    bool finalStage = false, finalStart = false;
 
 
     //possible tet text that has no effect
@@ -100,9 +115,10 @@ class Tet {
     tetPower flip = {"FLIP THE SCREEN!", "turn"};                                                               //turns the screen 90, 180, or 270 degrees
     tetPower Zblock = {"Here are some amazing\nblocks to help you.", "zblock"};                                 //replaces next three blocks with z blocks
     tetPower Sblock = {"Here are some amazing\nblocks to help you.", "sblock"};                                 //replaces next three blocks with s blocks
-    tetPower babies1 = {"PUNCH the baby, you\nevil degenerate!", "babies1"};
+    tetPower babies1 = {"PUNCH the baby, you\nevil degenerate!", "babies1"};                                    //spawns number of babies, player must click these babies in certain time or else they will lost points
     tetPower babies2 = {"PUNCH the babies, you\nevil degenerate!", "babies2"};
     tetPower babies3 = {"PUNCH the babies, you\nevil degenerate!", "babies3"};
+    tetPower fly = {"GOODBYE!!!!", "fly"};                                                                      //flies towards grid and destroys blocks in way, blocks that are destroyed decrease points
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
 
     bool tetpowertoggle = false;                                                                                //to determine if next dialogue should be a tetPower
@@ -113,11 +129,21 @@ class Tet {
     Texture2D babyHead = LoadTexture("resources/tet/baby_head.png");                //normal baby head
     Texture2D redBabyHead = LoadTexture("resources/tet/baby_head_final.png");       //final stage baby head
 
+    //for tet flying power
+    Rectangle oldDest;
+    bool flying = false;
+    Vector2 tetVel = {0, 0};
+    int flytime = 0;
+    float tetFade = 1;
+    float tetFade2 = 0;
+    Texture2D t2 = LoadTexture("resources/tet/tet_4_left.png");
+
+
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                 //current chosen power
     const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1};                     //stage 1 powers, starts at beginning
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2};           //stage 2 powers, when score is greater than 50,000
-    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3};
+    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2};
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head
@@ -126,8 +152,9 @@ class Tet {
     void tetTalk(bool wait);                                                            //for tet's mouth moving when talking
     int tetCounter = 0, tetCounterMax = GetRandomValue(3, 7), facePhase = 0;
     bool spaceWait = false;                                                             //make sure tet's mouth is closed when there is a period.
+    float scale = 3.5;                                                                  //how much larger we draw tet compared to original texture
     Rectangle source = (Rectangle) {0, 0, tdim, tdim};                                  //source rectangle for mista tet structure
-    Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                        //destination rectabgle for mista tet texture
+    Rectangle dest = (Rectangle) {650, 350, tdim*3.5, tdim*3.5};                        //destination rectangle for mista tet texture
     Texture2D t = LoadTexture("resources/tet/tet_1.png");                               //mista tet texture
     float rotation = 0;                                                                 //current rotation of Tet's face
     int tetStage = 1;                                                                   //current stage out of 4, each stage has a different texture
@@ -150,6 +177,7 @@ class Tet {
     Score* src;                                                     //score object pointer
     Font tetFont = LoadFont("resources/all_font.ttf");              //font used for text
     int level;                                                      //current level
+    int (*grid)[10];                                                //pointer to grid
 
 };
 

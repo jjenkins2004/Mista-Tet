@@ -43,8 +43,9 @@ void Grid::drawAll(bool drawBlock, bool useCamera) {
     if (useCamera) BeginMode2D(cameraMain);
         drawGrid(drawBlock);
         scr->drawScore();
+        pow->drawPowerBoard();
         tet->drawTet();
-        pow->drawPowerup();
+        pow->drawPowerupItems();
     if (useCamera) EndMode2D();
 }
 
@@ -291,6 +292,8 @@ void Grid::updateAll() {
 }
 
 void Grid::updateCamera() {
+    if (tet->flyShake) tetFlyCamUpdate();
+
     if (rotationIt == null.end()) {
         bool cont = false;
         for (rotationIt = rotations.begin(); rotationIt != rotations.end(); rotationIt++) {
@@ -362,6 +365,16 @@ void Grid::updateCamera() {
         cameraMain.offset.y = 400 + 3*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
         if (angVel < 1) angVel+=angAcc;
         else angVel = 1;
+    }
+}
+
+void Grid::tetFlyCamUpdate() {
+    cameraMain.offset.x = 400 + maxOffsetFly*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+    cameraMain.offset.y = 400 + maxOffsetFly*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
+    if (maxOffsetFly > 0) maxOffsetFly-=0.15;
+    else {
+        maxOffsetFly = 5;
+        tet->flyShake = false;
     }
 }
 

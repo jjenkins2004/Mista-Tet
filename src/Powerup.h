@@ -153,7 +153,8 @@ class Powerup {
         void setScore(Score* s) {src = s;}
 
         //powerup related functions
-        void drawPowerup();                                     //draw everything related to player powerups
+        void drawPowerupItems();                                //draw everything related to player powerups
+        void drawPowerBoard();                                  //draws out powerup board
         void spawnPowerup(bool include5Rand);                   //spawn a powerup with set chances, bool tells whether to include the five
                                                                 //random powerups power, set to false when a five random powerup is used to
                                                                 //prevent overpowered chaining

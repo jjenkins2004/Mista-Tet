@@ -31,14 +31,30 @@ void Score::drawScore() {
 }
 
 void Score::addScore(int score) {
-    if (this->score+score*multiplier > 0) this->score+=score*multiplier;
+    float scr = score*multiplier;
+    if (this->score+scr > 0) this->score+=scr;
     else this->score = 0;
     std::string s;
-    if (score*multiplier > 0) s = "+" + convertDecimal(score*multiplier);
-    else s = convertDecimal(score*multiplier);
-    int font = 12 + log2(abs(score*multiplier))*2;
+    if (scr > 0) s = "+" + convertDecimal(scr);
+    else s = convertDecimal(scr);
+    int font = 12 + log2(abs(scr))*2;
     Color c = WHITE;
-    if (score*multiplier >= 100) c = GOLD;
+    if (scr >= 100) c = GOLD;
+    else if (scr < 0) c = RED;
+    scores.push_back(Text(s.c_str(), 690, 637, font, c));
+}
+
+void Score::addScoreIgnoreNeg(int score) {
+    float scr = score*(multiplier > 0 ? multiplier: multiplier*-1);
+    if (this->score+scr > 0) this->score+=scr;
+    else this->score = 0;
+    std::string s;
+    if (scr > 0) s = "+" + convertDecimal(scr);
+    else s = convertDecimal(scr);
+    int font = 12 + log2(abs(scr))*2;
+    Color c = WHITE;
+    if (scr >= 100) c = GOLD;
+    else if (scr < 0) c = RED;
     scores.push_back(Text(s.c_str(), 690, 637, font, c));
 }
 

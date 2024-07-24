@@ -28,12 +28,13 @@ class Grid {
 
         Grid();
         void setScoreBoard(Score* score) { scr = score; }       //set scr to pointer
-        void setTet(Tet* t) { tet = t; }                        //set tet to pointer
+        void setTet(Tet* t) { tet = t; t->setGrid(grid);}       //set tet to pointer and give access to grid
         void setPowerup(Powerup* p) { pow = p; }                //set powerup to pointer
         void drawAll(bool block, bool useCamera);               //convinient funciton that draws everything
         void drawGrid(bool block);                              //draws the grid and bool tells grid if block should also be drawn
         void updateAll();                                       //convinient function that calls all updating functions
         void updateCamera();                                    //called everyframe to update the camera
+        void tetFlyCamUpdate();                                 //called to create screen shake for tet flying powerup
         int finalStage();                                       //function called when bringing tet into final stage
         void updatelevel();                                     //updating function for level and level related powers
         int getLevel() { return level; }                        //get current level  
@@ -143,6 +144,9 @@ class Grid {
         double angAcc = 0.075;                                          //accelerates the angular velocity until it reaches 1.5
         bool shake = false;                                             //bool to determine whether we should shake the screen at each 90 degree rotation
         float maxOffsetRotation = 15;                                   //max offset of x and y for screen shake
+
+        //tet fly screen shake
+        float maxOffsetFly = 5;                                         //the max offset of x and y for when tet flys
 
         //resources
         Texture2D fog = LoadTexture("resources/tet/fog.png");           //for blind power

@@ -12,12 +12,21 @@ Tet::Tet(Score* s): src(s) {
 
 void Tet::drawTet() {
     
-    //tet and what he is saying
-    DrawTexturePro(t, source, dest, (Vector2){3.5*tdim/2, 3.5*tdim/2}, rotation,  WHITE);
-
     //tetbobbing
-    tetBob();
+    if (!flying) tetBob();          //don't want tet to bob when he is in this powerup
 
+    //update tet dialogue
+    updateDialogue();
+
+    //tet power drawing
+    babyPower();
+    flyPower();
+
+    //tet and what he is saying
+    DrawTexturePro(t, source, dest, (Vector2){scale*tdim/2, scale*tdim/2}, rotation,  Fade(WHITE, tetFade));
+}
+
+void Tet::updateDialogue() {
     if (wait) {
         if (time == waitTime) {
             time = 0;
@@ -39,6 +48,7 @@ void Tet::drawTet() {
                             tetpowertoggle = false;
                             stop = true;
                             usePower(finalPowers[txtIndex]);
+                            if (finalStart) finalStart = false;
                         }
                     }
                     else if (tetStage <=2) {
@@ -72,16 +82,18 @@ void Tet::drawTet() {
                     txtCounterWait = 15;
                 }
                 else {
-                    if (talk == 2) {
-                        std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
-                        sound().play(*it);
-                        tetSounds.erase(it);
-                        if (tetSounds.size() == 3) {
-                            tetSounds = tetSoundsOriginal;
+                    if (!finalStart) {
+                        if (talk == 2) {
+                            std::vector<std::string>::iterator it = tetSounds.begin() + GetRandomValue(0, tetSounds.size()-1);
+                            sound().play(*it);
+                            tetSounds.erase(it);
+                            if (tetSounds.size() == 3) {
+                                tetSounds = tetSoundsOriginal;
+                            }
+                            talk = 0;
                         }
-                        talk = 0;
+                        else talk++;
                     }
-                    else talk++;
 
                     txtCounterWait = 3;
                 }
@@ -104,7 +116,6 @@ void Tet::drawTet() {
     }
     else {
         ++time;
-        //std::cout << "time: " << time << std::endl;
         if (time == timebetweenText) {
             stop = false;
             //choosing which text we should put on screen
@@ -115,18 +126,18 @@ void Tet::drawTet() {
             if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
                 if (finalStage) {
-                    if (hugeFlip) {
+                    if (finalStart) {
                         //initial final stage flurry of powers
+                        sound().play("resources/audio/tet_scream.mp3");
                         txtIndex = 0;
-                        hugeFlip = false;
                     }
                     else {
                         //normal final stage tet powers
-                        txtIndex = GetRandomValue(2, 2);
+                        txtIndex = GetRandomValue(3, 3);
                     }
                 }
-                else if (tetStage <=2) txtIndex = /*GetRandomValue(0, 5)*/6;  //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 6);               //choosing power from our late stage bag
+                else if (tetStage <=2) txtIndex = GetRandomValue(0, 6);  //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 7);               //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -135,8 +146,9 @@ void Tet::drawTet() {
             }
         }
     }
+}
 
-    //for babies
+void Tet::babyPower() {
     if (get<0>(babies) != 0) {
         Texture2D* babyT;
         if (finalStage) babyT = &redBabyHead;
@@ -156,16 +168,201 @@ void Tet::drawTet() {
             }
         }
         if (positions.empty()) {                                                                                    //player has clicked all the heads, reward them
-            src->addScore(300);
+            src->addScoreIgnoreNeg(300);
             babies = make_tuple(0, 0, 0);                                                                           //shows to not draw babies
         }
         else {
             if (--get<2>(babies) == 0) {
-                src->addScore(get<1>(babies)*-1);
+                src->addScoreIgnoreNeg(get<1>(babies)*-1);
                 babies = make_tuple(0, 0, 0);
             }
         }
     }
+}
+
+void Tet::flyPower() {
+    if (!flying) return;
+
+    if (flytime == 0) oldDest = dest;
+    else if (flytime > 30 && flytime <= 90) {
+        if (tetFade > 0) tetFade-=0.1;
+        else tetFade = 0;
+    }
+    else if (flytime > 90 && flytime <= 130) {
+        if (flytime == 91) {
+            scale = 2;
+            dest = {575, 575, tdim*scale, tdim*scale};
+            look({dest.x-1, dest.y+0.3f});
+        }
+        if (tetFade < 1) tetFade+=0.1;
+        else tetFade = 1;
+    }
+    else if (flytime > 130 && flytime <= 136) {
+        if (flytime == 131) {
+            sound().play("resources/audio/tet_fly_boom.mp3");
+            flyShake = true;
+            tetVel = {-60, 15};
+        }
+        else if (flytime == 132 || flytime == 133) {
+            tetVel.x-=10;
+            tetVel.y+=10;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 132) grids = {{17, 7}, {17, 8}, {17, 9}, {18, 7}, {18, 8}, {18, 9}};
+            else grids = {{18, 4}, {18, 5}, {18, 6}, {19, 4}, {19, 5}, {19, 6}, {19, 7}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+        }
+        else if (flytime == 134 || flytime == 135) {
+            tetVel.y-=20;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 134) grids = {{19, 3}, {19, 4}, {20, 2}, {20, 3}, {20, 4}, {20, 5}};
+            else grids = {{19, 0}, {19, 1}, {20, 0}, {20, 1}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+        }
+        look({dest.x+tetVel.x, dest.y+tetVel.y});
+        tetFade-=0.03;
+        dest.x+=tetVel.x;
+        dest.y+=tetVel.y;
+    }
+    else if (flytime > 136 && flytime <= 170) {
+        if (tetFade > 0) tetFade-=0.03;
+        else tetFade = 0;
+        if (flytime >= 150 && tetFade2 < 1) tetFade2+=0.1;
+        if (flytime == 170) {
+            dest.x = 575;
+            dest.y = 575;
+            look({dest.x-1, dest.y-0.3f});
+            tetFade = 1;
+        }
+        DrawTexturePro(t2, source, {575, 575, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
+    }
+    else if (flytime > 170 && flytime <= 176) {
+        if (flytime == 171) {
+            sound().play("resources/audio/tet_fly_boom.mp3");
+            flyShake = true;
+            tetVel = {-60, -15};
+        }
+        else if (flytime == 172 || flytime == 173) {
+            tetVel.x-=10;
+            tetVel.y-=10;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 172) grids = {{16, 9}, {16, 8}, {15, 9}, {15, 8}, {15, 7}};
+            else grids = {{15, 6}, {14, 7}, {14, 6}, {14, 5}, {13, 5}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            
+        }
+        else if (flytime == 174 || flytime == 175) {
+            tetVel.y+=20;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 174) grids = {{14, 2}, {14, 3}, {14, 4}, {13, 2}, {13, 3}, {13, 4}};
+            else grids = {{14, 0}, {14, 1}, {13, 0}, {13, 1}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+        }
+        look({dest.x+tetVel.x, dest.y+tetVel.y});
+        tetFade-=0.03;
+        dest.x+=tetVel.x;
+        dest.y+=tetVel.y;
+    }
+    else if (flytime > 176 && flytime <= 210) {
+        if (tetFade > 0) tetFade-=0.03;
+        else tetFade = 0;
+        if (flytime >= 190 && tetFade2 < 1) tetFade2+=0.1;
+        if (flytime == 210) {
+            dest.x = 575;
+            dest.y = 500;
+            look({dest.x-1, dest.y-0.3f});
+            tetFade = 1;
+        }
+        DrawTexturePro(t2, source, {575, 500, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
+    }
+    else if (flytime > 210 && flytime <= 216) {
+        if (flytime == 211) {
+            sound().play("resources/audio/tet_fly_boom.mp3");
+            flyShake = true;
+            tetVel = {-60, -40};
+        }
+        else if (flytime == 212 || flytime == 213) {
+            tetVel.x-=10;
+            tetVel.y-=10;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 212) grids = {{13, 9}, {12, 9}, {12, 8}, {11, 9}, {11, 8}, {11, 7}, {10, 8}};
+            else grids = {{11, 6}, {10, 7}, {10, 6}, {9, 6}, {9, 5}, {8, 5}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+
+        }
+        else if (flytime == 214 || flytime == 215) {
+            tetVel.y-=5;
+            std::vector<Vector2> grids;
+            int scoreCount = 0;
+            if (flytime == 214) grids = {{9, 4}, {8, 4}, {8, 3}, {7, 4}, {7, 3}, {7, 2}, {6, 3}, {6, 2}};
+            else grids = {{7, 1}, {6, 1}, {5, 1}, {5, 0}, {4, 0}};
+            for (Vector2 g: grids) {
+                if (grid[int(g.x)][int(g.y)] != 0) {
+                    grid[int(g.x)][int(g.y)] = 0;
+                    ++scoreCount;
+                }
+            }
+            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+        }
+        look({dest.x+tetVel.x, dest.y+tetVel.y});
+        tetFade-=0.03;
+        dest.x+=tetVel.x;
+        dest.y+=tetVel.y;
+    }
+    else if (flytime > 210 && flytime <= 260) {
+        if (tetFade > 0) tetFade-=0.03;
+        else  {
+            tetFade = 0;
+        }
+    }
+    else if (flytime > 260) {
+        if (flytime == 261) {
+            dest = oldDest;
+            scale = 3.5;
+            look({-1, -1});
+        }
+        if (tetFade < 1) tetFade+=0.1;
+        else {
+            flying = false;
+            flytime = 0;
+            tetFade2 = 0;
+        }
+    }
+    ++flytime;
 }
 
 void Tet::look(Vector2 coor) {
@@ -391,6 +588,9 @@ void Tet::usePower(tetPower p) {
         babies = std::make_tuple(3, 400, 260);
         sound().play("resources/audio/baby_laugh_final.mp3");
     }
+    else if (p.power == "fly") {
+        flying = true;
+    }
     else currPower = p.power;
 }
 
@@ -569,6 +769,9 @@ int Tet::tetCutscene() {
     //playing music
     MusicPlayer().play("resources/music/tet_theme.mp3");
 
+    //tet flying towards player sound
+    sound().play("resources/audio/tet_fly_cutscene.mp3");
+
     //loop for Tet's monologue
     while(!WindowShouldClose()) {
 
@@ -726,7 +929,6 @@ int Tet::tetCutscene() {
             if (fade == 0) MusicPlayer().fade(140);
             fade+=0.01;
             if (fade >= 1.5) {
-                tetFinalStage();                //bring tet into final stage
                 return 0;
             }
         }
@@ -742,6 +944,6 @@ void Tet::tetFinalStage() {
     txtCounter = 0;
     talk = 0;
     finalStage = true;
-    hugeFlip = true;
+    finalStart = true;
     timebetweenText = 120;
 }

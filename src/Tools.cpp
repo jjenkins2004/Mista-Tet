@@ -113,6 +113,8 @@ void MusicPlayer::play(std::string file) {
     song = LoadMusicStream(file.c_str());
     PlayMusicStream(song);
     playing = true;
+    decrease = 0;
+    vol = 1;
 }
 
 void MusicPlayer::pause() {
