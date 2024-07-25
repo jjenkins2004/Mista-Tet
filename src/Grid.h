@@ -48,7 +48,7 @@ class Grid {
         void moveRight();                                       //move block right one tile
         void moveLeft();                                        //move block left one tile
         void rotate();                                          //rotate block once
-        int drop();                                             //drop block, int is how many tiles for score
+        void drop();                                            //drop block
         void placeBlock();                                      //place block into grid at current location
         void generateBlock();                                   //generate a new random block
         void hold();                                            //add the current block to the hold and current block in the hold becomes active block

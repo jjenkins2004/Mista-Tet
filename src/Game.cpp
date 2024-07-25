@@ -36,13 +36,20 @@ int main() {
     int levelcounter = 0;                                   //counter to keep track of when we should move block down
     int horizontalcounter = 0;                              //cooldown for moving block horizontally
     int downcounter = 0;                                    //cooldown for moving block down
+    int rotatecounter = 0;                                  //cooldown for rotate
     int powerupcounter = 0;                                 //keeps track of when to spawn new powerup
     bool start = true;                                      //bool to bring us to the start menu
     int spawnpower = -1;                                    //how often we should spawn powerup
 
+    //for powers
+    std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
+    std::pair<bool, int> slow = std::make_pair(false, 0);   //for input slowing, bool is if its active, int is time left
+    int keysPressed = 0;                                    //need to press key 2 times for one movement
+    std::pair<bool, int> delay = std::make_pair(false, 0);  //for input delay, bool is if active, int is time left
+    std::deque<std::pair<std::string, int>> moveQueue;      //movement queue for when inputs are delayed
+
     //other
     Font titleFont = LoadFont("resources/title_font.ttf");  //title font
-    std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
     int level = 0;                                          //the current level, determines how fast the blocks fall
     bool scenePlayed = false;                               //has tet cutscene already played?
 
@@ -86,7 +93,7 @@ int main() {
 
             //temp
             // grid->randomRotate();
-            score->addScore(89900);
+            //score->addScore(89000);
             // powerUp->spawnPowerup(true);
             start = false; continue;
 
@@ -127,6 +134,35 @@ int main() {
 
         //updating functions
         grid->updateAll();
+
+        //for delaying and slowing power
+        if (delay.first) {
+            --delay.second;
+            if (delay.second == 0) delay.first = false;
+        }
+
+        if (slow.first) {
+            --slow.second;
+            if (slow.second == 0) delay.first = false;
+        }
+        for (std::deque<std::pair<std::string, int>>::iterator it = moveQueue.begin(); it != moveQueue.end(); it++) {
+            --it->second;
+            if (it->second == 0) {
+                if (it->first == "right") grid->moveRight();
+                else if (it->first == "left") grid->moveLeft();
+                else if (it->first == "rotate") grid->rotate();
+                else if (it->first == "down") {
+                    grid->moveDown();
+                    checkRows = true;
+                }
+                else if (it->first == "drop") {
+                    grid->drop();
+                    checkRows = true;
+                }
+                moveQueue.erase(it);
+                --it;
+            }
+        }
 
         //checking if we should go to tet cutscene
         if (!scenePlayed && score->getScore() >= 90000) {
@@ -184,6 +220,13 @@ int main() {
         else if (power == "zblock") grid->changeNext(5);
         else if (power == "sblock") grid->changeNext(7);
         else if (power == "turn") grid->randomRotate();
+        else if (power == "inputslow") slow = std::make_pair(true, GetRandomValue(60*20, 60*35));
+        else if (power == "inputdelay") delay = std::make_pair(true, GetRandomValue(60*20, 60*35)); 
+        else if (power == "slowanddelay") {
+            int rand = GetRandomValue(60*20, 60*35);
+            slow = std::make_pair(true, rand);
+            delay = std::make_pair(true, rand); 
+        }
         else if (power == "flurry") {
             grid->extremeRandomRotate();
             score->addMultiplier(-1);
@@ -218,61 +261,136 @@ int main() {
 
         //right arrow key to move right
         if (IsKeyPressed(KEY_RIGHT)) {
-            grid->moveRight();
-            horizontalcounter = -7;
+            if (slow.first) {
+                if (keysPressed >= 1) {
+                    if (delay.first) {
+                        moveQueue.push_back(std::make_pair("right", 30));
+                    }
+                    else grid->moveRight();
+                    keysPressed = 0;
+                }
+                else ++keysPressed;
+            }
+            else if (delay.first) {
+                moveQueue.push_back(std::make_pair("right", 30));
+            }
+            else grid->moveRight();
+            horizontalcounter = slow.first? -14: -7;
         }
 
         //right arrow key held down
         else if (IsKeyDown(KEY_RIGHT)) {
-            if (horizontalcounter == 3) {
+            if (horizontalcounter >= (slow.first ? 20: 3)) {
+                if (delay.first) moveQueue.push_back(std::make_pair("right", 30));
+                else grid->moveRight();
                 horizontalcounter = 0;
-                grid->moveRight();
             }
             else ++horizontalcounter;
         }
 
         //left arrow key to move left
         else if (IsKeyPressed(KEY_LEFT)) {
-            grid->moveLeft();
-            horizontalcounter = -7;
+            if (slow.first) {
+                if (keysPressed >= 1) {
+                    if (delay.first) moveQueue.push_back(std::make_pair("left", 30));
+                    else grid->moveLeft();
+                    keysPressed = 0;
+                }
+                else ++keysPressed;
+            }
+            else if (delay.first) {
+                moveQueue.push_back(std::make_pair("left", 30));
+            }
+            else grid->moveLeft();
+            horizontalcounter = slow.first? -14: -7;
         }
 
         //left arrow key held down
         else if (IsKeyDown(KEY_LEFT)) {
-            if (horizontalcounter == 3) {
+             if (horizontalcounter >= (slow.first ? 20: 3)) {
+                if (delay.first) moveQueue.push_back(std::make_pair("left", 30));
+                else grid->moveLeft();
                 horizontalcounter = 0;
-                grid->moveLeft();
             }
             else ++horizontalcounter;
         }
 
         //down arrow key to move down
         if (IsKeyPressed(KEY_DOWN)) {
-            grid->moveDown();
-            score->addScore(1);
-            checkRows = true;
+            if (slow.first) {
+                if (keysPressed >= 1) {
+                    if (delay.first) moveQueue.push_back(std::make_pair("down", 30));
+                    else {
+                        grid->moveDown();
+                        checkRows = true;
+                    }
+                    keysPressed = 0;
+                }
+                else ++keysPressed;
+            }
+            else if (delay.first) {
+                moveQueue.push_back(std::make_pair("down", 30));
+            }
+            else {
+                grid->moveDown();
+                checkRows = true;
+            }
+            horizontalcounter = slow.first? -14: -7;
         }
 
         //down arrow key held down 
         else if (IsKeyDown(KEY_DOWN)) {
-            if (downcounter == 3) {
+            if (downcounter >= (slow.first ? 20: 3)) {
                 downcounter = 0;
-                grid->moveDown();
-                score->addScore(1);
-                checkRows = true;
+                if (delay.first) moveQueue.push_back(std::make_pair("down", 30));
+                else {
+                    grid->moveDown();
+                    checkRows = true;
+                }
             }
             else ++downcounter;
         }
 
         //space bar to drop block
         else if (IsKeyPressed(KEY_SPACE)) {
-            sound().play("resources/audio/block_dropping.mp3");
-            score->addScore(grid->drop()*2);
-            checkRows = true;
+            if (delay.first) {
+                moveQueue.push_back(std::make_pair("drop", 30));
+            }
+            else {
+                grid->drop();
+                checkRows = true;
+            }
         }
 
         //up arrow key to rotate block
-        if (IsKeyPressed(KEY_UP)) grid->rotate();
+        if (IsKeyPressed(KEY_UP)) {
+            if (slow.first) {
+                if (keysPressed >= 1) {
+                    keysPressed = 0;
+                    if (delay.first) {
+                        moveQueue.push_back(std::make_pair("rotate", 30));
+                    }
+                    else grid->rotate();
+                }
+                else ++keysPressed;
+            }
+            else if (delay.first) {
+                moveQueue.push_back(std::make_pair("rotate", 30));
+            }
+            else grid->rotate();
+            rotatecounter = slow.first? -14: -7;
+        }
+
+        else if (IsKeyDown(KEY_UP)) {
+            if (rotatecounter >= (slow.first ? 30: 6)) {
+                rotatecounter = 0;
+                if (delay.first) moveQueue.push_back(std::make_pair("rotate", 30));
+                else {
+                    grid->rotate();
+                }
+            }
+            else ++rotatecounter;
+        }
 
         //C key to hold current block
         if (IsKeyPressed(KEY_C)) grid->hold();

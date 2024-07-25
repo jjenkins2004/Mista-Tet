@@ -557,6 +557,7 @@ void Grid::updatelevel() {
 
 
 void Grid::moveDown() {
+    scr->addScore(1);
     if (!block.moveDown(grid)) {
         this->placeBlock();
         this->generateBlock();
@@ -575,11 +576,11 @@ void Grid::rotate() {
     block.rotate(grid);
 }
 
-int Grid::drop() {
-    int r = block.drop(grid);
+void Grid::drop() {
+    sound().play("resources/audio/block_dropping.mp3");
+    scr->addScore(2*block.drop(grid)); 
     this->placeBlock();
     this->generateBlock();
-    return r;
 }
 
 void Grid::hold() {

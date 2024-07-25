@@ -123,6 +123,9 @@ class Tet {
     tetPower babies1 = {"PUNCH the baby, you\nevil degenerate!", "babies1"};                                    //spawns number of babies, player must click these babies in certain time or else they will lost points
     tetPower babies2 = {"PUNCH the babies, you\nevil degenerate!", "babies2"};
     tetPower babies3 = {"PUNCH the babies, you\nevil degenerate!", "babies3"};
+    tetPower inputSlow = {"Work those chubby\nlittle fingers. AHAHAHA!!!", "inputslow"};                        //makes player input a lot slower
+    tetPower inputDelay = {"Struggling are we? Just\ngive up you clumsy fool.", "inputdelay"};                  //delays player input
+    tetPower slowAndDelay = {"Oh yeah, it's gonna be\nfun watching you struggle.", "slowanddelay"};             //delay and slow input
     tetPower fly = {"GOODBYE!!!!", "fly"};                                                                      //flies towards grid and destroys blocks in way, blocks that are destroyed decrease points
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
 
@@ -144,7 +147,7 @@ class Tet {
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                 //current chosen power
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1};                     //stage 1 powers, starts at beginning
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, slowAndDelay};                     //stage 1 powers, starts at beginning
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2};           //stage 2 powers, when score is greater than 50,000
     const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2};                 //final stage when score is greater than 90,000
 
