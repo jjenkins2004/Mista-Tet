@@ -604,9 +604,18 @@ int Tet::tetMonologue() {
 }
 
 void Tet::usePower(tetPower p) {
-    if (p.power == "less") src->addMultiplier(0.7);
-    else if (p.power == "half") src->addMultiplier(0.5);
-    else if (p.power == "negative") src->addMultiplier(-1);
+    if (p.power == "less") {
+        src->addMultiplier(0.7);
+        sound().play("resources/audio/tet_debuff.mp3");
+    }
+    else if (p.power == "half") {
+        src->addMultiplier(0.5);
+        sound().play("resources/audio/tet_debuff.mp3");
+    }
+    else if (p.power == "negative") {
+        src->addMultiplier(-1);
+        sound().play("resources/audio/tet_debuff.mp3");
+    }
     else if (p.power == "babies1") {
         babies = std::make_tuple(1, 200, 200);
         sound().play("resources/audio/baby_laugh.mp3");

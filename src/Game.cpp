@@ -202,6 +202,7 @@ int main() {
         else if (IsKeyPressed(KEY_TWO)) p = powerUp->usePowerup(2);
         else if (IsKeyPressed(KEY_THREE)) p = powerUp->usePowerup(3);
         if (p != nullptr && p->id == "speedchange") {
+            sound().play("resources/audio/slow_motion.mp3");
             SpeedChange* s = dynamic_cast<SpeedChange*>(p);
             if (s->variant == 0) speedChange.push_back(std::make_pair(-1, 1800));
             else if (s->variant == -1) speedChange.push_back(std::make_pair(1.3, 1800));

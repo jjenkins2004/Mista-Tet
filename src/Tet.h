@@ -146,7 +146,7 @@ class Tet {
     std::string currPower = "null";                                                                                                                 //current chosen power
     const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1};                     //stage 1 powers, starts at beginning
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2};           //stage 2 powers, when score is greater than 50,000
-    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2};
+    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2};                 //final stage when score is greater than 90,000
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head
