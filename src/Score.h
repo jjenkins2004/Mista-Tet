@@ -31,6 +31,7 @@ class Score {
     public:
         //updating, getting, drawing
         Score();                                        //constructor
+        ~Score();                                       //destructor
         void updateLevel(int l) {level = l;}            //update the current level
         void updateMultiplier();                        //updating the time on multipliers
         float getScore() {return score;}                //get score

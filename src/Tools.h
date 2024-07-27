@@ -39,6 +39,9 @@ struct MusicPlayer {
         static void updateMusic();
         //updating for pause menu music
         static void updatePauseMusic();
+        //reset MusicPlayer
+        static void reset();
+
     private:
         static float vol;               //volume of the music
         static float decrease;          //how much we decrease the volume each frame
@@ -56,6 +59,9 @@ struct sound {
         static void play(std::string file);
         //updating function
         static void updateSound();
+        //reset function
+        static void reset();
+        
     private:
         struct item {
             Sound curr;                                             //current item

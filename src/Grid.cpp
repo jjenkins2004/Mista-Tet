@@ -33,6 +33,14 @@ Grid::Grid() {
     rotationIt = null.end();
 }
 
+Grid::~Grid() {
+    MusicPlayer().reset();
+    sound().reset();
+    //unloading textures
+    UnloadTexture(fog);
+    UnloadFont(allFont);
+}
+
 
         //--------------------------------------------------------------------------
         // Drawing Functions
@@ -840,6 +848,7 @@ int Grid::lasers() {
                 this->scr->addScore(counter*30);
                 
                 tet->look({-1, 0});
+                UnloadTexture(laser);
                 return 0;
             }
     

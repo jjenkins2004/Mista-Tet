@@ -24,6 +24,12 @@ PowerupItem::PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
     }
 }
 
+PowerupItem::~PowerupItem() {
+    if (id != "null") {
+        UnloadTexture(texture);
+    }
+}
+
 void PowerupItem::DrawItem(bool withRotation) {
     if (id != "null") {
         if (withRotation) {
@@ -350,6 +356,7 @@ void powerList::remove(item* i) {
     if (i == tail) tail = i->prev;
     if (i->prev != nullptr) i->prev->next = i->next;
     if (i->next != nullptr) i->next->prev = i->prev;
+    UnloadTexture(i->curr->texture);
     delete i;
 }
 
@@ -367,6 +374,21 @@ Powerup::Powerup() {
     for (int i = 0; i < 3; i++) {
         currPower.push_back(new PowerupItem());
     }
+}
+
+Powerup::~Powerup() {
+    for (int i = 0; i < 3; i++) {
+        delete currPower[i];
+    }
+    
+    item* it = spawnedPower.head;
+    while (it != nullptr) {
+        item* temp = it;
+        it = it->next;
+        delete temp;
+    }
+
+    UnloadFont(allFont);
 }
 
 void Powerup::drawPowerupItems() {
@@ -485,8 +507,6 @@ void Powerup::drawPowerBoard() {
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
-    spawnedPower.push_back(new Laser(1000, lasers));
-    return;
     bool positive = false;
     int rand1;
     if (include5Rand) rand1 = GetRandomValue(1, 100);
@@ -495,45 +515,45 @@ void Powerup::spawnPowerup(bool include5Rand) {
     //multiplier powerup
     if (rand1 <= 25) {
         int rand2 = GetRandomValue(1, 5);
-        if (rand2 <= 1) spawnedPower.push_back(new Multiplier(2, 800, x2));
-        else if (rand2 <= 2) spawnedPower.push_back(new Multiplier(1.5, 1200, x1_5));
-        else if (rand2 <= 3) spawnedPower.push_back(new Multiplier(1.2, 1500, x1_2));
-        else if (rand2 <= 4) spawnedPower.push_back(new Multiplier(-1, 1500, xNegative));
-        else spawnedPower.push_back(new Multiplier(0.7, 1500, x0_7));
+        if (rand2 <= 1) spawnedPower.push_back(new Multiplier(2, 800, LoadTexture("resources/powerup/2_multiplier.png")));
+        else if (rand2 <= 2) spawnedPower.push_back(new Multiplier(1.5, 1200, LoadTexture("resources/powerup/1_5_multiplier.png")));
+        else if (rand2 <= 3) spawnedPower.push_back(new Multiplier(1.2, 1500, LoadTexture("resources/powerup/1_2_multiplier.png")));
+        else if (rand2 <= 4) spawnedPower.push_back(new Multiplier(-1, 1500, LoadTexture("resources/powerup/negative_multiplier.png")));
+        else spawnedPower.push_back(new Multiplier(0.7, 1500, LoadTexture("resources/powerup/0_7_multiplier.png")));
     }
     //next three blocks powerup
     else if (rand1 <= 45) {
         int rand2 = GetRandomValue(1, 5);
-        if (rand2 <= 1) spawnedPower.push_back(new ThreeBlock(1000, Iblock, 1));
-        else if (rand2 <= 2) spawnedPower.push_back(new ThreeBlock(1200, Jblock, 2));
-        else if (rand2 <= 3) spawnedPower.push_back(new ThreeBlock(1200, Lblock, 3));
-        else if (rand2 <= 4) spawnedPower.push_back(new ThreeBlock(1200, Oblock, 4));
-        else if (rand2 <= 5) spawnedPower.push_back(new ThreeBlock(1200, Tblock, 6));
+        if (rand2 <= 1) spawnedPower.push_back(new ThreeBlock(1000, LoadTexture("resources/powerup/I_block.png"), 1));
+        else if (rand2 <= 2) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/J_block.png"), 2));
+        else if (rand2 <= 3) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/L_block.png"), 3));
+        else if (rand2 <= 4) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/O_block.png"), 4));
+        else if (rand2 <= 5) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/T_block.png"), 6));
     }
     //change block movedown speed powerup
     else if (rand1 <= 65) {
         int rand2 = GetRandomValue(1, 5);
-        if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, pause));
-        if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, fast1));
-        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, fast2));
-        if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, slow1));
-        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(-2, 1000, slow2));
+        if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, LoadTexture("resources/powerup/pause.png")));
+        if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, LoadTexture("resources/powerup/fast_1.png")));
+        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, LoadTexture("resources/powerup/fast_2.png")));
+        if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, LoadTexture("resources/powerup/slow_1.png")));
+        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(-2, 1000, LoadTexture("resources/powerup/slow_2.png")));
     }
     //bomb, nuke, and laser powerups
     else if (rand1 <= 80) { 
         int rand2 = GetRandomValue(1, 5);
-        if (rand2 <= 2) spawnedPower.push_back(new Laser(1000, lasers));
-        else if (rand2 <= 4) spawnedPower.push_back(new Bomb(1000, bomb));
-        else spawnedPower.push_back(new Nuke(800, nuke));
+        if (rand2 <= 2) spawnedPower.push_back(new Laser(1000, LoadTexture("resources/powerup/lasers.png")));
+        else if (rand2 <= 4) spawnedPower.push_back(new Bomb(1000, LoadTexture("resources/powerup/bomb.png")));
+        else spawnedPower.push_back(new Nuke(800, LoadTexture("resources/powerup/nuke.png")));
     }
     //permanent multiplier boost powerup
     else if (rand1 <= 86) {
-        int rand2 = GetRandomValue(1, 4);
-        if (rand2 <= 3) spawnedPower.push_back(new PlusMultiplier(0.1, 1000, plus0_1));
-        else spawnedPower.push_back(new PlusMultiplier(0.2, 800, plus0_2));
+        int rand2 = GetRandomValue(1, 3);
+        if (rand2 <= 2) spawnedPower.push_back(new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/0_1_multiplier.png")));
+        else spawnedPower.push_back(new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/0_2_multiplier.png")));
     }
-    else if (rand1 <= 95) spawnedPower.push_back(new Mystery(1000, mystery));
-    else if (rand1 <= 100) spawnedPower.push_back(new FiveRandom(1000, fiveRandom));
+    else if (rand1 <= 95) spawnedPower.push_back(new Mystery(1000, LoadTexture("resources/powerup/mystery.png")));
+    else if (rand1 <= 100) spawnedPower.push_back(new FiveRandom(1000, LoadTexture("resources/powerup/5_random.png")));
 }
 
 PowerupItem* Powerup::usePowerup(int k) {
@@ -548,5 +568,3 @@ std::vector<std::pair<double, int>> Powerup::checkFastSpeed() {
     fastSpeed.clear();
     return temp;
 }; 
-
-std::vector<std::pair<Vector2, Vector2>> Powerup::circles = std::vector<std::pair<Vector2, Vector2>>();

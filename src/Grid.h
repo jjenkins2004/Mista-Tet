@@ -26,7 +26,8 @@ class Grid {
         // Constructors, setters, getters, drawing, updating
         //--------------------------------------------------------------------------
 
-        Grid();
+        Grid();                                                 //constructor
+        ~Grid();                                                //destuctor
         void setScoreBoard(Score* score) { scr = score; }       //set scr to pointer
         void setTet(Tet* t) { tet = t; t->setGrid(grid);}       //set tet to pointer and give access to grid
         void setPowerup(Powerup* p) { pow = p; }                //set powerup to pointer

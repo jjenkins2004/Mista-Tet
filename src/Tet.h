@@ -15,7 +15,11 @@
 class Tet {
     public:
 
+        //constructor
         Tet(Score* s);
+
+        //destructor
+        ~Tet();
 
         //set level
         void updateLevel(int l) { level = l;}
@@ -142,14 +146,12 @@ class Tet {
     int flytime = 0;                                                        //frame counter to know when to do certain actions during this power
     float tetFade = 1;                                                      //variable to keep track of tet texture fade
     float tetFade2 = 0;                                                     //variable to keep track of tet texture fade
-    Texture2D t2 = LoadTexture("resources/tet/tet_4_left.png");             //another texture, so as tet is fading out, he can simultaneously appear at another place
-
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
-    std::string currPower = "null";                                                                                                                 //current chosen power
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, slowAndDelay};                     //stage 1 powers, starts at beginning
-    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2};           //stage 2 powers, when score is greater than 50,000
-    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2};                 //final stage when score is greater than 90,000
+    std::string currPower = "null";                                                                                                                             //current chosen power
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, fly};                      //stage 1 powers, starts at beginning
+    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2, inputDelay};           //stage 2 powers, when score is greater than 50,000
+    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2, slowAndDelay};               //final stage when score is greater than 90,000
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head

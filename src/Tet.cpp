@@ -10,6 +10,13 @@ Tet::Tet(Score* s): src(s) {
      }
 }
 
+Tet::~Tet() {
+    UnloadTexture(t);
+    UnloadTexture(babyHead);
+    UnloadTexture(redBabyHead);
+    UnloadFont(tetFont);
+}
+
 void Tet::drawTet() {
     
     //tetbobbing
@@ -274,7 +281,7 @@ void Tet::flyPower() {
             look({dest.x-1, dest.y-0.3f});
             tetFade = 1;
         }
-        DrawTexturePro(t2, source, {575, 575, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
+        DrawTexturePro(t, source, {575, 575, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
     }
     //second path
     else if (flytime > 170 && flytime <= 176) {
@@ -329,7 +336,7 @@ void Tet::flyPower() {
             look({dest.x-1, dest.y-0.3f});
             tetFade = 1;
         }
-        DrawTexturePro(t2, source, {575, 500, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
+        DrawTexturePro(t, source, {575, 500, tdim*scale, tdim*scale}, {scale*tdim/2, scale*tdim/2}, 10, Fade(WHITE, tetFade2));
     }
     //3rd path tet
     else if (flytime > 210 && flytime <= 216) {
@@ -400,8 +407,14 @@ void Tet::look(Vector2 coor) {
     if (coor.x < 0) {                                                   //reset rotation back to zero and make tet look forward
         rotation = 0;
         if (tetStage == 1 || tetStage == 2) source.x = tdim*facePhase;
-        else if (tetStage == 3) t = LoadTexture("resources/tet/tet_3_forward.png");
-        else if (tetStage == 4) t = LoadTexture("resources/tet/tet_4_forward.png");
+        else if (tetStage == 3) {
+            UnloadTexture(t);
+            t = LoadTexture("resources/tet/tet_3_forward.png");
+        }
+        else if (tetStage == 4) {
+            UnloadTexture(t);
+            t = LoadTexture("resources/tet/tet_4_forward.png");
+        }
         return;
     }
     if (abs(dest.x-coor.x) < 0.001) {                                   //just in case somehow line is vertical, but this should never occur
@@ -414,8 +427,14 @@ void Tet::look(Vector2 coor) {
 
     //changing texture to side profile
     if ((tetStage == 1 || tetStage == 2) && source.x < tdim*2) source.x+=tdim*2;
-    else if (tetStage == 3) t = LoadTexture("resources/tet/tet_3_left.png");
-    else if (tetStage == 4) t = LoadTexture("resources/tet/tet_4_left.png");
+    else if (tetStage == 3) {
+        UnloadTexture(t);
+        t = LoadTexture("resources/tet/tet_3_left.png");
+    }
+    else if (tetStage == 4) {
+        UnloadTexture(t);
+        t = LoadTexture("resources/tet/tet_4_left.png");
+    }
 
 }
 
@@ -971,6 +990,7 @@ int Tet::tetCutscene() {
             if (fade == 0) MusicPlayer().fade(140);
             fade+=0.01;
             if (fade >= 1.5) {
+                UnloadTexture(tetFace);
                 return 0;
             }
         }

@@ -118,13 +118,15 @@ void MusicPlayer::play(std::string file) {
 }
 
 void MusicPlayer::pause() {
-    pauseSong = LoadMusicStream("resources/music/tet_theme.wav");
+    UnloadMusicStream(pauseSong);
+    pauseSong = LoadMusicStream("resources/music/tet_theme.mp3");
     PlayMusicStream(pauseSong);
 }
 
 void MusicPlayer::resume() {
     StopMusicStream(pauseSong);
     UnloadMusicStream(pauseSong);
+    pauseSong = LoadMusicStream("");
 }
 
 void MusicPlayer::fade(int frames, std::string file) {
@@ -164,8 +166,17 @@ void MusicPlayer::updatePauseMusic() {
     else UpdateMusicStream(pauseSong);
 }
 
-Music MusicPlayer::song;
-Music MusicPlayer::pauseSong;
+void MusicPlayer::reset() {
+    StopMusicStream(song);
+    UnloadMusicStream(song);
+    song = LoadMusicStream("");
+    StopMusicStream(pauseSong);
+    UnloadMusicStream(pauseSong);
+    pauseSong = LoadMusicStream("");
+}
+
+Music MusicPlayer::song = LoadMusicStream("");
+Music MusicPlayer::pauseSong = LoadMusicStream("");
 std::string MusicPlayer::nextSong = "";
 float MusicPlayer::vol = 1;
 float MusicPlayer::decrease = 0;
@@ -220,6 +231,16 @@ void sound::updateSound() {
     }
     else ++resetCounter;
 
+}
+
+void sound::reset() {
+    resetCounter = 0;
+    item* it = sounds.head;
+    while (it != nullptr) {
+        item* temp = it;
+        it = it->next;
+        sounds.remove(temp);
+    }
 }
 
 int sound::resetCounter = 0;

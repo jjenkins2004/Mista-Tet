@@ -17,6 +17,10 @@ void Text::move() {
 
 Score::Score(): score(0) {}
 
+Score::~Score() {
+    UnloadFont(allFont);
+}
+
 void Score::drawScore() {
     Color DarkRed = {static_cast<unsigned char>(255-level*1.4), 0, 0, 255};
 

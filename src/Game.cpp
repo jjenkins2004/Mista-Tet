@@ -95,7 +95,7 @@ int main() {
             // grid->randomRotate();
             //score->addScore(89000);
             // powerUp->spawnPowerup(true);
-            start = false; continue;
+            // start = false; continue;
 
             //bringing up our start menu
             if (menu() == -1) break;
@@ -541,7 +541,10 @@ int menu() {
                 DrawRectangle(0, 0, 800, 800, Fade(BLACK, fadeTracker));
                 fadeTracker+=0.01;
             }
-            if (fadeTracker >= 1.5) return 0;
+            if (fadeTracker >= 1.5) {
+                UnloadFont(titleFont);
+                return 0;
+            }
         EndDrawing();
 
     }
@@ -565,8 +568,8 @@ int pause() {
         MusicPlayer().updatePauseMusic();               //updating music stream
 
         //for bobbing of giant Tet Head
-        if (counter == 15) {
-                src.x+=70*add;
+        if (counter == 15) { 
+            src.x+=70*add;
             if (src.x == 280) add = -1;
             if (src.x == 0) add = 1;
             counter = 0;
@@ -594,7 +597,11 @@ int pause() {
 
         //checking user input
         if (startWait == 0) {                           //startWait is used to give a little delay before program recognizes user inputs
-            if (IsKeyPressed(KEY_P)) return 1;          //continue game
+            if (IsKeyPressed(KEY_P)) {                  //continue game
+                UnloadTexture(tetHead);
+                UnloadFont(allFont);
+                return 1;    
+            }
             else if (IsKeyPressed(KEY_M)) quit = true;  //go to main menu
             else if (IsKeyDown(KEY_Q)) return -1;       //quit program
         }
@@ -612,7 +619,11 @@ int pause() {
             }
         EndDrawing();
 
-        if (fade >= 1) return 0;
+        if (fade >= 1) {
+            UnloadTexture(tetHead);
+            UnloadFont(allFont);
+            return 0;
+        }
 
         ++counter;
         ++bobCounter;

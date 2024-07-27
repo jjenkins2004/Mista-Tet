@@ -30,7 +30,7 @@
 
 struct PowerupItem {
     PowerupItem() { id = "null"; }                          //construct a null PowerupItem
-    virtual ~PowerupItem() {}                               //virtual destructor
+    virtual ~PowerupItem();                                 //virtual destructor
     PowerupItem(std::string i, Texture2D txt, int t);       //main constructor that takes ID, texture path, and time until despawn
     void DrawItem(bool withRotation);                       //draw the item with its position
                                                             //with rotation tells whether to draw item with consideration of the board's rotation or to ignore
@@ -145,7 +145,8 @@ class Powerup {
         //constructor
         Powerup();
 
-        static std::vector<std::pair<Vector2, Vector2>> circles;
+        //destructor
+        ~Powerup();
 
         //updating and setting
         void updateRotation(float r, float w, bool s) {rotation = r;}
@@ -165,30 +166,6 @@ class Powerup {
 
         //font
         Font allFont = LoadFont("resources/all_font.ttf");
-
-        //textures
-        Texture2D x2 = LoadTexture("resources/powerup/2_multiplier.png");
-        Texture2D x1_5 = LoadTexture("resources/powerup/1_5_multiplier.png");
-        Texture2D x1_2 = LoadTexture("resources/powerup/1_2_multiplier.png");
-        Texture2D x0_7 = LoadTexture("resources/powerup/0_7_multiplier.png");
-        Texture2D xNegative = LoadTexture("resources/powerup/negative_multiplier.png");
-        Texture2D lasers = LoadTexture("resources/powerup/lasers.png");
-        Texture2D bomb = LoadTexture("resources/powerup/bomb.png");
-        Texture2D nuke = LoadTexture("resources/powerup/nuke.png");
-        Texture2D Jblock = LoadTexture("resources/powerup/J_block.png");
-        Texture2D Lblock = LoadTexture("resources/powerup/L_block.png");
-        Texture2D Oblock = LoadTexture("resources/powerup/O_block.png");
-        Texture2D Tblock = LoadTexture("resources/powerup/T_block.png");
-        Texture2D Iblock = LoadTexture("resources/powerup/I_block.png");
-        Texture2D plus0_2 = LoadTexture("resources/powerup/0_2_multiplier.png");
-        Texture2D plus0_1 = LoadTexture("resources/powerup/0_1_multiplier.png");
-        Texture2D mystery = LoadTexture("resources/powerup/mystery.png");
-        Texture2D fiveRandom = LoadTexture("resources/powerup/5_random.png");
-        Texture2D slow1 = LoadTexture("resources/powerup/slow_1.png");
-        Texture2D slow2 = LoadTexture("resources/powerup/slow_2.png");
-        Texture2D fast1 = LoadTexture("resources/powerup/fast_1.png");
-        Texture2D fast2 = LoadTexture("resources/powerup/fast_2.png");
-        Texture2D pause = LoadTexture("resources/powerup/pause.png");
 
         //locations for powerboard
         Rectangle powerBoard = (Rectangle) {350-RECWIDTH/2, 705, RECWIDTH, RECHEIGHT};  //board of stored powerups location
