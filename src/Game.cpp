@@ -39,7 +39,7 @@ int main() {
     int rotatecounter = 0;                                  //cooldown for rotate
     int powerupcounter = 0;                                 //keeps track of when to spawn new powerup
     bool start = true;                                      //bool to bring us to the start menu
-    int spawnpower = -1;                                    //how often we should spawn powerup
+    int spawnpower = 60*5;                                  //how often we should spawn powerup
 
     //for powers
     std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
@@ -143,7 +143,7 @@ int main() {
 
         if (slow.first) {
             --slow.second;
-            if (slow.second == 0) delay.first = false;
+            if (slow.second == 0) slow.first = false;
         }
         for (std::deque<std::pair<std::string, int>>::iterator it = moveQueue.begin(); it != moveQueue.end(); it++) {
             --it->second;
@@ -187,12 +187,13 @@ int main() {
                 it--;
             }
         }
+        std::cout << "num: " << num << std::endl;
 
         //check if we should move block down
-        if (levelcounter >= num) {
+        if (!(num < 0) && levelcounter >= num) {
             levelcounter = 0;
             grid->moveDown();
-            score->addScore(1);
+            score->addScore(2);
             checkRows = true;
         }
         levelcounter++;
@@ -207,7 +208,21 @@ int main() {
         if (powerupcounter == spawnpower) {
             powerUp->spawnPowerup(true);
             powerupcounter = 0;
-            //spawnpower = GetRandomValue(3*60, 5*60);
+            if (score->getScore() < 25000) {
+                spawnpower = GetRandomValue(15*60, 25*60);
+            }
+            else if (score->getScore() < 50000) {
+                spawnpower = GetRandomValue(11*60, 22*60);
+            }
+            else if (score->getScore() < 75000) {
+                spawnpower = GetRandomValue(9*60, 17*60);
+            }
+            else if (score->getScore() < 90000) {
+                spawnpower = GetRandomValue(8*60, 14*60);
+            }
+            else if (score->getScore() < 100000) {
+                spawnpower = GetRandomValue(6*60, 11*60);
+            }
         }
         powerupcounter++;
 
@@ -494,6 +509,7 @@ int menu() {
     int cubeSize = 20;                                                          //dimension of each cube
     bool fade = false;                                                          //bool to fade into Tet Monologue when play button is pressed
     double fadeTracker = 0;                                                     //for fade of screen
+    bool mouseOn = false;                                                       //if mouse has been on the button
 
     MusicPlayer().play("resources/music/tet_theme.mp3");                        //playing tet theme song
 
@@ -501,6 +517,7 @@ int menu() {
     while (!WindowShouldClose()) {
 
         MusicPlayer().updateMusic();            //updating the music player
+        sound().updateSound();
 
         BeginDrawing();
             ClearBackground(BLACK);
@@ -532,8 +549,16 @@ int menu() {
             //checking if mouse is over the play button and if play button is clicked
             float mX = GetMouseX(); float mY = GetMouseY();
             if (CheckCollisionPointRec((Vector2){mX, mY}, playbutton)) {
+                if (!mouseOn) {
+                    sound().play("resources/audio/button_down.mp3");
+                    mouseOn = true;
+                }
                 DrawRectangleRounded(playbutton, 0.2, 100, Fade(WHITE, 0.3));
                 if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) fade = true;
+            }
+            else {
+                if (mouseOn) sound().play("resources/audio/button_up.mp3");
+                mouseOn = false;
             }
 
             //once play button is hit then fade to black for tet monologue

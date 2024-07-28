@@ -586,7 +586,7 @@ void Grid::rotate() {
 
 void Grid::drop() {
     sound().play("resources/audio/block_dropping.mp3");
-    scr->addScore(2*block.drop(grid)); 
+    scr->addScore(4*block.drop(grid)); 
     this->placeBlock();
     this->generateBlock();
 }
@@ -612,7 +612,7 @@ void Grid::placeBlock() {
 }
 
 void Grid::generateBlock() {
-    block = Block(/*next.front()*/1, grid);
+    block = Block(next.front(), grid);
     const std::pair<int, int>* pos = block.getPos();
     for (int i = 0; i < 4; i++) if (grid[pos[i].second][pos[i].first] != 0) gameover = true;
     next.pop_front();
@@ -735,10 +735,10 @@ int Grid::fixRows(std::vector<int> rows) {
                 }
                 if (leave) {
                     counter = 0;
-                    if (rows.size() == 1) scr->addScore(150);
-                    else if (rows.size() == 2) scr->addScore(400);
-                    else if (rows.size() == 3) scr->addScore(600);
-                    else scr->addScore(1000);
+                    if (rows.size() == 1) scr->addScore(200);
+                    else if (rows.size() == 2) scr->addScore(350);
+                    else if (rows.size() == 3) scr->addScore(700);
+                    else scr->addScore(1500);
                     while (!WindowShouldClose()) {
                         updateAll();
                         if (counter == 15) {
@@ -844,8 +844,8 @@ int Grid::lasers() {
                     }
                 }
                 //the more blocks you break, the higher score and greater multiplier buff
-                this->scr->addMultiplier(1+counter*0.025);
-                this->scr->addScore(counter*30);
+                this->scr->addMultiplier(1+counter*0.05);
+                this->scr->addScore(counter*40);
                 
                 tet->look({-1, 0});
                 UnloadTexture(laser);
@@ -942,7 +942,7 @@ int Grid::bomb() {
                             }
                         }
                     }
-                scr->addScore(counter*25);
+                scr->addScore(counter*35);
                 }
                 else {
                     explosionSource.x+=250;
@@ -1035,7 +1035,7 @@ int Grid::nuke() {
             }
         }
         tet->look({-1, 0});
-        scr->addScore(gridCounter*10);
+        scr->addScore(gridCounter*15);
         UnloadTexture(explosion);
         return 0;
     }

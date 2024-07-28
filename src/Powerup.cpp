@@ -281,7 +281,10 @@ PlusMultiplier::PlusMultiplier(double m, int time, Texture2D texture): PowerupIt
 
 FiveRandom::FiveRandom(int time, Texture2D texture): PowerupItem("fiverandom", texture, time) {}
 
-SpeedChange::SpeedChange(int var, int time, Texture2D texture): PowerupItem("speedchange", texture, time), variant(var) {}
+SpeedChange::SpeedChange(int var, int time, Texture2D texture): PowerupItem("speedchange", texture, time), variant(var) {
+    if (var > 0) positive = false;
+    else positive = true;
+}
 
 Mystery::Mystery(int time, Texture2D texture): PowerupItem("mystery", texture, time) {}
 
@@ -356,7 +359,7 @@ void powerList::remove(item* i) {
     if (i == tail) tail = i->prev;
     if (i->prev != nullptr) i->prev->next = i->next;
     if (i->next != nullptr) i->next->prev = i->prev;
-    UnloadTexture(i->curr->texture);
+    if (!(i->curr->removed)) UnloadTexture(i->curr->texture);
     delete i;
 }
 
@@ -415,13 +418,14 @@ void Powerup::drawPowerupItems() {
                     removed = true;
                     bool added = false;
                     if (temp->curr->id == "multiplier" && !temp->curr->positive) { //we don't need to add bad multipliers to the collected powers, effects are realized immediately
+                        sound().play("resources/audio/debuff.mp3");
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
                         src->addMultiplier(m->multiplier);
                     }
                     else if (temp->curr->id == "fiverandom") { //don't need to add fiverandom to collected powerups, effects are realized immediately
                         for (int i = 0; i < 5; i++) spawnPowerup(false);
                     }
-                    else if (temp->curr->id == "speedchange") {
+                    else if (temp->curr->id == "speedchange" && !temp->curr->positive) {
                         SpeedChange* s = dynamic_cast<SpeedChange*>(temp->curr);
                         if (s->variant > 0) fastSpeed.push_back(std::make_pair(s->variant == 1 ? 0.8: 0.65, 1800));
                     }
@@ -507,7 +511,6 @@ void Powerup::drawPowerBoard() {
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
-    bool positive = false;
     int rand1;
     if (include5Rand) rand1 = GetRandomValue(1, 100);
     else rand1 = GetRandomValue(1, 95);
@@ -534,10 +537,10 @@ void Powerup::spawnPowerup(bool include5Rand) {
     else if (rand1 <= 65) {
         int rand2 = GetRandomValue(1, 5);
         if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, LoadTexture("resources/powerup/pause.png")));
-        if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, LoadTexture("resources/powerup/fast_1.png")));
-        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, LoadTexture("resources/powerup/fast_2.png")));
-        if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, LoadTexture("resources/powerup/slow_1.png")));
-        if (rand2 == 3) spawnedPower.push_back(new SpeedChange(-2, 1000, LoadTexture("resources/powerup/slow_2.png")));
+        else if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, LoadTexture("resources/powerup/fast_1.png")));
+        else if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, LoadTexture("resources/powerup/fast_2.png")));
+        else if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, LoadTexture("resources/powerup/slow_1.png")));
+        else if (rand2 == 5) spawnedPower.push_back(new SpeedChange(-2, 1000, LoadTexture("resources/powerup/slow_2.png")));
     }
     //bomb, nuke, and laser powerups
     else if (rand1 <= 80) { 

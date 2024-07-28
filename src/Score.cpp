@@ -86,7 +86,7 @@ void Score::updateMultiplier() {
 }
 
 void Score::addMultiplier(double i) {
-    currmultipliers.push_back(std::make_pair(i, 1800));
+    currmultipliers.push_back(std::make_pair(i, i > 0 ? 1800: 900));
 }
 
 std::string Score::convertDecimal(float i) {

@@ -130,7 +130,7 @@ void Tet::updateDialogue() {
                 txtTracker = 0;
                 wait = true;
                 waitTime = 300 + tetText.size()*3;
-                timebetweenText = GetRandomValue(1*60, 3*60); //how long should tet wait between dialogues
+                timebetweenText = GetRandomValue(5*60, 15*60); //how long should tet wait between dialogues
             }
             txtCounter = 0;
         }
@@ -146,7 +146,7 @@ void Tet::updateDialogue() {
             stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 10;
+            int num = 4;
             if (tetStage >= 3) num = 7;                             //later stages of the game make tet powers happen more often
             if (finalStage) num = 10;
             if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
@@ -161,8 +161,8 @@ void Tet::updateDialogue() {
                         txtIndex = GetRandomValue(3, 3);                    //final stage powers
                     }
                 }
-                else if (tetStage <=2) txtIndex = /*GetRandomValue(0, 6)*/7;     //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 7);                       //choosing power from our late stage bag
+                else if (tetStage <=2) txtIndex = GetRandomValue(0, 7);     //choosing power from our early stage bag
+                else txtIndex = GetRandomValue(0, 8);                       //choosing power from our late stage bag
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);

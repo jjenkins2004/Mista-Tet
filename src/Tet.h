@@ -149,7 +149,7 @@ class Tet {
 
     //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                             //current chosen power
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, fly};                      //stage 1 powers, starts at beginning
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, inputSlow};                      //stage 1 powers, starts at beginning
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2, inputDelay};           //stage 2 powers, when score is greater than 50,000
     const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2, slowAndDelay};               //final stage when score is greater than 90,000
 
