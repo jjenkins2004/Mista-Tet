@@ -187,7 +187,6 @@ int main() {
                 it--;
             }
         }
-        std::cout << "num: " << num << std::endl;
 
         //check if we should move block down
         if (!(num < 0) && levelcounter >= num) {

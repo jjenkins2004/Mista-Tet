@@ -411,26 +411,35 @@ void Powerup::drawPowerupItems() {
                 }
                 else m->collect();
             }
-            else { //the animation that plays everytime powerup is collected
+            else {                                                                          //the animation that plays everytime powerup is collected
                 it->curr->spaz();
-                if (it->curr->fade <= 0) {
+                if (it->curr->fade <= 0) {                                                  //powerup has been collected and had disappeared, so we need to do appropriate actions for after it is collected
                     item* temp = it; it = it->next;
-                    removed = true;
+                    removed = true;                                                         
                     bool added = false;
-                    if (temp->curr->id == "multiplier" && !temp->curr->positive) { //we don't need to add bad multipliers to the collected powers, effects are realized immediately
+                    if (temp->curr->id == "multiplier" && !temp->curr->positive) {          //we don't need to add bad multipliers to the collected powers, effects are realized immediately
                         sound().play("resources/audio/debuff.mp3");
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
+                        if (m->multiplier == 0.7) src->addPermanentMultiplier(0.02);        //gives small permanent multiplier
+                        if (m->multiplier == -1) src->addPermanentMultiplier(0.05);
                         src->addMultiplier(m->multiplier);
                     }
-                    else if (temp->curr->id == "fiverandom") { //don't need to add fiverandom to collected powerups, effects are realized immediately
+                    else if (temp->curr->id == "plusmultiplier") {                          //immediately add buff of plus multiplier
+                        sound().play("resources/audio/powerup_sound.mp3");
+                        PlusMultiplier* m = dynamic_cast<PlusMultiplier*>(temp->curr);
+                        src->addPermanentMultiplier(m->multiplier);
+
+                    }
+                    else if (temp->curr->id == "fiverandom") {                              //don't need to add fiverandom to collected powerups, effects are realized immediately
                         for (int i = 0; i < 5; i++) spawnPowerup(false);
                     }
-                    else if (temp->curr->id == "speedchange" && !temp->curr->positive) {
+                    else if (temp->curr->id == "speedchange" && !temp->curr->positive) {    //immediately give the debuff of faster speed
                         SpeedChange* s = dynamic_cast<SpeedChange*>(temp->curr);
-                        if (s->variant > 0) fastSpeed.push_back(std::make_pair(s->variant == 1 ? 0.8: 0.65, 1800));
+                        fastSpeed.push_back(std::make_pair(s->variant == 1 ? 0.8: 0.65, 1800));
+                        src->addMultiplier(s->variant == 1 ? 1.3: 1.5);                     //trade off, gives multiplier
                     }
-                    else {
-                        for (int i = 0; i < 3; i++) {
+                    else {                                                                  //no special conditions for this powerup, so add it the player powerup holder
+                        for (int i = 0; i < 3; i++) {                                       //iterate through 3 slots and check if there is an open space
                             if (currPower[i]->id == "null") {
                                 currPower[i] = temp->curr;
                                 if (i == 0) {
@@ -511,6 +520,8 @@ void Powerup::drawPowerBoard() {
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
+    spawnedPower.push_back(new Laser(1000, LoadTexture("resources/powerup/lasers.png")));
+    return;
     int rand1;
     if (include5Rand) rand1 = GetRandomValue(1, 100);
     else rand1 = GetRandomValue(1, 95);
