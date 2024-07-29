@@ -565,7 +565,7 @@ void Grid::updatelevel() {
 
 
 void Grid::moveDown() {
-    scr->addScore(1);
+    scr->addScore(2);
     if (!block.moveDown(grid)) {
         this->placeBlock();
         this->generateBlock();
@@ -698,13 +698,13 @@ int Grid::removeRow(std::vector<int>& rows) {
     return -1;
 }
 
-int Grid::fixRows(std::vector<int> rows) {
+int Grid::fixRows(std::vector<int> rows, bool showBlock, bool addScore) {
 
     /*****
      * The logic is that we start from the lowest row removed (which is the last element of the removed rows vector), then 
      * iterate through the removed rows vector, in order to find from which row we need to move all our tetris pieces down.
      * However, this program also takes into account if the removed rows are not all together. For example, if rows 19 and 17
-     * were removed, then the program would first find row 18 as the start and move everything about row 18 down a distance of one.
+     * were removed, then the program would first find row 18 as the start and move everything above row 18 down a distance of one.
      * Then it would find row 17 (17 becuase we moved everything down one already) as a new starting 
      * point (there is still a gap at row 18). Finally, it would fill this gap.
     *****/
@@ -735,10 +735,12 @@ int Grid::fixRows(std::vector<int> rows) {
                 }
                 if (leave) {
                     counter = 0;
-                    if (rows.size() == 1) scr->addScore(200);
-                    else if (rows.size() == 2) scr->addScore(350);
-                    else if (rows.size() == 3) scr->addScore(700);
-                    else scr->addScore(1500);
+                    if (addScore) {
+                        if (rows.size() == 1) scr->addScore(200);
+                        else if (rows.size() == 2) scr->addScore(350);
+                        else if (rows.size() == 3) scr->addScore(700);
+                        else scr->addScore(1500);
+                    }
                     while (!WindowShouldClose()) {
                         updateAll();
                         if (counter == 15) {
@@ -747,7 +749,7 @@ int Grid::fixRows(std::vector<int> rows) {
                         }
                         else counter++;
                         BeginDrawing();
-                            drawAll(false, true);
+                            drawAll(showBlock, true);
                         EndDrawing();
                     }
                     return -1;
@@ -762,6 +764,7 @@ int Grid::fixRows(std::vector<int> rows) {
                 }
             }
 
+
             //removedRows needs the distance moved to be added to it
             for (int i = 0; i < removedRows.size(); i++) {
                 removedRows.push(removedRows.front()+1);
@@ -772,6 +775,7 @@ int Grid::fixRows(std::vector<int> rows) {
             for (int i = row; i >= 0; i--) for (int j = 0; j < 10; j++) grid[i+1][j] = grid[i][j];
             sound().play("resources/audio/block_dropping.mp3");
             distance--; row++; counter = 0;
+            
         }
         else {
             counter++;
@@ -779,7 +783,7 @@ int Grid::fixRows(std::vector<int> rows) {
 
         //drawing
         BeginDrawing();
-            drawAll(false, true);
+            drawAll(showBlock, true);
         EndDrawing();
 
     }
@@ -800,11 +804,12 @@ int Grid::lasers() {
     Texture2D laser = LoadTexture("resources/powerup/laser.png");
     float fade = 0;
     int wait = 0;
+    int counter = 0;
 
     //camera for screen shake
     Camera2D camera;
-    float maxAngle = 1.5;
-    float maxOffset = 15;
+    float maxAngle = 3;
+    float maxOffset = 30;
 
     //choosing three random rows
     std::vector<int> row;
@@ -817,6 +822,16 @@ int Grid::lasers() {
         std::vector<int>::iterator it = nums.begin() + randnum;
         row.push_back(nums[randnum]);
         nums.erase(it);
+    }
+    
+    //finding number of blocks that were hit by laser
+    int blocks = 0;
+    for (int i = 0; i < 3; i++) {
+        for (int j = 0; j < 10; j++) {
+            if (grid[row[i]][j] != 0) {
+                blocks++;
+            }
+        }
     }
     
     sound().play("resources/audio/laser_audio.mp3");
@@ -832,44 +847,49 @@ int Grid::lasers() {
                 continue;
             }
 
+            //stream of score being added
+            if (counter%7 == 0) {
+                scr->addScore(blocks);
+            }
+            counter++;
+
             camera.offset.x = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             camera.offset.y = 400 + maxOffset*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             camera.rotation = cameraMain.rotation + maxAngle*(double(rand())/RAND_MAX)*(1-GetRandomValue(0, 1)*2);
             fade+=0.008;
             if (fade >= 1.2) {
-                int counter = 0;
+
+                //the more blocks you break, the higher score and greater multiplier buff
+                this->scr->addMultiplier(1+blocks*0.04);
+
+                //removing affected blocks
                 for (int i = 0; i < 3; i++) {
                     for (int j = 0; j < 10; j++) {
                         if (grid[row[i]][j] != 0) {
                             grid[row[i]][j] = 0;
-                            counter++;
                         }
                     }
                 }
-                //the more blocks you break, the higher score and greater multiplier buff
-                this->scr->addMultiplier(1+counter*0.05);
-                this->scr->addScore(counter*30);
                 
                 tet->look({-1, 0});
                 UnloadTexture(laser);
 
                 for (int i = 0; i < 3; i++) {
                     for (int j = i; j < 3; j++) {
-                        if (row[j] > row[i]) {
+                        if (row[j] < row[i]) {
                             int temp = row[i];
                             row[i] = row[j];
                             row[j] = temp;
                         }
                     }
                 }
-                fixRows(row);
+                fixRows(row, true, false);
                 return 0;
             }
-    
-            if (fade > 0.5) {
-                if (maxOffset > 3) maxOffset-=0.3;
-                if (maxAngle > 0.2) maxAngle-=0.03;
-            }
+
+            if (maxOffset > 0.5) maxOffset-=0.3;
+            if (maxAngle > 0.1) maxAngle-=0.05;
+
         BeginDrawing();
             BeginMode2D(camera);
                 this->drawAll(true, false);

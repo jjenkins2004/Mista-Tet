@@ -4,7 +4,7 @@
 
 using namespace std;
 
-Tet::Tet(Score* s): src(s) {
+Tet::Tet(Score* s): scr(s) {
      for (int i = 0; i < 20; i++) {
         vals.push_back(i);
      }
@@ -193,12 +193,12 @@ void Tet::babyPower() {
             }
         }
         if (positions.empty()) {                                                                                    //player has clicked all the heads, reward them
-            src->addScoreIgnoreNeg(300);
+            scr->addScoreIgnoreNeg(300);
             babies = make_tuple(0, 0, 0);                                                                           //shows to not draw babies
         }
         else {
             if (--get<2>(babies) == 0) {
-                src->addScoreIgnoreNeg(get<1>(babies)*-1);
+                scr->addScoreIgnoreNeg(get<1>(babies)*-1);
                 babies = make_tuple(0, 0, 0);
             }
         }
@@ -249,7 +249,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
         }
         else if (flytime == 134 || flytime == 135) {
             tetVel.y-=20;
@@ -263,7 +263,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
         }
         look({dest.x+tetVel.x, dest.y+tetVel.y});
         tetFade-=0.03;
@@ -303,7 +303,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
             
         }
         else if (flytime == 174 || flytime == 175) {
@@ -318,7 +318,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
         }
         look({dest.x+tetVel.x, dest.y+tetVel.y});
         tetFade-=0.03;
@@ -358,7 +358,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
 
         }
         else if (flytime == 214 || flytime == 215) {
@@ -373,7 +373,7 @@ void Tet::flyPower() {
                     ++scoreCount;
                 }
             }
-            if (scoreCount != 0) src->addScoreIgnoreNeg(-5*scoreCount);
+            if (scoreCount != 0) scr->addScoreIgnoreNeg(-5*scoreCount);
         }
         look({dest.x+tetVel.x, dest.y+tetVel.y});
         tetFade-=0.03;
@@ -624,15 +624,15 @@ int Tet::tetMonologue() {
 
 void Tet::usePower(tetPower p) {
     if (p.power == "less") {
-        src->addMultiplier(0.7);
+        scr->addMultiplier(0.7);
         sound().play("resources/audio/debuff.mp3");
     }
     else if (p.power == "half") {
-        src->addMultiplier(0.5);
+        scr->addMultiplier(0.5);
         sound().play("resources/audio/debuff.mp3");
     }
     else if (p.power == "negative") {
-        src->addMultiplier(-1);
+        scr->addMultiplier(-1);
         sound().play("resources/audio/debuff.mp3");
     }
     else if (p.power == "babies1") {
@@ -777,20 +777,20 @@ void Tet::drawTetText(std::string& s) {
 }
 
 void Tet::checkStage() {
-    if (src->getScore() >= 25000 && tetStage < 2) {
+    if (scr->getScore() >= 25000 && tetStage < 2) {
         tetStage = 2;
         UnloadTexture(t);
         t = LoadTexture("resources/tet/tet_2.png");
         MusicPlayer().fade(300, "resources/music/tet_stage_2.mp3");
     }
-    else if (src->getScore() >= 50000 && tetStage < 3) {
+    else if (scr->getScore() >= 50000 && tetStage < 3) {
         tetStage = 3;
         UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/tet_3_forward.png");
         else t = LoadTexture("resources/tet/tet_3_left.png");
         MusicPlayer().fade(300, "resources/music/tet_stage_3.mp3");
     }
-    else if (src->getScore() >= 75000 && tetStage < 4) {
+    else if (scr->getScore() >= 75000 && tetStage < 4) {
         tetStage = 4;
         UnloadTexture(t);
         if (rotation == 0) t = LoadTexture("resources/tet/tet_4_forward.png");
@@ -800,10 +800,10 @@ void Tet::checkStage() {
 
     //handled in game.cpp
 
-    //else if (src->getScore() >= 90000) {
+    //else if (scr->getScore() >= 90000) {
         //cutscene and tet goes crazy with his powers
     //}
-    //else if (src->getScore() >= 100000) {
+    //else if (scr->getScore() >= 100000) {
         //you win
     //}
 }

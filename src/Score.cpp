@@ -60,6 +60,7 @@ void Score::addScore(int score) {
     if (scr >= 100) c = GOLD;
     else if (scr < 0) c = RED;
     scores.push_back(Text(s.c_str(), 690, 637, font, c));
+    std::cout << "added " << scr << std::endl;
 }
 
 void Score::addScoreIgnoreNeg(int score) {

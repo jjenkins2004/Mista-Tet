@@ -58,9 +58,9 @@ class Grid {
         // Row Related Functions
         //--------------------------------------------------------------------------
 
-        int removeRow(std::vector<int>& rows);                      //removes rows in argument and plays animation to make it look cool!
-        const std::vector<int> checkRowComplete() const;            //returns which rows need to be removed in a vector if empty then no rows need to be removed
-        int fixRows(std::vector<int> rows);                         //fixes row gap after removal of rows in argument vector 
+        int removeRow(std::vector<int>& rows);                              //removes rows in argument and plays animation to make it look cool!
+        const std::vector<int> checkRowComplete() const;                    //returns which rows need to be removed in a vector if empty then no rows need to be removed
+        int fixRows(std::vector<int> rows, bool showBlock, bool addScore);  //fixes row gap after removal of rows in argument vector 
 
         //--------------------------------------------------------------------------
         // Player powerup and Tet power functions

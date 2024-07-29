@@ -185,7 +185,7 @@ class Tet {
     void drawTetText(std::string& s);                                                                   //function that puts tet's dialogue on correct position
 
     float camRotation = 0;                                          //current camera rotation
-    Score* src;                                                     //score object pointer
+    Score* scr;                                                     //score object pointer
     Font tetFont = LoadFont("resources/all_font.ttf");              //font used for text
     int level;                                                      //current level
     int (*grid)[10];                                                //pointer to grid

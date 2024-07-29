@@ -192,7 +192,6 @@ int main() {
         if (!(num < 0) && levelcounter >= num) {
             levelcounter = 0;
             grid->moveDown();
-            score->addScore(2);
             checkRows = true;
         }
         levelcounter++;
@@ -433,7 +432,7 @@ int main() {
             levelcounter = 0;
             //removes our grid rows and fixes, if -1 is returned then program needs to exit
             if (!rowsRemoved.empty()) {
-                if (grid->removeRow(rowsRemoved) == -1 || grid->fixRows(rowsRemoved) == -1) {
+                if (grid->removeRow(rowsRemoved) == -1 || grid->fixRows(rowsRemoved, false, true) == -1) {
                     CloseWindow();
                     return 0;
                 }
