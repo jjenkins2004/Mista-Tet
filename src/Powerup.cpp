@@ -520,23 +520,30 @@ void Powerup::drawPowerBoard() {
 }
 
 void Powerup::spawnPowerup(bool include5Rand) {
-    spawnedPower.push_back(new Laser(1000, LoadTexture("resources/powerup/lasers.png")));
-    return;
-    int rand1;
-    if (include5Rand) rand1 = GetRandomValue(1, 100);
-    else rand1 = GetRandomValue(1, 95);
+    double rand1 = double(rand())/RAND_MAX;
+    if (!include5Rand) {
+        rand1*=dividers[10];
+    }
+
+    int upperBound;                 //the upperbound divider of the powerup that was randomly chosen
 
     //multiplier powerup
-    if (rand1 <= 25) {
-        int rand2 = GetRandomValue(1, 5);
+    if (rand1 <= dividers[1]) {
+        upperBound = 1;
+        int rand2 = GetRandomValue(1, 3);
         if (rand2 <= 1) spawnedPower.push_back(new Multiplier(2, 800, LoadTexture("resources/powerup/2_multiplier.png")));
         else if (rand2 <= 2) spawnedPower.push_back(new Multiplier(1.5, 1200, LoadTexture("resources/powerup/1_5_multiplier.png")));
-        else if (rand2 <= 3) spawnedPower.push_back(new Multiplier(1.2, 1500, LoadTexture("resources/powerup/1_2_multiplier.png")));
-        else if (rand2 <= 4) spawnedPower.push_back(new Multiplier(-1, 1500, LoadTexture("resources/powerup/negative_multiplier.png")));
+        else spawnedPower.push_back(new Multiplier(1.2, 1500, LoadTexture("resources/powerup/1_2_multiplier.png")));
+    }
+    else if (rand1 <= dividers[2]) {
+        upperBound = 2;
+        int rand2 = GetRandomValue(1, 2);
+        if (rand2 <= 1) spawnedPower.push_back(new Multiplier(-1, 1500, LoadTexture("resources/powerup/negative_multiplier.png")));
         else spawnedPower.push_back(new Multiplier(0.7, 1500, LoadTexture("resources/powerup/0_7_multiplier.png")));
     }
     //next three blocks powerup
-    else if (rand1 <= 45) {
+    else if (rand1 <= dividers[3]) {
+        upperBound = 3;
         int rand2 = GetRandomValue(1, 5);
         if (rand2 <= 1) spawnedPower.push_back(new ThreeBlock(1000, LoadTexture("resources/powerup/I_block.png"), 1));
         else if (rand2 <= 2) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/J_block.png"), 2));
@@ -545,29 +552,83 @@ void Powerup::spawnPowerup(bool include5Rand) {
         else if (rand2 <= 5) spawnedPower.push_back(new ThreeBlock(1200, LoadTexture("resources/powerup/T_block.png"), 6));
     }
     //change block movedown speed powerup
-    else if (rand1 <= 65) {
-        int rand2 = GetRandomValue(1, 5);
+    else if (rand1 <= dividers[4]) {
+        upperBound = 4;
+        int rand2 = GetRandomValue(1, 3);
         if (rand2 == 1) spawnedPower.push_back(new SpeedChange(0, 800, LoadTexture("resources/powerup/pause.png")));
-        else if (rand2 == 2) spawnedPower.push_back(new SpeedChange(1, 1000, LoadTexture("resources/powerup/fast_1.png")));
-        else if (rand2 == 3) spawnedPower.push_back(new SpeedChange(2, 1000, LoadTexture("resources/powerup/fast_2.png")));
-        else if (rand2 == 4) spawnedPower.push_back(new SpeedChange(-1, 1000, LoadTexture("resources/powerup/slow_1.png")));
-        else if (rand2 == 5) spawnedPower.push_back(new SpeedChange(-2, 1000, LoadTexture("resources/powerup/slow_2.png")));
+        else if (rand2 == 2) spawnedPower.push_back(new SpeedChange(-1, 1000, LoadTexture("resources/powerup/slow_1.png")));
+        else spawnedPower.push_back(new SpeedChange(-2, 1000, LoadTexture("resources/powerup/slow_2.png")));
     }
-    //bomb, nuke, and laser powerups
-    else if (rand1 <= 80) { 
-        int rand2 = GetRandomValue(1, 5);
-        if (rand2 <= 2) spawnedPower.push_back(new Laser(1000, LoadTexture("resources/powerup/lasers.png")));
-        else if (rand2 <= 4) spawnedPower.push_back(new Bomb(1000, LoadTexture("resources/powerup/bomb.png")));
-        else spawnedPower.push_back(new Nuke(800, LoadTexture("resources/powerup/nuke.png")));
+    else if (rand1 <= dividers[5]) {
+        upperBound = 5;
+        int rand2 = GetRandomValue(1, 2);
+        if (rand2 == 1) spawnedPower.push_back(new SpeedChange(1, 1000, LoadTexture("resources/powerup/fast_1.png")));
+        else spawnedPower.push_back(new SpeedChange(2, 1000, LoadTexture("resources/powerup/fast_2.png")));
+    }
+    //nuke
+    else if (rand1 <= dividers[6]) { 
+        upperBound = 6;
+        spawnedPower.push_back(new Nuke(800, LoadTexture("resources/powerup/nuke.png")));
+    }
+    //laser
+    else if (rand1 <= dividers[7]) {
+        upperBound = 7;
+        spawnedPower.push_back(new Laser(1000, LoadTexture("resources/powerup/lasers.png")));
+    }
+    //bomb
+    else if (rand1 <= dividers[8]) {
+        upperBound = 8;
+        spawnedPower.push_back(new Bomb(1000, LoadTexture("resources/powerup/bomb.png")));
     }
     //permanent multiplier boost powerup
-    else if (rand1 <= 86) {
+    else if (rand1 <= dividers[9]) {
+        upperBound = 9;
         int rand2 = GetRandomValue(1, 3);
         if (rand2 <= 2) spawnedPower.push_back(new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/0_1_multiplier.png")));
         else spawnedPower.push_back(new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/0_2_multiplier.png")));
     }
-    else if (rand1 <= 95) spawnedPower.push_back(new Mystery(1000, LoadTexture("resources/powerup/mystery.png")));
-    else if (rand1 <= 100) spawnedPower.push_back(new FiveRandom(1000, LoadTexture("resources/powerup/5_random.png")));
+    else if (rand1 <= dividers[10]) {
+        upperBound = 10;
+        spawnedPower.push_back(new Mystery(1000, LoadTexture("resources/powerup/mystery.png")));
+    }
+    else {
+        upperBound = 11;
+        spawnedPower.push_back(new FiveRandom(1000, LoadTexture("resources/powerup/5_random.png")));
+    }
+
+    if (++numPow == 15) {                               //resetting dividers to original after 15 powerups have been spawned
+        dividers = originalDividers;
+        numPow = 0;
+    }
+    else {                                              //makes chosen powerup percentDecrease less likely to show up again and increases the chances of all other powerups, scaling with their makeup of the total percentage
+        std::vector<double> oldDividers = dividers;
+        double percentDecrease = 0.3;
+        double chance = dividers[upperBound]-dividers[upperBound-1];
+
+        //finding the new dividers after the percentDecrase decrease in chance
+        if (upperBound == 11) {                         
+            dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+        }
+        else if (upperBound == 1) {
+            dividers[upperBound] = chance*(1-percentDecrease);
+        }
+        else {
+            dividers[upperBound] = dividers[upperBound-1] + chance*(1-percentDecrease/2);
+            dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+        }
+
+        //finding the total percent increase of the set above and below our chosen powerup
+        double belowPercentIncrease = dividers[upperBound-1]/oldDividers[upperBound-1];
+        double abovePercentIncrease = (1-dividers[upperBound])/(1-oldDividers[upperBound]);
+
+        //looping through before and after our chosen powerup and adjusting the border values
+        for (int i = 1; i < upperBound-1; i++) {
+            dividers[i] = (oldDividers[i]-oldDividers[i-1])*belowPercentIncrease+dividers[i-1];
+        }
+        for (int i = upperBound+1; i < 11; i++) {
+            dividers[i] = (oldDividers[i]-oldDividers[i-1])*abovePercentIncrease+dividers[i-1];
+        }
+    }
 }
 
 PowerupItem* Powerup::usePowerup(int k) {

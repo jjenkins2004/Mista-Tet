@@ -173,6 +173,23 @@ class Powerup {
         Vector2 circle2 = (Vector2) {350, 740};                                         //circle2 location in board
         Vector2 circle3 = (Vector2) {420, 740};                                         //circle3 location in board
         Color circleColor = (Color) {40, 40, 40, 255};                                  //color of circle outline
+
+        //powerup generation variables
+        std::vector<double> dividers = {0, 0.15, 0.25, 0.45, 0.55, 0.65, 0.69, 0.76, 0.85, 0.92, 0.97, 1};
+
+            //positive multipliers: 15%, <= 0.15
+            //negative multipliers: 10%, <= 0.25
+            //three blocks: 20%, <= 0.45
+            //slowing powerups: 10%, <= 0.55
+            //fast powerups: 10%, <= 0.65
+            //nuke: 4%, <= 0.69
+            //laser: 7%, <= 0.76
+            //bomb: 9%, <= 0.85
+            //permanent multiplier: 7%, <= 0.92
+            //mystery: 5%, <= 0.97
+            //five random: 3%, <= 1
+        std::vector<double> originalDividers = {0, 0.15, 0.25, 0.45, 0.55, 0.65, 0.69, 0.76, 0.85, 0.92, 0.97, 1};
+        int numPow = 0;                                 //when 10 powerups have spawned, reset to original chances
         
 
         //storage for spawned powerups
