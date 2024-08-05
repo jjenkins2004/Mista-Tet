@@ -39,6 +39,7 @@ class Grid {
         int finalStage();                                       //function called when bringing tet into final stage
         void updatelevel();                                     //updating function for level and level related powers
         int getLevel() { return level; }                        //get current level  
+        std::string getFinalTime();                             //get time in mm:ss format
         bool checkGameOver() { return gameover; }               //check if player lost
 
         //--------------------------------------------------------------------------
@@ -186,6 +187,9 @@ class Grid {
 
         //font for the game
         Font allFont = LoadFont("resources/all_font.ttf");
+
+        //time to complete game
+        int timer = 0;
         
         //our grid of placed blocks
         int grid[21][10];

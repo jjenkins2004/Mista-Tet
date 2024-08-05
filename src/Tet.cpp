@@ -158,7 +158,7 @@ void Tet::updateDialogue() {
                         txtIndex = 0;
                     }
                     else {
-                        txtIndex = GetRandomValue(3, 3);                    //final stage powers
+                        txtIndex = GetRandomValue(0, 9);                    //final stage powers
                     }
                 }
                 else if (tetStage <=2) txtIndex = GetRandomValue(0, 7);     //choosing power from our early stage bag

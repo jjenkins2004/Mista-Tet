@@ -7,11 +7,15 @@
 #include "tools.h"
 #include <cmath>
 
+#ifndef M_E
+#define M_E 2.718281828459045
+#endif
 #define screenWidth 800
 #define screenHeight 800
 
 int menu();
 int pause();
+int win();
 int usePower(PowerupItem* p, Score* src, Grid* grid);
 
 int main() {
@@ -93,7 +97,7 @@ int main() {
 
             //temp
             // grid->randomRotate();
-            //score->addScore(89000);
+            //score->addScore(100000);
             // powerUp->spawnPowerup(true);
             // start = false; continue;
 
@@ -169,6 +173,40 @@ int main() {
             if (tet->tetCutscene() == -1) break;
             scenePlayed = true;
             if (grid->finalStage() == -1) break;
+        }
+        //player wins
+        else if (score->getScore() >= 100000) {
+            bool quit = true; start = true;
+            int endcounter = 0; double fade = 0;
+            sound().reset();
+            MusicPlayer().play("resources/music/victory_song.mp3");
+            while (!WindowShouldClose()) {
+                MusicPlayer().updateMusic();
+                fade +=0.007;
+                if (fade > 4 && IsMouseButtonPressed(MOUSE_BUTTON_LEFT)) {
+                    quit = false;
+                    break;
+                }
+                BeginDrawing();
+                    ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
+                    if (fade < 1) {
+                        grid->drawAll(true, true);
+                        sound().reset();
+                    }
+                    //White Screen fade in and text that says you have defeated tet and how long it took player
+                    DrawRectangle(0, 0, 800, 800, Fade(WHITE, fade));
+                    std::string txt = "DEFEATED TET IN";
+                    DrawTextPro(titleFont, txt.c_str(), {400, 300}, {MeasureTextEx(titleFont, txt.c_str(), 50, 0).x/2, MeasureTextEx(titleFont, txt.c_str(), 50, 0).y/2}, 0, 50, 0, Fade(RED, fade));
+                    txt = grid->getFinalTime();
+                    DrawTextPro(titleFont, txt.c_str(), {400, 400}, {MeasureTextEx(titleFont, txt.c_str(), 60, 4).x/2, MeasureTextEx(titleFont, txt.c_str(), 60, 4).y/2}, 0, 60, 4, Fade(RED, fade-1.5));
+                    txt = "thank you";
+                    DrawTextPro(titleFont, txt.c_str(), {400, 500}, {MeasureTextEx(titleFont, txt.c_str(), 30, 0).x/2, MeasureTextEx(titleFont, txt.c_str(), 30, 0).y/2}, 0, 30, 0, Fade(RED, fade-3));
+                    txt = "click to proceed";
+                    DrawTextPro(titleFont, txt.c_str(), {725, 775}, {MeasureTextEx(titleFont, txt.c_str(), 10, 0).x/2, MeasureTextEx(titleFont, txt.c_str(), 10, 0).y/2}, 0, 10, 0, Fade(RED, fade));
+                EndDrawing();
+            }
+            if (quit) break;
+            else continue;
         }
 
         //updating our block every so often, speed starts at 120 frames per movement but value of logistic growth function
@@ -456,8 +494,9 @@ int main() {
                     ClearBackground((Color){static_cast<unsigned char>(0+level/2), 0, 0});
                     grid->drawAll(true, true);
                     //Fade in YOU LOSE text into center of screen with a black bar background, like in Dark Souls
-                    DrawRectangle(0, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2-10, 800, MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y+20, Fade(BLACK, fade));
-                    DrawTextEx(titleFont, "YOU LOSE", (Vector2){400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).x/2, 400-MeasureTextEx(titleFont, "YOU LOSE", 150, 5).y/2}, 150, 5, Fade(WHITE, fade));
+                    std::string txt = "YOU LOSE";
+                    DrawRectanglePro({400, 400, 800, MeasureTextEx(titleFont, txt.c_str(), 100, 0).y+20}, {400, (MeasureTextEx(titleFont, txt.c_str(), 100, 0).y+20)/2}, 0, Fade(BLACK, fade));
+                    DrawTextPro(titleFont, txt.c_str(), {400, 400}, {MeasureTextEx(titleFont, txt.c_str(), 100, 0).x/2, MeasureTextEx(titleFont, txt.c_str(), 100, 0).y/2}, 0, 100, 0, Fade(WHITE, fade));
                 EndDrawing();
             }
             if (quit) break;
@@ -493,12 +532,12 @@ int main() {
 }
 
 //----------------------------------------------------------------------------------
-// Functions: menu(), pause(), usePower()
+// Functions: menu(), pause(), usePower(), win()
 //----------------------------------------------------------------------------------
 
 int menu() {
     Font titleFont = LoadFont("resources/title_font.ttf");                      //loading font
-    Rectangle playbutton {275, 400, 240, 100};                                  //start menu play button
+    Rectangle playbutton {275, 500, 240, 100};                                  //start menu play button
     const std::vector<Color> colors = {SKYBLUE, DARKBLUE, ORANGE, 
                                         YELLOW, LIME, PURPLE, RED};             //colors for background cubes
     std::vector<std::pair<Rectangle, Color>> cubes;                             //vector that stores individual cubes each cube will
@@ -539,10 +578,10 @@ int menu() {
             }
 
             //drawing our title and play button
-            DrawTextEx(titleFont, "MistaTet", (Vector2){400-MeasureTextEx(titleFont, "MistaTet", 150, 5).x/2, 200}, 150, 5, WHITE);
+            DrawTextEx(titleFont, "MISTA TET", (Vector2){400-MeasureTextEx(titleFont, "MISTA TET", 100, 0).x/2, 200}, 100, 0, WHITE);
             DrawRectangleRounded(playbutton, 0.2, 100, LIGHTGRAY);
             DrawRectangleRoundedLines(playbutton, 0.2, 100, 10, GRAY);
-            DrawTextEx(titleFont, "start", Vector2{playbutton.x+playbutton.width/2-MeasureTextEx(titleFont, "start", 60, 0).x/2, playbutton.y+playbutton.height/2-MeasureTextEx(titleFont, "start", 60, 0).y/2}, 60, 0, WHITE);
+            DrawTextEx(titleFont, "START", Vector2{playbutton.x+playbutton.width/2-MeasureTextEx(titleFont, "START", 40, 0).x/2, playbutton.y+playbutton.height/2-MeasureTextEx(titleFont, "START", 40, 0).y/2}, 40, 0, WHITE);
 
             //checking if mouse is over the play button and if play button is clicked
             float mX = GetMouseX(); float mY = GetMouseY();

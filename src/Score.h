@@ -6,6 +6,7 @@
 #include <string>
 #include <raylib.h>
 #include <iostream>
+#include "math.h"
 
 //a singular score item, which flies out of score board when score is added and disappears
 struct Text {

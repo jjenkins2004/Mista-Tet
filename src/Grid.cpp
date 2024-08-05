@@ -297,6 +297,7 @@ void Grid::updateAll() {
     PowerupItem::rotationVel = subtract ? -angVel: angVel;
     MusicPlayer().updateMusic();
     sound().updateSound();
+    timer++;
 }
 
 void Grid::updateCamera() {
@@ -556,6 +557,15 @@ void Grid::updatelevel() {
             it--;
         }
     }
+}
+
+std::string Grid::getFinalTime() {
+    int time = timer/60;
+    std::string minutes = std::to_string(time/60);
+    if (minutes.length() == 1) minutes = "0" + minutes;
+    std::string seconds = std::to_string(time%60);
+    if (seconds.length() == 1) seconds = "0" + seconds;
+    return minutes + ":" + seconds;
 }
 
 
