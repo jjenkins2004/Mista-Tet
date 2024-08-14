@@ -52,7 +52,7 @@ class Score {
 
         Font allFont = LoadFont("resources/all_font.ttf");                  //font we are using for text
         std::deque<std::pair<double, int>> currmultipliers;                 //the current multipliers that are being applied
-        int level;                                                          //current level (used for color of text)
+        int level = 0;                                                      //current level (used for color of text)
         std::vector<Text> scores;                                           //used for animation of scores being added
         float multiplier = 1;                                               //current multiplier
         float baseMultiplier = 1;                                           //base multiplier which only includes permanent multipliers

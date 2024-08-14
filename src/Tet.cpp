@@ -25,13 +25,14 @@ void Tet::drawTet() {
     //update tet dialogue
     updateDialogue();
 
+    //tet and what he is saying
+    DrawTexturePro(t, source, dest, (Vector2){scale*tdim/2, scale*tdim/2}, rotation,  Fade(WHITE, tetFade));
+
     //tet power drawing
     //these functions will do nothing if powerup is not active but will update if it is active
     babyPower();
     flyPower();
 
-    //tet and what he is saying
-    DrawTexturePro(t, source, dest, (Vector2){scale*tdim/2, scale*tdim/2}, rotation,  Fade(WHITE, tetFade));
 }
 
 void Tet::updateDialogue() {
