@@ -26,6 +26,7 @@ PowerupItem::PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
 
 PowerupItem::~PowerupItem() {
     if (id != "null") {
+        if (id == "mystery") std::cout << "\n\nmystery unloaded \n\n" << std::endl;
         UnloadTexture(texture);
     }
 }
@@ -308,7 +309,7 @@ void Mystery::collect() {
         if (rand == 12) mystery = new Bomb(1000, LoadTexture("resources/powerup/bomb.png"));
         if (rand == 13) mystery = new Nuke(800, LoadTexture("resources/powerup/nuke.png"));
         if (rand == 14) mystery = new PlusMultiplier(0.1, 1000, LoadTexture("resources/powerup/0_1_multiplier.png"));
-        if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/0_5_multiplier.png"));
+        if (rand == 15) mystery = new PlusMultiplier(0.2, 800, LoadTexture("resources/powerup/0_2_multiplier.png"));
         if (rand == 16) mystery = new FiveRandom(1000, LoadTexture("resources/powerup/5_random.png"));
         if (rand == 17) mystery = new SpeedChange(0, 800, LoadTexture("resources/powerup/pause.png"));
         if (rand == 18) mystery = new SpeedChange(1, 800, LoadTexture("resources/powerup/fast_1.png"));
@@ -359,7 +360,10 @@ void powerList::remove(item* i) {
     if (i == tail) tail = i->prev;
     if (i->prev != nullptr) i->prev->next = i->next;
     if (i->next != nullptr) i->next->prev = i->prev;
-    if (!(i->curr->removed)) UnloadTexture(i->curr->texture);
+    // if (!(i->curr->removed)) {
+    //     if (i->curr->id == "mystery") std::cout << "\n\nremoved mystery!!!\n\n" << std::endl;
+    //     UnloadTexture(i->curr->texture);
+    // }
     delete i;
 }
 
@@ -382,6 +386,7 @@ Powerup::Powerup() {
 Powerup::~Powerup() {
     for (int i = 0; i < 3; i++) {
         delete currPower[i];
+        currPower[i] = nullptr;
     }
     
     item* it = spawnedPower.head;
@@ -406,6 +411,7 @@ void Powerup::drawPowerupItems() {
                     spawnedPower.push_back(m->mystery);
                     item* temp = it;
                     it = it->next;
+                    delete temp->curr;
                     spawnedPower.remove(temp);
                     continue;
                 }
@@ -441,6 +447,7 @@ void Powerup::drawPowerupItems() {
                     else {                                                                  //no special conditions for this powerup, so add it the player powerup holder
                         for (int i = 0; i < 3; i++) {                                       //iterate through 3 slots and check if there is an open space
                             if (currPower[i]->id == "null") {
+                                delete currPower[i];
                                 currPower[i] = temp->curr;
                                 if (i == 0) {
                                     currPower[i]->pos.x = circle1.x; currPower[i]->pos.y = circle1.y;

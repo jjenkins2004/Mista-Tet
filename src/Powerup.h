@@ -62,7 +62,7 @@ struct PowerupItem {
 
 //multiplicative multiplier that is only active for a certain amount of time
 struct Multiplier: PowerupItem {
-    Multiplier(double m, int time, Texture2D texture);      //Multiplier constructor
+    Multiplier(double m, int time, Texture2D texture);      //Multiplier constructor                  
     double multiplier;                                      //multiplier of the item
 };
 

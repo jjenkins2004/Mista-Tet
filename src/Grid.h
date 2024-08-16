@@ -53,6 +53,7 @@ class Grid {
         void drop();                                            //drop block
         void placeBlock();                                      //place block into grid at current location
         void generateBlock();                                   //generate a new random block
+        bool blockSpawned();                                    //returns true if a block has just been generated
         void hold();                                            //add the current block to the hold and current block in the hold becomes active block
 
         //--------------------------------------------------------------------------
@@ -172,6 +173,7 @@ class Grid {
         Block block;                                    //current block that is moving
         std::deque<int> next;                           //next blocks                        
         RandomBlock randBlock = RandomBlock();          //used to get random blocks
+        bool justGenerated = false;                     //will be true if a block has just been generated
 
         //block hold related variables
         int held = 0;                                   //current block being held

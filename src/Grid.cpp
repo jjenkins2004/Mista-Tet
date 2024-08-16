@@ -628,6 +628,15 @@ void Grid::generateBlock() {
     next.pop_front();
     next.push_back(randBlock.getBlock());
     ableToHold = true;
+    justGenerated = true;
+}
+
+bool Grid::blockSpawned() {
+    if (justGenerated) {
+        justGenerated = false;
+        return true;
+    }
+    return false;
 }
 
 const std::vector<int> Grid::checkRowComplete() const{

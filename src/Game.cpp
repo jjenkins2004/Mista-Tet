@@ -44,6 +44,7 @@ int main() {
     int powerupcounter = 0;                                 //keeps track of when to spawn new powerup
     bool start = true;                                      //bool to bring us to the start menu
     int spawnpower = 60*5;                                  //how often we should spawn powerup
+    int blockInitialWait = 0;                               //initial wait counter for when the block has just been generated
 
     //for powers
     std::vector<std::pair<double, int>> speedChange;        //for our speedchange powerup, double represents how changed and int is time left of effect
@@ -94,12 +95,6 @@ int main() {
             horizontalcounter = 0;
             downcounter = 0;
             scenePlayed = false;
-
-            //temp
-            // grid->randomRotate();
-            //score->addScore(100000);
-            // powerUp->spawnPowerup(true);
-            // start = false; continue;
 
             //bringing up our start menu
             if (menu() == -1) break;
@@ -226,13 +221,26 @@ int main() {
             }
         }
 
-        //check if we should move block down
-        if (!(num < 0) && levelcounter >= num) {
-            levelcounter = 0;
-            grid->moveDown();
-            checkRows = true;
+        //speed cap
+        if (num > 0 && num < 5) num = 5;
+
+        //give a slight initial delay when the block has just spawned
+        if (grid->blockSpawned()) { 
+            blockInitialWait = 15;
         }
-        levelcounter++;
+
+        if (blockInitialWait != 0) {
+            blockInitialWait--;
+        }
+        else {
+            //check if we should move block down
+            if (!(num < 0) && levelcounter >= num) {
+                levelcounter = 0;
+                grid->moveDown();
+                checkRows = true;
+            }
+            levelcounter++;
+        }
 
 
         //----------------------------------------------------------------------------------
@@ -245,19 +253,19 @@ int main() {
             powerUp->spawnPowerup(true);
             powerupcounter = 0;
             if (score->getScore() < 25000) {
-                spawnpower = GetRandomValue(15*60, 25*60);
+                spawnpower = GetRandomValue(15*60, 24*60);
             }
             else if (score->getScore() < 50000) {
-                spawnpower = GetRandomValue(11*60, 22*60);
+                spawnpower = GetRandomValue(11*60, 20*60);
             }
             else if (score->getScore() < 75000) {
-                spawnpower = GetRandomValue(9*60, 17*60);
+                spawnpower = GetRandomValue(9*60, 16*60);
             }
             else if (score->getScore() < 90000) {
-                spawnpower = GetRandomValue(8*60, 14*60);
+                spawnpower = GetRandomValue(8*60, 13*60);
             }
             else if (score->getScore() < 100000) {
-                spawnpower = GetRandomValue(6*60, 11*60);
+                spawnpower = GetRandomValue(6*60, 10*60);
             }
         }
         powerupcounter++;
