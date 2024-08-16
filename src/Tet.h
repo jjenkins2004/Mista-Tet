@@ -132,6 +132,7 @@ class Tet {
     tetPower slowAndDelay = {"Oh yeah, it's gonna be\nfun watching you struggle.", "slowanddelay"};             //delay and slow input
     tetPower fly = {"GOODBYE!!!!", "fly"};                                                                      //flies towards grid and destroys blocks in way, blocks that are destroyed decrease points
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
+    tetPower combo = {"A double dose of\ndevestation!", "combo"};                                               //combo power for tetpower1
 
     //for the babie head powerup
     std::tuple<int, int, int> babies = std::make_tuple(0, 0, 0);                    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
@@ -147,11 +148,57 @@ class Tet {
     float tetFade = 1;                                                      //variable to keep track of tet texture fade
     float tetFade2 = 0;                                                     //variable to keep track of tet texture fade
 
-    //2 vector<tetPower> inside a vector which represents the two stages, progressively gets better powers
+    //3 vector<tetPower> inside a vector which represents the three stages, progressively gets better powers
     std::string currPower = "null";                                                                                                                             //current chosen power
-    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, inputSlow};                      //stage 1 powers, starts at beginning
-    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2, inputDelay};           //stage 2 powers, when score is greater than 50,000
-    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2, slowAndDelay};               //final stage when score is greater than 90,000
+    const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, inputSlow, combo};               //stage 1 powers, starts at beginning
+    const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2, inputDelay, combo};    //stage 2 powers, when score is greater than 50,000
+    const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2, slowAndDelay, combo};        //final stage when score is greater than 90,000
+
+    //function for choosing a tet power for the correct stage
+    int chooseTetPower();
+
+    //reset percentages after every 10 tet powers
+    int resetTetPower = 0;
+
+    //Dividers for choosing different powers
+
+    //lessMutiplier: 8%, <=0.08
+    //halfMultiplier: 7%, <=0.15
+    //increaseLevel1: 14%, <= 0.29
+    //blind1: 13%, <= 0.42
+    //Zblock: 5%, <= 0.47
+    //Sblock: 5%, <= 0.52
+    //babies1: 14%, <= 0.66
+    //inputSlow: 14%, <= 0.8
+    //combo1: 20%, <= 1
+    std::vector<double> originalPowerDivider1 = {0, 0.08, 0.15, 0.29, 0.42, 0.47, 0.52, 0.66, 0.8, 1};          //tetPowers1
+    std::vector<double> powerDivider1 = {0, 0.08, 0.15, 0.29, 0.42, 0.47, 0.52, 0.66, 0.8, 1}; 
+
+    //halfMultiplier: 7%, <= 0.07
+    //negativeMultiplier: 6%, <= 0.13
+    //increaseLevel2: 12%, <= 0.25
+    //blind2: 10%, <= 0.35
+    //flip: 15%, <= 0.5
+    //Zblock: 5%, <= 0.55
+    //Sblock: 5%, <= 0.6
+    //babies2: 10%, <= 0.7
+    //inputDelay: 10%, <= 0.8
+    //combo: 20%, <= 1
+    std::vector<double> originalPowerDivider2 = {0, 0.07, 0.13, 0.25, 0.35, 0.5, 0.55, 0.6, 0.7, 0.8, 1};       //tetPowers2
+    std::vector<double> powerDivider2 = {0, 0.07, 0.13, 0.25, 0.35, 0.5, 0.55, 0.6, 0.7, 0.8, 1};       
+
+    //halfMultiplier: 6%, <= 0.06
+    //babies3: 12%, <= 0.18
+    //fly: 15%, <= 0.33
+    //flip: 12%, <= 0.45
+    //blind2: 8%, <= 0.53
+    //Zblock: 4%, <= 0.57
+    //Sblock: 4%, <= 0.61
+    //increaseLevel: 9%, <= 0.7
+    //slowAndDelay: 10%, <= 0.8
+    //combo: 20%, <= 1
+    std::vector<double> originalPowerDividerFinal = {0, 0.06, 0.18, 0.33, 0.45, 0.53, 0.57, 0.61, 0.7, 0.8, 1}; //final stage
+    std::vector<double> powerDividerFinal = {0, 0.06, 0.18, 0.33, 0.45, 0.53, 0.57, 0.61, 0.7, 0.8, 1};
 
     //for tet's face
     void tetBob();                                                                      //for the constant up and down motion of the tet head

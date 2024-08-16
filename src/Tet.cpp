@@ -130,8 +130,8 @@ void Tet::updateDialogue() {
                 time = 0;
                 txtTracker = 0;
                 wait = true;
-                waitTime = 300 + tetText.size()*3;
-                timebetweenText = GetRandomValue(5*60, 15*60); //how long should tet wait between dialogues
+                waitTime = 200 + tetText.size()*3;
+                timebetweenText = GetRandomValue(5*60, 10*60); //how long should tet wait between dialogues
             }
             txtCounter = 0;
         }
@@ -147,23 +147,19 @@ void Tet::updateDialogue() {
             stop = false;
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 4;
-            if (tetStage >= 3) num = 7;                             //later stages of the game make tet powers happen more often
-            if (finalStage) num = 10;
+            int num = 5;
+            if (tetStage >= 3) num = 6;                             //later stages of the game make tet powers happen more often
+            if (finalStage) num = 7;
             if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
                 tetpowertoggle = true;
-                if (finalStage) {
-                    if (finalStart) {
-                        //initial final stage flurry of powers
-                        sound().play("resources/audio/tet_scream.mp3");
-                        txtIndex = 0;
-                    }
-                    else {
-                        txtIndex = GetRandomValue(0, 9);                    //final stage powers
-                    }
+                if (finalStart) {
+                    //initial final stage flurry of powers
+                    sound().play("resources/audio/tet_scream.mp3");
+                    txtIndex = 0;
                 }
-                else if (tetStage <=2) txtIndex = GetRandomValue(0, 7);     //choosing power from our early stage bag
-                else txtIndex = GetRandomValue(0, 8);                       //choosing power from our late stage bag
+                else {
+                    txtIndex = chooseTetPower();
+                }
             }
             else {
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
@@ -623,6 +619,183 @@ int Tet::tetMonologue() {
     return -1;
 }
 
+int Tet::chooseTetPower() {
+    double random = double(rand())/RAND_MAX;    //random value between 0 and 1
+
+    int upperBound = 1;                         //the upperbound divider of the powerup that was randomly chosen
+    int returnVal = 1;                          //our return value
+
+    if (finalStage) {                           //final stage powers
+        if (random <= powerDividerFinal[1]) {
+            upperBound = 1;
+            returnVal = 1;
+        }
+        else if (random <= powerDividerFinal[2]) {
+            upperBound = 2;
+            returnVal = 2;
+        }
+        else if (random <= powerDividerFinal[3]) {
+            upperBound = 3;
+            returnVal = 3;
+        }
+        else if (random <= powerDividerFinal[4]) {
+            upperBound = 4;
+            returnVal = 4;
+        }
+        else if (random <= powerDividerFinal[5]) {
+            upperBound = 5;
+            returnVal = 5;
+        }
+        else if (random <= powerDividerFinal[6]) {
+            upperBound = 6;
+            returnVal = 6;
+        }
+        else if (random <= powerDividerFinal[7]) {
+            upperBound = 7;
+            returnVal = 7;
+        }
+        else if (random <= powerDividerFinal[8]) {
+            upperBound = 8;
+            returnVal = 8;
+        }
+        else if (random <= powerDividerFinal[9]) {
+            upperBound = 9;
+            returnVal = 9;
+        }
+        else if (random <= powerDividerFinal[10]) {
+            upperBound = 10;
+            returnVal = 10;
+        }
+    
+    }
+    else if (tetStage <= 2) {                   //score < 50,000 powers
+        if (random <= powerDivider1[1]) {
+            upperBound = 1;
+            returnVal = 0;
+        }
+        else if (random <= powerDivider1[2]) {
+            upperBound = 2;
+            returnVal = 1;
+        }
+        else if (random <= powerDivider1[3]) {
+            upperBound = 3;
+            returnVal = 2;
+        }
+        else if (random <= powerDivider1[4]) {
+            upperBound = 4;
+            returnVal = 3;
+        }
+         else if (random <= powerDivider1[5]) {
+            upperBound = 5;
+            returnVal = 4;
+        }
+         else if (random <= powerDivider1[6]) {
+            upperBound = 6;
+            returnVal = 5;
+        }
+         else if (random <= powerDivider1[7]) {
+            upperBound = 7;
+            returnVal = 6;
+        }
+         else if (random <= powerDivider1[8]) {
+            upperBound = 8;
+            returnVal = 7;
+        }
+         else if (random <= powerDivider1[9]) {
+            upperBound = 9;
+            returnVal = 8;
+        }
+    }
+    else {                                      //score > 50,000 but < 90,000 powers
+        if (random <= powerDivider2[1]) {
+            upperBound = 1;
+            returnVal = 0;
+        }
+        else if (random <= powerDivider2[2]) {
+            upperBound = 2;
+            returnVal = 1;
+        }
+        else if (random <= powerDivider2[3]) {
+            upperBound = 3;
+            returnVal = 2;
+        }
+        else if (random <= powerDivider2[4]) {
+            upperBound = 4;
+            returnVal = 3;
+        }
+         else if (random <= powerDivider2[5]) {
+            upperBound = 5;
+            returnVal = 4;
+        }
+         else if (random <= powerDivider2[6]) {
+            upperBound = 6;
+            returnVal = 5;
+        }
+         else if (random <= powerDivider2[7]) {
+            upperBound = 7;
+            returnVal = 6;
+        }
+         else if (random <= powerDivider2[8]) {
+            upperBound = 8;
+            returnVal = 7;
+        }
+         else if (random <= powerDivider2[9]) {
+            upperBound = 9;
+            returnVal = 8;
+        }
+        else if (random <= powerDivider2[10]) {
+            upperBound = 10;
+            returnVal = 9;
+        }
+    }
+
+    if (++resetTetPower == 10) {
+        powerDivider1 = originalPowerDivider1;
+        powerDivider2 = originalPowerDivider2;
+        powerDividerFinal = originalPowerDividerFinal;
+        resetTetPower = 0;
+    }
+    
+    //making sure we are refrencing the correct divider
+    std::vector<double>* dividersPoint = &powerDivider2;
+    if (finalStage) dividersPoint = &powerDividerFinal;
+    else if (tetStage <= 2) dividersPoint = &powerDivider1;
+
+    std::vector<double>& dividers = *dividersPoint;
+
+    //making a copy of the divider before we make changes
+    std::vector<double> oldDividers = dividers;
+
+    double percentDecrease = 0.3;
+    double chance = dividers[upperBound]-dividers[upperBound-1];
+
+    //finding the new dividers after the percentDecrase decrease in chance
+    if (upperBound == dividers.size()-1) {                         
+        dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+    }
+    else if (upperBound == 1) {
+        dividers[upperBound] = chance*(1-percentDecrease);
+    }
+    else {
+        dividers[upperBound] = dividers[upperBound-1] + chance*(1-percentDecrease/2);
+        dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+    }
+
+    //finding the total percent increase of the set above and below our chosen powerup
+    double belowPercentIncrease = dividers[upperBound-1]/oldDividers[upperBound-1];
+    double abovePercentIncrease = (1-dividers[upperBound])/(1-oldDividers[upperBound]);
+
+    //looping through before and after our chosen powerup and adjusting the border values
+    for (int i = 1; i < upperBound-1; i++) {
+        dividers[i] = (oldDividers[i]-oldDividers[i-1])*belowPercentIncrease+dividers[i-1];
+    }
+    for (int i = upperBound+1; i < dividers.size()-1; i++) {
+        dividers[i] = (oldDividers[i]-oldDividers[i-1])*abovePercentIncrease+dividers[i-1];
+    }
+
+    return returnVal;
+}
+
 void Tet::usePower(tetPower p) {
     if (p.power == "less") {
         scr->addMultiplier(0.7);
@@ -637,15 +810,15 @@ void Tet::usePower(tetPower p) {
         sound().play("resources/audio/debuff.mp3");
     }
     else if (p.power == "babies1") {
-        babies = std::make_tuple(1, 200, 200);
+        babies = std::make_tuple(1, 120, 200);
         sound().play("resources/audio/baby_laugh.mp3");
     }
     else if (p.power == "babies2"){
-        babies = std::make_tuple(2, 300, 230);
+        babies = std::make_tuple(2, 200, 230);
         sound().play("resources/audio/baby_laugh.mp3");
     }
     else if (p.power == "babies3") {
-        babies = std::make_tuple(3, 400, 260);
+        babies = std::make_tuple(3, 250, 260);
         sound().play("resources/audio/baby_laugh_final.mp3");
     }
     else if (p.power == "fly") {

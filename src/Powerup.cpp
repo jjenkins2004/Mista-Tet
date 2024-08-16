@@ -607,34 +607,33 @@ void Powerup::spawnPowerup(bool include5Rand) {
         dividers = originalDividers;
         numPow = 0;
     }
-    else {                                              //makes chosen powerup percentDecrease less likely to show up again and increases the chances of all other powerups, scaling with their makeup of the total percentage
-        std::vector<double> oldDividers = dividers;
-        double percentDecrease = 0.3;
-        double chance = dividers[upperBound]-dividers[upperBound-1];
+    
+    std::vector<double> oldDividers = dividers;
+    double percentDecrease = 0.3;
+    double chance = dividers[upperBound]-dividers[upperBound-1];
 
-        //finding the new dividers after the percentDecrase decrease in chance
-        if (upperBound == 11) {                         
-            dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
-        }
-        else if (upperBound == 1) {
-            dividers[upperBound] = chance*(1-percentDecrease);
-        }
-        else {
-            dividers[upperBound] = dividers[upperBound-1] + chance*(1-percentDecrease/2);
-            dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
-        }
+    //finding the new dividers after the percentDecrase decrease in chance
+    if (upperBound == 11) {                         
+        dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+    }
+    else if (upperBound == 1) {
+        dividers[upperBound] = chance*(1-percentDecrease);
+    }
+    else {
+        dividers[upperBound] = dividers[upperBound-1] + chance*(1-percentDecrease/2);
+        dividers[upperBound-1] = dividers[upperBound]-chance*(1-percentDecrease);
+    }
 
-        //finding the total percent increase of the set above and below our chosen powerup
-        double belowPercentIncrease = dividers[upperBound-1]/oldDividers[upperBound-1];
-        double abovePercentIncrease = (1-dividers[upperBound])/(1-oldDividers[upperBound]);
+    //finding the total percent increase of the set above and below our chosen powerup
+    double belowPercentIncrease = dividers[upperBound-1]/oldDividers[upperBound-1];
+    double abovePercentIncrease = (1-dividers[upperBound])/(1-oldDividers[upperBound]);
 
-        //looping through before and after our chosen powerup and adjusting the border values
-        for (int i = 1; i < upperBound-1; i++) {
-            dividers[i] = (oldDividers[i]-oldDividers[i-1])*belowPercentIncrease+dividers[i-1];
-        }
-        for (int i = upperBound+1; i < 11; i++) {
-            dividers[i] = (oldDividers[i]-oldDividers[i-1])*abovePercentIncrease+dividers[i-1];
-        }
+    //looping through before and after our chosen powerup and adjusting the border values
+    for (int i = 1; i < upperBound-1; i++) {
+        dividers[i] = (oldDividers[i]-oldDividers[i-1])*belowPercentIncrease+dividers[i-1];
+    }
+    for (int i = upperBound+1; i < 11; i++) {
+        dividers[i] = (oldDividers[i]-oldDividers[i-1])*abovePercentIncrease+dividers[i-1];
     }
 }
 
