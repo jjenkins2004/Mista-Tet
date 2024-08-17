@@ -271,25 +271,27 @@ int main() {
         powerupcounter++;
 
         //checking if tet used a new power and acting accordingly
-        std::string power = tet->checkTetPower();
-        if (power == "level1") grid->increaseLevel(15);
-        else if (power == "level2") grid->increaseLevel(25);
-        else if (power == "blind1") grid->blind(GetRandomValue(5, 7));
-        else if (power == "blind2") grid->blind(GetRandomValue(8, 12));
-        else if (power == "zblock") grid->changeNext(5);
-        else if (power == "sblock") grid->changeNext(7);
-        else if (power == "turn") grid->randomRotate();
-        else if (power == "inputslow") slow = std::make_pair(true, GetRandomValue(60*20, 60*35));
-        else if (power == "inputdelay") delay = std::make_pair(true, GetRandomValue(60*20, 60*35)); 
-        else if (power == "slowanddelay") {
-            int rand = GetRandomValue(60*20, 60*35);
-            slow = std::make_pair(true, rand);
-            delay = std::make_pair(true, rand); 
-        }
-        else if (power == "flurry") {
-            grid->extremeRandomRotate();
-            score->addMultiplier(-1);
-            score->halfMultiplier();
+        std::vector<std::string> powers = tet->checkTetPower();
+        for (std::string power: powers) {
+            if (power == "level1") grid->increaseLevel(15);
+            else if (power == "level2") grid->increaseLevel(25);
+            else if (power == "blind1") grid->blind(GetRandomValue(5, 7));
+            else if (power == "blind2") grid->blind(GetRandomValue(8, 12));
+            else if (power == "zblock") grid->changeNext(5);
+            else if (power == "sblock") grid->changeNext(7);
+            else if (power == "turn") grid->randomRotate();
+            else if (power == "inputslow") slow = std::make_pair(true, GetRandomValue(60*20, 60*35));
+            else if (power == "inputdelay") delay = std::make_pair(true, GetRandomValue(60*20, 60*35)); 
+            else if (power == "slowanddelay") {
+                int rand = GetRandomValue(60*20, 60*35);
+                slow = std::make_pair(true, rand);
+                delay = std::make_pair(true, rand); 
+            }
+            else if (power == "flurry") {
+                grid->extremeRandomRotate();
+                score->addMultiplier(-1);
+                score->halfMultiplier();
+            }
         }
 
         //ask powerup class if there are any fast speedchange
@@ -323,7 +325,7 @@ int main() {
             if (slow.first) {
                 if (keysPressed >= 1) {
                     if (delay.first) {
-                        moveQueue.push_back(std::make_pair("right", 30));
+                        moveQueue.push_back(std::make_pair("right", 20));
                     }
                     else grid->moveRight();
                     keysPressed = 0;
@@ -331,7 +333,7 @@ int main() {
                 else ++keysPressed;
             }
             else if (delay.first) {
-                moveQueue.push_back(std::make_pair("right", 30));
+                moveQueue.push_back(std::make_pair("right", 20));
             }
             else grid->moveRight();
             horizontalcounter = slow.first? -14: -7;
@@ -340,7 +342,7 @@ int main() {
         //right arrow key held down
         else if (IsKeyDown(KEY_RIGHT)) {
             if (horizontalcounter >= (slow.first ? 20: 3)) {
-                if (delay.first) moveQueue.push_back(std::make_pair("right", 30));
+                if (delay.first) moveQueue.push_back(std::make_pair("right", 20));
                 else grid->moveRight();
                 horizontalcounter = 0;
             }
@@ -351,14 +353,14 @@ int main() {
         else if (IsKeyPressed(KEY_LEFT)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
-                    if (delay.first) moveQueue.push_back(std::make_pair("left", 30));
+                    if (delay.first) moveQueue.push_back(std::make_pair("left", 20));
                     else grid->moveLeft();
                     keysPressed = 0;
                 }
                 else ++keysPressed;
             }
             else if (delay.first) {
-                moveQueue.push_back(std::make_pair("left", 30));
+                moveQueue.push_back(std::make_pair("left", 20));
             }
             else grid->moveLeft();
             horizontalcounter = slow.first? -14: -7;
@@ -367,7 +369,7 @@ int main() {
         //left arrow key held down
         else if (IsKeyDown(KEY_LEFT)) {
              if (horizontalcounter >= (slow.first ? 20: 3)) {
-                if (delay.first) moveQueue.push_back(std::make_pair("left", 30));
+                if (delay.first) moveQueue.push_back(std::make_pair("left", 20));
                 else grid->moveLeft();
                 horizontalcounter = 0;
             }
@@ -378,7 +380,7 @@ int main() {
         if (IsKeyPressed(KEY_DOWN)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
-                    if (delay.first) moveQueue.push_back(std::make_pair("down", 30));
+                    if (delay.first) moveQueue.push_back(std::make_pair("down", 20));
                     else {
                         grid->moveDown();
                         checkRows = true;
@@ -388,7 +390,7 @@ int main() {
                 else ++keysPressed;
             }
             else if (delay.first) {
-                moveQueue.push_back(std::make_pair("down", 30));
+                moveQueue.push_back(std::make_pair("down", 20));
             }
             else {
                 grid->moveDown();
@@ -401,7 +403,7 @@ int main() {
         else if (IsKeyDown(KEY_DOWN)) {
             if (downcounter >= (slow.first ? 20: 3)) {
                 downcounter = 0;
-                if (delay.first) moveQueue.push_back(std::make_pair("down", 30));
+                if (delay.first) moveQueue.push_back(std::make_pair("down", 20));
                 else {
                     grid->moveDown();
                     checkRows = true;
@@ -413,7 +415,7 @@ int main() {
         //space bar to drop block
         else if (IsKeyPressed(KEY_SPACE)) {
             if (delay.first) {
-                moveQueue.push_back(std::make_pair("drop", 30));
+                moveQueue.push_back(std::make_pair("drop", 20));
             }
             else {
                 grid->drop();
@@ -427,14 +429,14 @@ int main() {
                 if (keysPressed >= 1) {
                     keysPressed = 0;
                     if (delay.first) {
-                        moveQueue.push_back(std::make_pair("rotate", 30));
+                        moveQueue.push_back(std::make_pair("rotate", 20));
                     }
                     else grid->rotate();
                 }
                 else ++keysPressed;
             }
             else if (delay.first) {
-                moveQueue.push_back(std::make_pair("rotate", 30));
+                moveQueue.push_back(std::make_pair("rotate", 20));
             }
             else grid->rotate();
             rotatecounter = slow.first? -14: -7;
@@ -443,7 +445,7 @@ int main() {
         else if (IsKeyDown(KEY_UP)) {
             if (rotatecounter >= (slow.first ? 30: 6)) {
                 rotatecounter = 0;
-                if (delay.first) moveQueue.push_back(std::make_pair("rotate", 30));
+                if (delay.first) moveQueue.push_back(std::make_pair("rotate", 20));
                 else {
                     grid->rotate();
                 }

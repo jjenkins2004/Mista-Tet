@@ -51,7 +51,7 @@ class Tet {
         int tetCutscene();
 
         //check if a tet power is activated
-        std::string checkTetPower();
+        std::vector<std::string> checkTetPower();
 
         //tet will turn to the side and look at the given corrdinates, if x coordinate is negative, will reset face back to facing forward
         void look(Vector2 coor);
@@ -81,6 +81,7 @@ class Tet {
     int time = 0;                                           //counter for time between dialogues
     bool finalStage = false, finalStart = false;            //determines if we should give the initial final stage dialogue and powers
     bool tetpowertoggle = false;                            //to determine if next dialogue should be a tetPower
+    double chanceForPower = 0.4;                            //if random num is less than this then power will happen
 
 
     //possible tet text that has no effect
@@ -134,6 +135,9 @@ class Tet {
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
     tetPower combo = {"A double dose of\ndevestation!", "combo"};                                               //combo power for tetpower1
 
+    //combo powerup function
+    void comboPowerup();
+
     //for the babie head powerup
     std::tuple<int, int, int> babies = std::make_tuple(0, 0, 0);                    //first int is num of babies, second is score lost if no succeed, third is frames to do it, last is texture of babie
     std::vector<Vector2> positions;                                                 //positions of our baby heads
@@ -149,7 +153,7 @@ class Tet {
     float tetFade2 = 0;                                                     //variable to keep track of tet texture fade
 
     //3 vector<tetPower> inside a vector which represents the three stages, progressively gets better powers
-    std::string currPower = "null";                                                                                                                             //current chosen power
+    std::vector<std::string> currPower;                                                                                                                           //current chosen power
     const std::vector<tetPower> tetPowers1 = {lessMultiplier, halfMultiplier, increaseLevel1, blind1, Zblock, Sblock, babies1, inputSlow, combo};               //stage 1 powers, starts at beginning
     const std::vector<tetPower> tetPowers2 = {halfMultiplier, negativeMultiplier, increaseLevel2, blind2, flip, Zblock, Sblock, babies2, inputDelay, combo};    //stage 2 powers, when score is greater than 50,000
     const std::vector<tetPower> finalPowers = {flurry, halfMultiplier, babies3, fly, flip, blind2, Zblock, Sblock, increaseLevel2, slowAndDelay, combo};        //final stage when score is greater than 90,000

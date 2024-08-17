@@ -1111,7 +1111,7 @@ void Grid::blind(int num) {
     for (int i = 1; i <= 20; i++) rows.push_back(i);
     for (int i = 0; i < num; i++) {
         std::vector<int>::iterator it = rows.begin()+GetRandomValue(0, rows.size()-1);
-        blindRows.push_back(std::make_tuple(*it, 1800, 0));
+        blindRows.push_back(std::make_tuple(*it, 900, 0));
         rows.erase(it);
     }
 }

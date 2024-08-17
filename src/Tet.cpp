@@ -145,12 +145,17 @@ void Tet::updateDialogue() {
         //determining whether this should be a tet power and generating a new dialogue
         if (time == timebetweenText) {
             stop = false;
+
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
-            int num = 5;
-            if (tetStage >= 3) num = 6;                             //later stages of the game make tet powers happen more often
-            if (finalStage) num = 7;
-            if (GetRandomValue(1, 10) <= num) {                     //determines whether the next dialogue from tet should be a tet power
+           
+            if (double(rand())/RAND_MAX <= chanceForPower) {        //determines whether the next dialogue from tet should be a tet power
+
+                //resetting chances
+                if (tetStage >= 3) chanceForPower = 0.5;
+                else if (finalStage) chanceForPower = 0.6;
+                else chanceForPower = 0.4;
+
                 tetpowertoggle = true;
                 if (finalStart) {
                     //initial final stage flurry of powers
@@ -162,6 +167,7 @@ void Tet::updateDialogue() {
                 }
             }
             else {
+                chanceForPower+=0.05;           //increase chance for tetPower if it didn't happen
                 std::vector<int>::iterator it = vals.begin()+GetRandomValue(0, vals.size()-1);
                 txtIndex = *it;
                 vals.erase(it);
@@ -824,7 +830,56 @@ void Tet::usePower(tetPower p) {
     else if (p.power == "fly") {
         flying = true;
     }
-    else currPower = p.power;
+    else if (p.power == "combo") {
+        comboPowerup();
+    }
+    else currPower.push_back(p.power);
+}
+
+void Tet::comboPowerup() {
+    int random = GetRandomValue(1, 3);          //3 possible combos from each stage that are all equally likely to be chosen
+    if (finalStage) {                           //final stage combo power
+        if (random == 1) {
+            usePower(fly);
+            usePower(flip);
+        }
+        else if (random == 2) {
+            usePower(blind2);
+            usePower(fly);
+        }
+        else {
+            usePower(slowAndDelay);
+            usePower(flip);
+        }
+    }
+    else if (tetStage <= 2) {                   //stage 1 combo power
+        if (random == 1) {
+            usePower(inputSlow);
+            usePower(increaseLevel1);
+        }
+        else if (random == 2) {
+            usePower(increaseLevel1);
+            usePower(babies1);
+        }
+        else {
+            usePower(blind1);
+            usePower(babies1);
+        }
+    }
+    else {                                      //stage 2 combo power
+        if (random == 1) {
+            usePower(inputDelay);
+            usePower(increaseLevel2);
+        }
+        else if (random == 2) {
+            usePower(blind2);
+            usePower(flip);
+        }
+        else {
+            usePower(flip);
+            usePower(babies2);
+        }
+    }
 }
 
 void Tet::tetTalk(bool wait) {
@@ -924,9 +979,9 @@ void Tet::tetBob() {
     }   
 }
 
-std::string Tet::checkTetPower() {
-    std::string temp = currPower;
-    currPower = "none";
+std::vector<std::string> Tet::checkTetPower() {
+    std::vector<std::string> temp = currPower;
+    currPower.clear();
     return temp;
 }
 
