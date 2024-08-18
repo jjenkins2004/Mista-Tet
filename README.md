@@ -10,7 +10,10 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 
 ### How to Install
 
-1. download this repository (click on the green code button dropdown and download zip)
+1. download this repository
+- click the green code button dropdown at the top of the github page
+- click download zip
+- extract zip file
 2. open bin folder
 3. run the executable file for your system, MistaTet_win for Windows or MistaTet_mac for Mac
 
@@ -27,6 +30,7 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 | **C**          | Hold current block                 |
 | **1, 2, 3**    | Use power-ups in corresponding slot|
 | **P**          | Open pause menu                    |
+|**ESC**         | Exit game                          |
 
 ---
 
