@@ -26,7 +26,6 @@ PowerupItem::PowerupItem(std::string i, Texture2D txt, int t): id(i), time(t) {
 
 PowerupItem::~PowerupItem() {
     if (id != "null") {
-        if (id == "mystery") std::cout << "\n\nmystery unloaded \n\n" << std::endl;
         UnloadTexture(texture);
     }
 }
