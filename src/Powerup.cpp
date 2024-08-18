@@ -426,7 +426,7 @@ void Powerup::drawPowerupItems() {
                     if (temp->curr->id == "multiplier" && !temp->curr->positive) {          //we don't need to add bad multipliers to the collected powers, effects are realized immediately
                         sound().play("resources/audio/debuff.mp3");
                         Multiplier* m = dynamic_cast<Multiplier*>(temp->curr);
-                        if (m->multiplier == 0.7) src->addPermanentMultiplier(0.02);        //gives small permanent multiplier
+                        if (m->multiplier == 0.7) src->addPermanentMultiplier(0.025);        //gives small permanent multiplier
                         if (m->multiplier == -1) src->addPermanentMultiplier(0.05);
                         src->addMultiplier(m->multiplier);
                     }
@@ -442,7 +442,7 @@ void Powerup::drawPowerupItems() {
                     else if (temp->curr->id == "speedchange" && !temp->curr->positive) {    //immediately give the debuff of faster speed
                         SpeedChange* s = dynamic_cast<SpeedChange*>(temp->curr);
                         fastSpeed.push_back(std::make_pair(s->variant == 1 ? 0.8: 0.65, 1800));
-                        src->addMultiplier(s->variant == 1 ? 1.3: 1.5);                     //trade off, gives multiplier
+                        src->addMultiplier(s->variant == 1 ? 1.5: 2);                       //trade off, gives multiplier
                     }
                     else {                                                                  //no special conditions for this powerup, so add it the player powerup holder
                         for (int i = 0; i < 3; i++) {                                       //iterate through 3 slots and check if there is an open space

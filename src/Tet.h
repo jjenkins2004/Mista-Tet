@@ -133,7 +133,7 @@ class Tet {
     tetPower slowAndDelay = {"Oh yeah, it's gonna be\nfun watching you struggle.", "slowanddelay"};             //delay and slow input
     tetPower fly = {"GOODBYE!!!!", "fly"};                                                                      //flies towards grid and destroys blocks in way, blocks that are destroyed decrease points
     tetPower flurry = {"AAAAAAAAAAAAAEEEEEHHH\nHHHHHHHHHHHHHHHHHH!", "flurry"};                                 //power at the start of final stage: extreme flip, giant block, and negative multiplier all at once
-    tetPower combo = {"A double dose of\ndevestation!", "combo"};                                               //combo power for tetpower1
+    tetPower combo = {"Time to combo things\nup.", "combo"};                                                    //combo power
 
     //combo powerup function
     void comboPowerup();
