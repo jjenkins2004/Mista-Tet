@@ -12,6 +12,7 @@ COMPILER_WIN = g++
 SOURCE_LIBS_WIN = -I lib/
 WIN_OPT = -std=c++17 -L lib/ -lraylib_win -lopengl32 -lgdi32 -lwinmm
 WIN_OUT = -o "bin/MistaTet_Win.exe"
+WIN_STATIC = -static
 
 # macOS build target
 mac: 
@@ -19,4 +20,4 @@ mac:
 
 # Windows build target
 win:
-	$(COMPILER_WIN) $(CFILES) $(SOURCE_LIBS_WIN) $(WIN_OUT) $(WIN_OPT)
+	$(COMPILER_WIN) $(CFILES) $(SOURCE_LIBS_WIN) $(WIN_OUT) $(WIN_OPT) $(WIN_STATIC)
