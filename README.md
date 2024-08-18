@@ -10,7 +10,7 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 
 ### How to Install
 
-1. fork/download this repository
+1. clone/download this repository
 2. open bin folder
 3. run the executable file for your system, MistaTet_win for Windows or MistaTet_mac for Mac
 
