@@ -10,6 +10,8 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 
 ### How to Install
 
+*works on apple chip macs and x64 windows computers*
+
 1. download this repository
 - click the green code button dropdown at the top of the github page
 - click download zip
@@ -23,11 +25,11 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 
 | Key(s)         | Action                             |
 |----------------|------------------------------------|
-| **← →**        | Move left and right                |
-| **↑**          | Rotate block                       |
-| **↓**          | Move downward                      |
+| **← → or A D** | Move left and right                |
+| **↑ or W**     | Rotate block                       |
+| **↓ or S**     | Move downward                      |
 | **␣**          | Drop block                         |
-| **C**          | Hold current block                 |
+| **Left Shift** | Hold current block                 |
 | **1, 2, 3**    | Use power-ups in corresponding slot|
 | **P**          | Open pause menu                    |
 |**ESC**         | Exit game                          |
