@@ -321,7 +321,7 @@ int main() {
 
 
         //right arrow key to move right
-        if (IsKeyPressed(KEY_RIGHT)) {
+        if (IsKeyPressed(KEY_RIGHT) || IsKeyPressed(KEY_D)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
                     if (delay.first) {
@@ -340,7 +340,7 @@ int main() {
         }
 
         //right arrow key held down
-        else if (IsKeyDown(KEY_RIGHT)) {
+        else if (IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) {
             if (horizontalcounter >= (slow.first ? 20: 3)) {
                 if (delay.first) moveQueue.push_back(std::make_pair("right", 20));
                 else grid->moveRight();
@@ -350,7 +350,7 @@ int main() {
         }
 
         //left arrow key to move left
-        else if (IsKeyPressed(KEY_LEFT)) {
+        else if (IsKeyPressed(KEY_LEFT) || IsKeyPressed(KEY_A)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
                     if (delay.first) moveQueue.push_back(std::make_pair("left", 20));
@@ -367,7 +367,7 @@ int main() {
         }
 
         //left arrow key held down
-        else if (IsKeyDown(KEY_LEFT)) {
+        else if (IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) {
              if (horizontalcounter >= (slow.first ? 20: 3)) {
                 if (delay.first) moveQueue.push_back(std::make_pair("left", 20));
                 else grid->moveLeft();
@@ -377,7 +377,7 @@ int main() {
         }
 
         //down arrow key to move down
-        if (IsKeyPressed(KEY_DOWN)) {
+        if (IsKeyPressed(KEY_DOWN) || IsKeyPressed(KEY_S)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
                     if (delay.first) moveQueue.push_back(std::make_pair("down", 20));
@@ -400,7 +400,7 @@ int main() {
         }
 
         //down arrow key held down 
-        else if (IsKeyDown(KEY_DOWN)) {
+        else if (IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) {
             if (downcounter >= (slow.first ? 20: 3)) {
                 downcounter = 0;
                 if (delay.first) moveQueue.push_back(std::make_pair("down", 20));
@@ -424,7 +424,7 @@ int main() {
         }
 
         //up arrow key to rotate block
-        if (IsKeyPressed(KEY_UP)) {
+        if (IsKeyPressed(KEY_UP) || IsKeyPressed(KEY_W)) {
             if (slow.first) {
                 if (keysPressed >= 1) {
                     keysPressed = 0;
@@ -442,7 +442,7 @@ int main() {
             rotatecounter = slow.first? -14: -7;
         }
 
-        else if (IsKeyDown(KEY_UP)) {
+        else if (IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) {
             if (rotatecounter >= (slow.first ? 30: 6)) {
                 rotatecounter = 0;
                 if (delay.first) moveQueue.push_back(std::make_pair("rotate", 20));
@@ -454,7 +454,7 @@ int main() {
         }
 
         //C key to hold current block
-        if (IsKeyPressed(KEY_C)) grid->hold();
+        if (IsKeyPressed(KEY_LEFT_SHIFT)) grid->hold();
 
         //pause menu
         if (IsKeyPressed(KEY_P)) {
