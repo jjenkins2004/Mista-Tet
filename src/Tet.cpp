@@ -149,7 +149,7 @@ void Tet::updateDialogue() {
             //choosing which text we should put on screen
             if (vals.size() == 0) for (int i = 0; i < 20; i++) vals.push_back(i);
            
-            if (double(rand())/RAND_MAX <= chanceForPower) {        //determines whether the next dialogue from tet should be a tet power
+            if (double(rand())/RAND_MAX <= chanceForPower || finalStart) {        //determines whether the next dialogue from tet should be a tet power
 
                 //resetting chances
                 if (tetStage >= 3) chanceForPower = 0.5;

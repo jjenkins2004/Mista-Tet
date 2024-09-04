@@ -96,6 +96,8 @@ int main() {
             downcounter = 0;
             scenePlayed = false;
 
+            score->addScore(89000);
+
             //bringing up our start menu
             if (menu() == -1) break;
             start = false;

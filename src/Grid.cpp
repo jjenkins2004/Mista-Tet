@@ -946,10 +946,10 @@ int Grid::bomb() {
         updateAll();
         camera = cameraMain;
         if (counter1 <= 150) {
-            if (IsKeyDown(KEY_RIGHT) && pos.x + 5 < 500) pos.x+=5;
-            if (IsKeyDown(KEY_LEFT) && pos.x - 5 > 200) pos.x-=5;
-            if (IsKeyDown(KEY_DOWN) && pos.y + 5 < 700) pos.y+=5;
-            if (IsKeyDown(KEY_UP) && pos.y - 5 > 100) pos.y-=5;
+            if ((IsKeyDown(KEY_RIGHT) || IsKeyDown(KEY_D)) && pos.x + 5 < 500) pos.x+=5;
+            if ((IsKeyDown(KEY_LEFT) || IsKeyDown(KEY_A)) && pos.x - 5 > 200) pos.x-=5;
+            if ((IsKeyDown(KEY_DOWN) || IsKeyDown(KEY_S)) && pos.y + 5 < 700) pos.y+=5;
+            if ((IsKeyDown(KEY_UP) || IsKeyDown(KEY_W)) && pos.y - 5 > 100) pos.y-=5;
             if (counter1 >= 20) tet->look({pos.x, pos.y});
             BeginDrawing();
                 BeginMode2D(camera);
