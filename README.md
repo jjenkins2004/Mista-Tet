@@ -12,6 +12,8 @@ Try to get your score to 100,000 as fast as possible to defeat Tet.
 
 *works on apple chip macs and x64 windows computers*
 
+Note: windows version is outdated currently
+
 1. download this repository
 - click the green code button dropdown at the top of the github page
 - click download zip
